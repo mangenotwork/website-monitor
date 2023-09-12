@@ -1,0 +1,27 @@
+# app相关基础信息
+app:
+  name: "中趣网络站点监测平台"
+  runType: "dev"
+
+# http服务
+httpServer:
+  open: true
+  prod: 18888
+
+# udp服务
+udpServer:
+  open: true
+  prod: 18889
+
+# user
+user:
+  -
+    name: "admin"
+    password: "123"
+
+# jwt设置
+jwt:
+  secret: "small-website-monitor20230808"
+  expire: 86400
+
+logPath: "./log/"
