@@ -17,7 +17,7 @@ func main() {
 	go udpServer.RunUDPServer()
 
 	// 启动 https servers
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	server := &http.Server{
 		Addr:           ":" + conf.Conf.Default.HttpServer.Prod,
 		Handler:        routers.Routers(),

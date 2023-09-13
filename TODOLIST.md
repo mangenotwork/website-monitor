@@ -1,4 +1,6 @@
-- master 登录
+- master 登录  ok
+- master 邮件 
+- master 设计"网站"实体 
 - master 添加网站
 - master 任务表
 - monitor 每次启动拉一次监测任务表
