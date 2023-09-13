@@ -21,6 +21,7 @@ func Routers() *gin.Engine {
 	Router.Use(gzip.Gzip(gzip.DefaultCompression))
 	Router.StaticFS("/static", http.Dir("./static"))
 	Router.Delims("{[", "]}")
+	Svg()
 	Router.LoadHTMLGlob("views/**/*")
 	Login()
 	Page()
