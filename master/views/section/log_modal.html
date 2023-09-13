@@ -1,0 +1,59 @@
+<!-- 查看监控日志 -->
+<div class="modal modal-xl fade" id="logModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">监控日志</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <select class="form-select" v-model="monitorLog.log">
+                        <template v-for="item in monitorLog.logList">
+                            <option v-bind:value="item">{{ item }}</option>
+                        </template>
+                    </select>
+                    <label class="input-group-text" @click="uploadLog()">下载日志</label>
+                </div>
+                <hr>
+                当前日志:
+                <div style="height: 520px; overflow: auto;">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">类型</th>
+                            <th scope="col">时间</th>
+                            <th scope="col">站点</th>
+                            <th scope="col">监测类型</th>
+                            <th scope="col">监测URI</th>
+                            <th scope="col">状态码</th>
+                            <th scope="col">响应时间</th>
+                            <th scope="col">Ping时间</th>
+                            <th scope="col">对照组响应时间</th>
+                            <th scope="col">监测结果</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="item in monitorLog.data">
+                            <tr>
+                                <td>{{ item.LogType }}</td>
+                                <td>{{ item.Time }}</td>
+                                <td>{{ item.Host }}</td>
+                                <td>{{ item.UriType }}</td>
+                                <td>{{ item.Uri }}</td>
+                                <td>{{ item.UriCode }}</td>
+                                <td>{{ item.UriMs }} ms</td>
+                                <td>{{ item.PingMs }} ms</td>
+                                <td>{{ item.ContrastUriMs }} ms</td>
+                                <td>{{ item.Msg }}</td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>

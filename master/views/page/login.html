@@ -1,0 +1,19 @@
+{[ template "__start__.html" . ]}
+<body class="body-signin">
+    <main class="form-signin w-100 m-auto">
+        <h3 class="h3 mb-3 fw-normal">{[ .Title ]}</h3>
+        <form action="/login" method="post">
+            {[ .csrf ]}
+            <div class="form-floating">
+                <input type="text" class="form-control" id="user" name="user" placeholder="name">
+                <label for="user">账号</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control" id="password" name="password" placeholder="password">
+                <label for="password">密码</label>
+            </div>
+            <button class="w-100 btn btn-lg btn-dark" type="submit">登录</button>
+        </form>
+    </main>
+</body>
+{[ template "__end__.html" . ]}

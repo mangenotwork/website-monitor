@@ -1,0 +1,71 @@
+<!-- 添加站点监测 modal fade modal-lg   -->
+<div class="modal fade" id="addHostModal"  tabindex="-1" aria-labelledby="addHostModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addHostModalLabel">添加站点监测</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">站点 <span style="color: red;">*</span></label>
+                    <div class="col-sm-8">
+                        <input type="text" v-model="addWebSite.param.host" class="form-control" >
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">根URI,首页,入口页 <span style="color: red;">*</span></label>
+                    <div class="col-sm-8">
+                        <input type="text" v-model="addWebSite.param.healthUri" class="form-control">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">监测频率 <span style="color: red;">*</span></label>
+                    <div class="col-sm-8">
+                        <input type="text" v-model="addWebSite.param.rate" class="form-control">
+                    </div>
+                    <div class="form-text">单位秒</div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">超时报警 <span style="color: red;">*</span></label>
+                    <div class="col-sm-8">
+                        <input type="text" v-model="addWebSite.param.alarmResTime" class="form-control" >
+                    </div>
+                    <div class="form-text">请求响应超过这个时间会报警，单位ms</div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">采集站点深度</label>
+                    <div class="col-sm-8">
+                        <input type="text" v-model="addWebSite.param.uriDepth" class="form-control" >
+                    </div>
+                    <div class="form-text">用于抓取站点的URI</div>
+                </div>
+                <p>当前默认勾选并启用以下功能</p>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" checked disabled>
+                    <label class="form-check-label" >启用死链检测(1小时次)</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" checked disabled>
+                    <label class="form-check-label" >启用TDK检测</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" checked disabled>
+                    <label class="form-check-label" >启用随机URI检测</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" checked disabled>
+                    <label class="form-check-label" >TODO 外链检查</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" checked disabled>
+                    <label class="form-check-label" >TODO 证书检查</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <a type="button" class="btn btn-primary" @click="addWebSiteMonitor()">提交</a>
+            </div>
+        </div>
+    </div>
+</div>

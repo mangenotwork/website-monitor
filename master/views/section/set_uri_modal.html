@@ -1,0 +1,32 @@
+<!-- 设置监测点 -->
+<div class="modal modal-lg fade" id="setUriModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setUriModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="setUriModalLabel">设置监测点</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text" id="basic-addon3">{{ point.hostUri }}</span>
+                        <input type="text" class="form-control" v-model="point.nowUri" aria-describedby="basic-addon3">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-light" @click="addUriPoint">确认添加监测点</button>
+                <br>
+                <hr>
+                <ul class="list-group list-group-flush" style="height: 360px; overflow: auto;">
+                    <template v-for="item in point.uriList">
+                        <li class="list-group-item list-group-item-action">
+                            <span>{{ item }}</span>
+                            <a @click="delUriPoint(item)" style="float: right;"><img src="/static/bootstrap/img/trash-fill.svg" alt="" width="18" height="18"></a>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+<!-- 设置报警 -->
+<div class="modal fade" id="setAlertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="setAlertModalLabel">{{ editWebsiteConf.host }} 监测设置</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" v-model="editWebsiteConf.param.rate" placeholder="smtp.qq.com">
+                    <label>监测频率</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" v-model="editWebsiteConf.param.alarmResTime" placeholder="smtp.qq.com">
+                    <label>超时报警</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" v-model="editWebsiteConf.param.uriDepth" placeholder="smtp.qq.com">
+                    <label>采集站点深度</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" @click="editWebsiteConfSubmit()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>

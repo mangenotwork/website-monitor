@@ -1,0 +1,5 @@
+- master 登录
+- master 添加网站
+- master 任务表
+- monitor 每次启动拉一次监测任务表
+- master 获取monitor在线情况

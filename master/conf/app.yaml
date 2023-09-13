@@ -1,6 +1,6 @@
 # app相关基础信息
 app:
-  name: "中趣网络站点监测平台"
+  name: "Website Monitor"
   runType: "dev"
 
 # http服务
@@ -21,7 +21,8 @@ user:
 
 # jwt设置
 jwt:
-  secret: "small-website-monitor20230808"
+  secret: "website-monitor"
   expire: 86400
 
+# 存放监测日志的路径
 logPath: "./log/"

@@ -1,0 +1,33 @@
+<!-- 报警详情 -->
+<div class="modal modal-lg fade" id="alertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">报警详情</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="height: 520px; overflow: auto;">
+                    <template v-if="websiteAlert.len==0">
+                        <div class="alert alert-success" role="alert">
+                            暂无任何报警，站点运行正常，持续监测中...
+                        </div>
+                    </template>
+                    <template v-else>
+                        <template v-for="item in websiteAlert.list">
+                            <div class="alert alert-danger" role="alert" style="width: 98%;">
+                                <p>{{ item.Date }} <a :href="item.Uri" class="alert-link" target=_blank>{{ item.Uri }}</a>{{ item.Msg }} ;</p>
+                                <span>[监测值=> 状态码:{{ item.UriCode }};响应:{{ item.UriMs }}] |
+                                                    [对照组:{{ item.ContrastUriMs }};ping:{{ item.PingMs }}]</span>
+                                <button type="button" class="btn btn-link">添加到误报（TODO）</button>
+                                <button type="button" class="btn btn-link" @click="delAlert(item.Date, item.Uri)">删除报警</button>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>

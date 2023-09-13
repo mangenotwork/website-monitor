@@ -1,0 +1,144 @@
+{[ template "__start__.html" . ]}
+<body>
+    <div id="app">
+        {[ template "__header__.html" . ]}
+        <div class="container-fluid">
+            <div class="row">
+                {[ template "__menu__.html" . ]}
+                <main class="col-md-9 ms-sm-auto col-lg-11 px-md-4">
+
+                    <template v-if="hasMail.data===false">
+                        <div class="alert alert-danger" role="alert">
+                            <a aria-current="page" data-bs-toggle="modal" data-bs-target="#mailSetModal">还未设置邮件通知! 请点击 <span style="text-decoration:underline;">邮件设置</span> 进行设置</a>
+                        </div>
+                    </template>
+                    <div class="row" style="margin-bottom: 24px;">
+                        <div class="col">
+                            <div class="card box">
+                                <div class="card-header">网站监测报警通知
+                                    <template v-if="alertList.len !== 0">
+                                        <span class="badge text-bg-danger">{{ alertList.len }}</span>
+                                    </template>
+                                    <img src="/static/bootstrap/img/record-circle-fill.svg" @click="alertClear" style="float: right;" alt="" width="18" height="18">
+                                </div>
+                                <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
+                                    <ul class="list-group list-group-flush">
+                                        <template v-if="alertList.len === 0"><p style="text-align: center;">占无报警通知</p></template>
+                                        <template v-else>
+                                            <template v-for="item in alertList.list">
+                                                <li class="list-group-item list-group-item-action"><span>{{item}}</span></li>
+                                            </template>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card box">
+                                <div class="card-header">监测器列表
+                                    <template v-if="monitorErrList.len !== 0">
+                                        <span class="badge text-bg-warning">{{ monitorErrList.len }}</span>
+                                    </template>
+                                </div>
+                                <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
+                                    <ul class="list-group list-group-flush">
+                                        <template v-if="monitorErrList.len === 0"><p style="text-align: center;">占无监测器在线,请部署监测器</p></template>
+                                        <template v-else>
+                                            <template v-for="item in monitorErrList.list">
+                                                <li class="list-group-item list-group-item-action"><span>{{item}}</span></li>
+                                            </template>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addHostModal">添加网站进行监测</button>
+                    </div>
+                    <div style="margin-top: 1.2rem;padding: 0px;">
+                        <div class="box" style="height: 420px; overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
+                            <table class="table table-hover">
+                                <thead style="z-index: 99;">
+                                <tr>
+                                    <th scope="col">网站</th>
+                                    <th scope="col">报警</th>
+                                    <th scope="col">监测方式</th>
+                                    <th scope="col">根URI</th>
+                                    <th scope="col">状态码</th>
+                                    <th scope="col">响应</th>
+                                    <th scope="col">Ping</th>
+                                    <th scope="col">对照组</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="item in websiteList.data.List">
+                                    <tr>
+                                        <td><a @click="openAlert(item.ID)"><span style="font-size: 14px;"><b>{{ item.Host }}</b></span></a></td>
+                                        <td>
+                                            <template v-if="item.AlertCount>0">
+                                                <a @click="openAlert(item.ID)"><span class="badge text-bg-danger">报警: {{ item.AlertCount }}</span></a>
+                                            </template>
+                                            <template v-else><span class="badge text-bg-success">Passed</span></template>
+                                        </td>
+                                        <td><span style="font-size: 10px;">根URI+随机URI+监测点/{{ item.Rate }}s</span></td>
+                                        <td><span style="font-size: 10px;">{{ item.HealthUri }}</span></td>
+                                        <td>{{ item.Code }}</td>
+                                        <td>{{ item.Ms }}ms</td>
+                                        <td>{{ item.PingMs }}ms</td>
+                                        <td>{{ item.ContrastMs }}ms</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="openEditWebsiteConf(item)">
+                                                    <img src="/static/bootstrap/img/gear-fill.svg" alt="" width="18" height="18">
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="openWebsiteInfo(item.ID)">
+                                                    <img src="/static/bootstrap/img/house-fill.svg" alt="" width="18" height="18">
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="setUriPoint(item)">
+                                                    <img src="/static/bootstrap/img/broadcast.svg" alt="" width="18" height="18">
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="logShow(item.ID)">
+                                                    <img src="/static/bootstrap/img/file-text-fill.svg" alt="" width="18" height="18">
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="openChart(item)">
+                                                    <img src="/static/bootstrap/img/graph-up.svg" alt="" width="18" height="18">
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="deleteWebsiteOpen(item)">
+                                                    <img src="/static/bootstrap/img/trash-fill.svg" alt="" width="18" height="18">
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {[ template "add_host_modal.html" . ]}
+                    {[ template "set_alert_modal.html" . ]}
+                    {[ template "set_uri_modal.html" . ]}
+                    {[ template "mail_set_modal.html" . ]}
+                    {[ template "website_info_modal.html" . ]}
+                    {[ template "log_modal.html" ]}
+                    {[ template "isok_modal.html" ]}
+                    {[ template "chart_modal.html" ]}
+                    {[ template "alert_modal.html" ]}
+                    {[ template "toast.html" ]}
+                </main>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="/static/bootstrap/js/bootstrap.bundle.min.js?v=1"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script type="module" src="/static/js/public.js?v={[ .timeStamp ]}"></script>
+<script type="module" src="/static/js/home.js?v={[ .timeStamp ]}"></script>
+{[ template "__end__.html" . ]}

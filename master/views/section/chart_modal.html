@@ -1,0 +1,37 @@
+<!-- 图表 -->
+<div class="modal modal-lg fade" id="chartModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" >图表</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="myChart" style="margin:auto;width: 720px;height: 420px;"></div>
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">筛选日期</label>
+                        <select class="form-select" v-model="chartData.selectDay">
+                            <template v-for="item in chartData.dayList">
+                                <option v-bind:value="item">{{ item }}</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">筛选监控类型</label>
+                        <select class="form-select" v-model="chartData.selectUriType">
+                            <template v-for="item in chartData.uriType">
+                                <option v-bind:value="item.value">{{ item.name }}</option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+                <br>
+                <button type="button" class="btn btn-secondary" @click="loadingChart()">加载图表</button>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>

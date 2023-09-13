@@ -1,0 +1,65 @@
+<nav id="sidebarMenu" class="col-md-1 col-lg-1 d-md-block bg-light sidebar collapse">
+    <div class="position-sticky pt-3 sidebar-sticky">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link
+                {[ if eq .nav "home" ]} active {[ end ]}
+                " href="/home">
+                <img src="/static/bootstrap/img/speedometer2.svg" alt="" width="16" height="16">
+                <span style="font-size: 14px;"> 面板</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link
+                {[ if eq .nav "monitor" ]} active {[ end ]}
+                " href="/monitor">
+                <img src="/static/bootstrap/img/display.svg" alt="" width="16" height="16">
+                <span style="font-size: 14px;"> 监测器</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link
+                {[ if eq .nav "tool" ]} active {[ end ]}
+                " href="/tool">
+                <img src="/static/bootstrap/img/tools.svg" alt="" width="14" height="14">
+                <span style="font-size: 14px;"> 工具</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link
+                {[ if eq .nav "tool" ]} active {[ end ]}
+                " href="/tool">
+                <span style="font-size: 14px;">接口测试</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link
+                {[ if eq .nav "tool" ]} active {[ end ]}
+                " href="/tool">
+                <span style="font-size: 14px;">压力测试</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link
+                {[ if eq .nav "tool" ]} active {[ end ]}
+                " href="/tool">
+                <span style="font-size: 14px;">渗透测试</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link
+                {[ if eq .nav "operation" ]} active {[ end ]}
+                " href="/operation">
+                <span style="font-size: 14px;">操作日志</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link
+                {[ if eq .nav "instructions" ]} active {[ end ]}
+                " href="/instructions">
+                <span style="font-size: 14px;">使用说明</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
