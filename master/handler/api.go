@@ -104,3 +104,11 @@ func MailSendTest(c *ginHelper.GinCtx) {
 	c.APIOutPut("", "测试邮件已发送请注意查收!")
 	return
 }
+
+func GetSSLCertificate(c *ginHelper.GinCtx) {
+	caseUrl := c.GetQuery("url")
+	log.Info(caseUrl)
+	data, _ := dao.GetCertificateInfo(caseUrl)
+	c.APIOutPut(data, "")
+	return
+}
