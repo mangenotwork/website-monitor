@@ -1,7 +1,8 @@
 - master 登录  ok
-- master 邮件 
-- master 设计"网站"实体 
+- master 邮件 ok
+- master 设计"网站" 实体 
 - master 添加网站
+- master 获取网站基础信息
 - master 任务表
 - monitor 每次启动拉一次监测任务表
 - master 获取monitor在线情况

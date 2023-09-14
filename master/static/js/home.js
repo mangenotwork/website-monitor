@@ -28,7 +28,7 @@ const app = createApp({
             },
             hasMail: {
                 api: "/api/mail/init",
-                data: false,
+                data: true,
             },
             mailConf: {
                 api: "/api/mail/conf",
@@ -125,13 +125,13 @@ const app = createApp({
         t.getMailInfo();
         t.getAlertList();
         t.getMonitorErrList();
-        t.timer = window.setInterval(() => {
-            t.getList();
-        }, 10000);
+        // t.timer = window.setInterval(() => {
+        //     t.getList();
+        // }, 10000);
     },
     destroyed:function () {
         let t = this;
-        window.clearInterval(t.timer);
+        // window.clearInterval(t.timer);
     },
     methods: {
         addWebSiteMonitor: function () {
@@ -222,11 +222,7 @@ const app = createApp({
         getMailInfo: function () {
             let t = this;
             common.AjaxGet(t.mailInfo.api, function (data){
-                t.mailConf.param.host = data.data.Host;
-                t.mailConf.param.port = data.data.Port;
-                t.mailConf.param.from = data.data.From;
-                t.mailConf.param.authCode = data.data.AuthCode;
-                t.mailConf.param.toList = data.data.ToList;
+                t.mailConf.param = data.data;
             });
         },
         mailSendTest: function () {

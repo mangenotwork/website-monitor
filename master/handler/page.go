@@ -1,12 +1,14 @@
 package handler
 
 import (
+	"net/http"
+
+	"website-monitor/master/constname"
+
 	"github.com/gin-gonic/gin"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/ginHelper"
 	"github.com/mangenotwork/common/utils"
-	"net/http"
-	"website-monitor/master/constname"
 )
 
 func ginH(h gin.H) gin.H {

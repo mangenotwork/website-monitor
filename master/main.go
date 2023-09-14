@@ -6,13 +6,14 @@ import (
 	"github.com/mangenotwork/common/log"
 	"net/http"
 	"time"
+	"website-monitor/master/dao"
 	"website-monitor/master/routers"
 	"website-monitor/master/udpServer"
 )
 
 func main() {
 	conf.InitConf("./conf/")
-
+	dao.DB.Init()
 	// 启动 udp servers
 	go udpServer.RunUDPServer()
 

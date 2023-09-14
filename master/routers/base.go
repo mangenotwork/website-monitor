@@ -1,14 +1,16 @@
 package routers
 
 import (
+	"net/http"
+
+	"website-monitor/master/constname"
+	"website-monitor/master/handler"
+
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/ginHelper"
 	"github.com/mangenotwork/common/utils"
-	"net/http"
-	"website-monitor/master/constname"
-	"website-monitor/master/handler"
 )
 
 var Router *gin.Engine
@@ -47,6 +49,12 @@ func Page() {
 }
 
 func API() {
+	api := Router.Group("/api").Use(AuthAPI())
+	api.GET("/out", handler.Out)
+	api.GET("/mail/init", ginHelper.Handle(handler.MailInit))          // 是否设置邮件
+	api.POST("/mail/conf", ginHelper.Handle(handler.MailConf))         // 设置邮件配置
+	api.GET("/mail/info", ginHelper.Handle(handler.MailInfo))          // 获取邮件配置信息
+	api.POST("/mail/sendTest", ginHelper.Handle(handler.MailSendTest)) // 测试发生邮件
 }
 
 // AuthPG 权限验证中间件
