@@ -137,5 +137,7 @@ func DNSLookUpAll(c *ginHelper.GinCtx) {
 
 func Whois(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
-	dao.Whois(host)
+	data := dao.Whois(host)
+	c.APIOutPut(data, "")
+	return
 }

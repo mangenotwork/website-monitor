@@ -1,68 +1,60 @@
-<nav id="sidebarMenu" class="col-md-1 col-lg-1 d-md-block bg-light sidebar collapse">
+<nav id="sidebarMenu" class="col-md-1 col-lg-2 d-md-block sidebar collapse">
     <div class="position-sticky pt-3 sidebar-sticky">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link
-                {[ if eq .nav "home" ]} active {[ end ]}
-                " href="/home">
-                {[ SVG "display" 16 16 ]}
-                <span style="font-size: 14px;"> 面板</span>
+                <a class="nav-link" href="/home">
+                    <div class='{[ if eq .nav "home" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "display" 16 16 ]} <span>面板</span>
+                    </div>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link
-                {[ if eq .nav "monitor" ]} active {[ end ]}
-                " href="/monitor">
-                {[ SVG "speedometer2" 16 16 ]}
-                <span style="font-size: 14px;"> 监测器</span>
+                <a class="nav-link" href="/monitor">
+                    <div class='{[ if eq .nav "monitor" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "speedometer2" 16 16 ]} <span>监测器</span>
+                    </div>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link
-                {[ if eq .nav "tool" ]} active {[ end ]}
-                " href="/tool">
-                {[ SVG "tools" 16 16 ]}
-                <span style="font-size: 14px;"> 工具</span>
+                <a class="nav-link">
+                    <div class='{[ if eq .nav "tool" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "tools" 16 16 ]} <span>工具</span>
+                    </div>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link
-                {[ if eq .nav "tool" ]} active {[ end ]}
-                " href="/tool">
-                {[ SVG "bug-fill" 16 16 ]}
-                <span style="font-size: 14px;"> 接口测试</span>
+                <a class="nav-link">
+                    <div class='{[ if eq .nav "api-test" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "bug-fill" 16 16 ]} <span>接口测试</span>
+                    </div>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link
-                {[ if eq .nav "tool" ]} active {[ end ]}
-                " href="/tool">
-                {[ SVG "bug-fill" 16 16 ]}
-                <span style="font-size: 14px;"> 压力测试</span>
+                <a class="nav-link">
+                    <div class='{[ if eq .nav "yali-test" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "bug-fill" 16 16 ]} <span>压力测试</span>
+                    </div>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link
-                {[ if eq .nav "tool" ]} active {[ end ]}
-                " href="/tool">
-                {[ SVG "bug-fill" 16 16 ]}
-                <span style="font-size: 14px;"> 渗透测试</span>
+                <a class="nav-link">
+                    <div class='{[ if eq .nav "st-test" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "bug-fill" 16 16 ]}<span>渗透测试</span>
+                    </div>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link
-                {[ if eq .nav "operation" ]} active {[ end ]}
-                " href="/operation">
-                {[ SVG "file-text" 16 16 ]}
-                <span style="font-size: 14px;"> 操作日志</span>
+                <a class="nav-link" href="/operation">
+                    <div class='{[ if eq .nav "operation" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "file-text" 16 16 ]}<span>操作日志</span>
+                    </div>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link
-                {[ if eq .nav "instructions" ]} active {[ end ]}
-                " href="/instructions">
-                {[ SVG "book" 16 16 ]}
-                <span style="font-size: 14px;"> 使用说明</span>
+                <a class="nav-link" href="/instructions">
+                    <div class='{[ if eq .nav "instructions" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "book" 16 16 ]}<span>使用说明</span>
+                    </div>
                 </a>
             </li>
         </ul>

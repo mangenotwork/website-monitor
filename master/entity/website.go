@@ -46,6 +46,7 @@ type WebsiteInfo struct {
 	CDN                string             // 网站cdn信息
 	SSLCertificateInfo SSLCertificateInfo // 证书信息
 	Filing             string             // 网站备案信息
+	Whois              *WhoisInfo         // Whois信息
 }
 
 // TODO 请求的时候要设置 Accept-Encoding ： gzip, deflate, br
@@ -127,4 +128,9 @@ type DNSInfo struct {
 	DnsServerName string   `json:"dnsServerName"`
 	IsCDN         bool     `json:"isCDN"`
 	Ms            float64  `json:"ms"` // ms
+}
+
+type WhoisInfo struct {
+	Root string
+	Rse  string
 }

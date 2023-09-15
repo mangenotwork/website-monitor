@@ -1,14 +1,15 @@
-<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand me-0 px-3 fs-6">
-        {[ .Title ]}
-        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addHostModal" style="margin-left: 36px;color: #FFFFFF;">
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow" style="height: 56px;">
+    <div class="col-lg-2">
+        <h2 class="me-0 px-3 fs-6 " style="color: #ffffff;">{[ .Title ]}</h2>
+    </div>
+    <div class="col-lg-10">
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addHostModal" style="color: #FFFFFF;float: left;margin-left: 4px;">
             {[ SVG "plus-lg" 18 18 ]} 添加网站进行监测
         </button>
-    </a>
-
-    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark" style="margin-right: 24px;float: right;">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
 
     <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbarDark" aria-labelledby="offcanvasNavbarDarkLabel">
         <div class="offcanvas-header">
