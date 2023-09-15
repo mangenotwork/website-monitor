@@ -119,3 +119,12 @@ type WebSiteUrl struct {
 	JsLink  []string // 资源文件 js
 	CssLink []string // 资源文件 css
 }
+
+type DNSInfo struct {
+	IPs           []string `json:"ips"`
+	LookupCNAME   string   `json:"cname"`
+	DnsServerIP   string   `json:"dnsServerIP"`
+	DnsServerName string   `json:"dnsServerName"`
+	IsCDN         bool     `json:"isCDN"`
+	Ms            float64  `json:"ms"` // ms
+}

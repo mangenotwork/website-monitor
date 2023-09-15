@@ -112,3 +112,30 @@ func GetSSLCertificate(c *ginHelper.GinCtx) {
 	c.APIOutPut(data, "")
 	return
 }
+
+type DNSLookUpAllOut struct {
+	List []*entity.DNSInfo `json:"list"`
+	IPs  []string          `json:"ips"`
+}
+
+func DNSLookUp(c *ginHelper.GinCtx) {
+	host := c.GetQuery("host")
+	data := dao.NsLookUpLocal(host)
+	c.APIOutPut(data, "")
+	return
+}
+
+func DNSLookUpAll(c *ginHelper.GinCtx) {
+	host := c.GetQuery("host")
+	list, allIP := dao.NsLookUpAll(host)
+	c.APIOutPut(&DNSLookUpAllOut{
+		List: list,
+		IPs:  allIP,
+	}, "")
+	return
+}
+
+func Whois(c *ginHelper.GinCtx) {
+	host := c.GetQuery("host")
+	dao.Whois(host)
+}

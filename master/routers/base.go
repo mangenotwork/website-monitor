@@ -60,6 +60,9 @@ func API() {
 
 	// tool
 	api.GET("/tool/certificate", ginHelper.Handle(handler.GetSSLCertificate)) // 获取证书
+	api.GET("/tool/dnslookup", ginHelper.Handle(handler.DNSLookUp))           // 查询dns
+	api.GET("/tool/dnslookup/all", ginHelper.Handle(handler.DNSLookUpAll))    // 查询dns
+	api.GET("/tool/whois", ginHelper.Handle(handler.Whois))                   // Whois查询
 }
 
 // AuthPG 权限验证中间件
