@@ -35,12 +35,12 @@ func NewMail() MailEr {
 type mailDao struct{}
 
 func (m *mailDao) SetMail(data *entity.Mail) error {
-	return DB.Set(MailTable, MailConf, data)
+	return DB.Set(MailTable, MailConfKeyName, data)
 }
 
 func (m *mailDao) GetMail() (*entity.Mail, error) {
 	data := &entity.Mail{}
-	err := DB.Get(MailTable, MailConf, data)
+	err := DB.Get(MailTable, MailConfKeyName, data)
 	return data, err
 }
 

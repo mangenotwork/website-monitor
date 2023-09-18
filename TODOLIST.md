@@ -1,8 +1,8 @@
 - master 登录  ok
 - master 邮件 ok
 - master 设计"网站" 实体 ok
-- 证书信息获取，dns扫描
-- IP属地获取
+- 证书信息获取，dns扫描  ok
+- IP属地获取 ok
 - master 添加网站
 - master 获取网站基础信息
 - master 任务表

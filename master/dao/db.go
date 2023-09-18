@@ -9,26 +9,32 @@ import (
 	"github.com/mangenotwork/common/utils"
 )
 
+// Table
 const (
-	WebSiteTable        = "website_table"
-	MailTable           = "mail_table"
-	MailConf            = "mail_conf"
-	WebSiteURITable     = "website_uri_table"
-	WebSitePointTable   = "website_point_table"
-	WebSiteAlertTable   = "website_alert_table"
-	MonitorErrInfoKey   = "MonitorErrInfo"
-	MonitorErrInfoTable = "monitor_err_info_table"
-	IncrementTable      = "increment_table"
-	IncrementKey        = "Increment"
-	IPTable             = "ip_table"
-	MasterConfTable     = "master_conf_table"
-	MasterConfKey       = "master_conf"
+	MailTable               = "mail_table"
+	WebSiteTable            = "website_table"
+	WebSiteInfoTable        = "website_Info_table"
+	WebsiteAlarmRuleTable   = "website_alarm_rule_table"
+	WebsiteScanCheckUpTable = "website_scan_checkup_table"
+	WebSiteURITable         = "website_url_table"
+	WebSiteUrlPointTable    = "website_url_point_table"
+	WebSiteAlertTable       = "website_alert_table"
+	IPTable                 = "ip_table"
+	MasterConfTable         = "master_conf_table"
+)
+
+// KeyName
+const (
+	MailConfKeyName       = "mail_conf"
+	MonitorErrInfoKeyName = "MonitorErrInfo"
+	IncrementKeyName      = "Increment"
+	MasterConfKeyName     = "master_conf"
 )
 
 var (
 	DBPath = "./data.db"
-	Tables = []string{WebSiteTable, MailTable, WebSiteURITable, WebSitePointTable,
-		WebSiteAlertTable, MonitorErrInfoTable, IncrementTable, IPTable, MasterConfTable}
+	Tables = []string{MailTable, WebSiteTable, WebSiteInfoTable, WebsiteAlarmRuleTable, WebsiteScanCheckUpTable,
+		WebSiteURITable, WebSiteUrlPointTable, WebSiteAlertTable, IPTable, MasterConfTable}
 	DB     = NewLocalDB(DBPath, Tables)
 	ISNULL = fmt.Errorf("ISNULL")
 )

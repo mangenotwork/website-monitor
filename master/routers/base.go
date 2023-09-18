@@ -63,6 +63,9 @@ func API() {
 	api.GET("/tool/dnslookup", ginHelper.Handle(handler.DNSLookUp))           // 查询dns
 	api.GET("/tool/dnslookup/all", ginHelper.Handle(handler.DNSLookUpAll))    // 查询dns
 	api.GET("/tool/whois", ginHelper.Handle(handler.Whois))                   // Whois查询
+	api.GET("/tool/ip", ginHelper.Handle(handler.IPInfo))                     // ip信息查询
+	api.GET("/tool/myip", ginHelper.Handle(handler.MyIPInfo))                 // 本机ip信息
+	api.GET("/tool/website/tdki", ginHelper.Handle(handler.GetWebSiteTDKI))   // 获取网站的T, D, K, 图标
 }
 
 // AuthPG 权限验证中间件

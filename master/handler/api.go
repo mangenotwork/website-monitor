@@ -141,3 +141,23 @@ func Whois(c *ginHelper.GinCtx) {
 	c.APIOutPut(data, "")
 	return
 }
+
+func IPInfo(c *ginHelper.GinCtx) {
+	ip := c.GetQuery("ip")
+	data := dao.GetIP(ip)
+	c.APIOutPut(data, "")
+	return
+}
+
+func MyIPInfo(c *ginHelper.GinCtx) {
+	data := dao.GetMyIP()
+	c.APIOutPut(data, "")
+	return
+}
+
+func GetWebSiteTDKI(c *ginHelper.GinCtx) {
+	url := c.GetQuery("url")
+	data := dao.NewWebsite().CollectTDK(url)
+	c.APIOutPut(data, "")
+	return
+}

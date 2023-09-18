@@ -1,5 +1,6 @@
 package entity
 
+// Mail 邮件
 type Mail struct {
 	From     string `json:"from"`     // 发件人
 	AuthCode string `json:"authCode"` // 发件人认证

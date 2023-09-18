@@ -8,45 +8,84 @@ import (
 
 // Website 监测网站
 type Website struct {
-	Host string // 默认取根url进行检测，主键
+	// 默认取根url进行检测，主键
+	Host string `json:"host"`
 
-	ID int64 // 网站ID, 独立id
+	// 监测频率  单位 ms
+	MonitorRate int64 `json:"monitorRate"`
 
-	// 监测网络频率  单位 ms
-	MonitorRate int64
+	// 保证监测的有效性:每次监测前用过对照组+ping来确认当前监测器网络的情况，只有当网络情况好才执行监测请求
+	// 对照组Url
+	ContrastUrl string
+	// 对照组响应超过这个时间判定为当前网络不稳定不执行本次监测请求
+	ContrastTime int64
+	// 用于检查当前网络
+	Ping string
+	// ping响应超过这个时间判定为当前网络不稳定不执行本次监测请求
+	PingTime int64
 
-	// 扫描站点深度 默认 2
-	UriDepth int64
+	Notes   string `json:"notes"`
+	Created int64  `json:"created"`
+}
 
-	// 扫描网站频率  单位秒
-	ScanRate int64
+// WebsiteAlarmRule 报警规则
+type WebsiteAlarmRule struct {
+	Host                     string // 主键与website Host对应
+	WebsiteSlowResponseTime  int64  // 单位ms  网站响应有多慢才记录报警
+	WebsiteSlowResponseCount int64  // 连续几次慢就发送邮件通知
+	SSLCertificateExpire     int64  // 单位天 证书还有几天过期就触发报警
+	NotTDK                   bool   // 在随机监测中发现网站页面没有存在 title, description, keywords 就触发报警
+	BadLink                  bool   // 扫描的时候存在死链就报警
+	ExtLinkChange            bool   // 扫描间隔判断外链有变化则报警,可以监测到是否被劫持
+}
 
-	// 扫描网站内容
-	ScanCheckUp ScanCheckUp
-
-	// 设置报警规则
-	AlarmRule AlarmRule
-
-	Created int64
-
-	Info WebsiteInfo
+// WebsiteScanCheckUp 网站扫描检查内容
+type WebsiteScanCheckUp struct {
+	Host         string // 主键与website Host对应
+	ScanDepth    int64  `json:"uriDepth"` // 扫描站点深度 默认 2
+	ScanRate     int64  `json:"scanRate"` // 扫描网站频率  单位秒
+	ScanExtLinks bool   // 是否检查外链,对比上一次扫描数据判别外链是否变化
+	ScanBadLink  bool   // 是否扫描死链接
+	// TODO... 安全扫描， Sql注入, XSS等等...
 }
 
 // WebsiteInfo 网站基本信息
 type WebsiteInfo struct {
+	Host               string // 主键与website Host对应
 	Title              string
 	Description        string
 	Keywords           string
 	Icon               string
-	DNS                string             // 网站DNS信息
-	IPAddr             []*IPAddr          // 网站IP和属地
-	Server             string             // response Headers 读取 headers Server
-	ContentEncoding    string             //  response Headers 是否压缩 读取 headers Content-Encoding
-	ContentLanguage    string             // response Headers 语言 读取 headers Content-Language
-	CDN                string             // 网站cdn信息
-	SSLCertificateInfo SSLCertificateInfo // 证书信息
-	Filing             string             // 网站备案信息
-	Whois              *WhoisInfo         // Whois信息
+	DNS                *DNSInfo            // 网站DNS信息
+	IPAddr             []*IPAddr           // 网站IP和属地
+	Server             string              // response Headers 读取 headers Server
+	ContentEncoding    string              //  response Headers 是否压缩 读取 headers Content-Encoding
+	ContentLanguage    string              // response Headers 语言 读取 headers Content-Language
+	SSLCertificateInfo *SSLCertificateInfo // 证书信息
+	Filing             string              // 网站备案信息
+	Whois              *WhoisInfo          // Whois信息
+}
+
+// WebSiteUrl 网站的URL存储
+type WebSiteUrl struct {
+	Host    string   // 主键与website Host对应
+	AllUri  []string // 抓取到的所有链接
+	ExtLink []string // 外链
+	BadLink []string // 死链
+	JsLink  []string // 资源文件 js
+	CssLink []string // 资源文件 css
+}
+
+// WebSiteUrlPoint 指定网站监测Url
+type WebSiteUrlPoint struct {
+	Host string // 主键与website Host对应
+	Uri  []string
+}
+
+// WebSiteAlert 监控报警信息
+type WebSiteAlert struct {
+	Host string // 主键与website Host对应
+	List []*AlertData
 }
 
 // TODO 请求的时候要设置 Accept-Encoding ： gzip, deflate, br
@@ -94,33 +133,7 @@ func (s SSLCertificateInfo) Expire() int64 {
 	return s.NotAfter - time.Now().Unix()
 }
 
-// AlarmRule 报警规则
-type AlarmRule struct {
-	WebsiteSlowResponseTime  int64 // 单位ms  网站响应有多慢才记录报警
-	WebsiteSlowResponseCount int64 // 连续几次慢就发送邮件通知
-	SSLCertificateExpire     int64 // 单位天 证书还有几天过期就触发报警
-	NotTDK                   bool  // 在随机监测中发现网站页面没有存在 title, description, keywords 就触发报警
-	BadLink                  bool  // 扫描的时候存在死链就报警
-	ExtLinkChange            bool  // 扫描间隔判断外链有变化则报警,可以监测到是否被劫持
-}
-
-// ScanCheckUp 网站扫描检查内容
-type ScanCheckUp struct {
-	ScanExtLinks bool // 是否检查外链,对比上一次扫描数据判别外链是否变化
-	ScanBadLink  bool // 扫描死链接
-	// TODO... 安全扫描， Sql注入, XSS等等...
-}
-
-// WebSiteUrl 网站的URL存储
-type WebSiteUrl struct {
-	HostID  string
-	AllUri  []string // 抓取到的所有链接
-	ExtLink []string // 外链
-	BadLink []string // 死链
-	JsLink  []string // 资源文件 js
-	CssLink []string // 资源文件 css
-}
-
+// DNS 信息
 type DNSInfo struct {
 	IPs           []string `json:"ips"`
 	LookupCNAME   string   `json:"cname"`
@@ -130,7 +143,15 @@ type DNSInfo struct {
 	Ms            float64  `json:"ms"` // ms
 }
 
+// Whois 信息
 type WhoisInfo struct {
 	Root string
 	Rse  string
+}
+
+type TDKI struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Keywords    string `json:"keywords"`
+	Icon        string `json:"icon"`
 }
