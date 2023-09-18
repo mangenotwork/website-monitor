@@ -169,9 +169,9 @@ func CollectWebSite(c *ginHelper.GinCtx) {
 	return
 }
 
-func GetIPC(c *ginHelper.GinCtx) {
+func GetICP(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
-	data := dao.GetIPC(host)
+	data := dao.GetICP(host)
 	c.APIOutPut(data, "")
 	return
 }

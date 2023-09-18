@@ -7,14 +7,14 @@ import (
 	"website-monitor/master/entity"
 )
 
-var GetIPCUrl = func(host string) string { return fmt.Sprintf("https://www.beianx.cn/search/%s", host) }
+var GetICPUrl = func(host string) string { return fmt.Sprintf("https://www.beianx.cn/search/%s", host) }
 
-// GetIPC 获取备案信息
-func GetIPC(host string) *entity.IPCInfo {
-	ipcInfo := &entity.IPCInfo{
+// GetICP 获取备案信息
+func GetICP(host string) *entity.ICPInfo {
+	ipcInfo := &entity.ICPInfo{
 		Host: host,
 	}
-	ctx, _ := gt.Get(GetIPCUrl(host))
+	ctx, _ := gt.Get(GetICPUrl(host))
 	rse := gt.RegHtmlTbody(ctx.Html)
 	if len(rse) > 0 {
 		tdList := gt.RegHtmlTdTxt(rse[0])

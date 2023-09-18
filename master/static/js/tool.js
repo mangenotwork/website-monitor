@@ -1,26 +1,11 @@
 const { createApp, ref } = Vue;
 const common = new Utils;
-const FidWebsiteQuery = 1;
-const FidIpQuery = 2;
-const FidGetExternal = 3;
-const FidDeadLink = 4;
-const FidGetICP = 5;
-const FidPing = 6;
-const FidNsLookUp = 7;
 const app = createApp({
     data() {
         return {
             mail: Mail,
             addWebSite: AddWebSite,
-            func: [
-                {fid: FidWebsiteQuery, title: "网站服务器查询", content: "查询网站的服务器IP地址，IP属地，服务器类型."},
-                {fid: FidIpQuery, title: "IP属地查询", content: "查询IP属地."},
-                {fid: FidGetExternal, title: "网站外链抓取", content: "网站外链抓取."},
-                {fid: FidDeadLink, title: "网站死链检查", content: "网站死链检查."},
-                {fid: FidGetICP, title: "备案查询", content: "网站备案查询."},
-                {fid: FidPing, title: "Ping", content: "执行ping功能."},
-                {fid: FidNsLookUp, title: "DNS查询", content: "执行nslookup功能."},
-            ]
+            func: funcData,
         }
     },
     created:function(){
@@ -33,27 +18,37 @@ const app = createApp({
         open: function (fid) {
             let t = this;
             switch (fid) {
-                case FidWebsiteQuery :
+                // 获取网站的T, D, K, 图标
+                case FidWebsiteTDKI :
                     console.log("FidWebsiteQuery...")
                     break;
-                case FidIpQuery :
-                    console.log("FidIpQuery...")
+                // ip信息查询
+                case FidIp :
+                    console.log("FidIp...")
                     break;
-                case FidGetExternal :
-                    console.log("FidGetExternal...")
-                    break;
-                case FidDeadLink :
-                    console.log("FidDeadLink...")
-                    break;
-                case FidGetICP :
-                    console.log("FidGetICP...")
-                    break;
-                case FidPing :
-                    console.log("FidPing...")
-                    $("#toolPingModal").modal("show");
-                    break;
+                // 查询dns
                 case FidNsLookUp :
                     console.log("FidNsLookUp...")
+                    break;
+                // Whois查询
+                case FidWhois :
+                    console.log("FidWhois...")
+                    break;
+                // 查询备案
+                case FidICP :
+                    console.log("FidICP...")
+                    break;
+                // 在线ping
+                case FidPing :
+                    console.log("FidPing...")
+                    break;
+                // 获取证书
+                case FidSSL :
+                    console.log("FidSSL...")
+                    break;
+                // 网站信息获取
+                case FidWebsiteInfo :
+                    console.log("FidWebsiteInfo...")
                     break;
             }
         },
