@@ -2,7 +2,7 @@
 - master 邮件 ok
 - master 设计"网站" 实体 ok
 - 证书信息获取，dns扫描  ok
-- IP属地获取 ok
+- IP属地获取，ipc查询 ok
 - tool : 获取证书
 - tool : 查询dns
 - tool : Whois查询
