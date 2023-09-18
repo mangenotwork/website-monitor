@@ -1,13 +1,15 @@
 const { createApp, ref } = Vue;
-import common from './public.js'
+const common = new Utils;
 const app = createApp({
     data() {
         return {
-
+            mail: Mail,
+            addWebSite: AddWebSite,
         }
     },
     created:function(){
         let t = this;
+        t.mail.getInfo();
     },
     destroyed:function () {
     },

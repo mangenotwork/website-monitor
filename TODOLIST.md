@@ -3,6 +3,14 @@
 - master 设计"网站" 实体 ok
 - 证书信息获取，dns扫描  ok
 - IP属地获取 ok
+- tool : 获取证书
+- tool : 查询dns
+- tool : Whois查询
+- tool : ip信息查询
+- tool : 本机ip信息
+- tool : 获取网站的T, D, K, 图标
+- tool : 采集网站信息
+- tool : 查询备案
 - master 添加网站
 - master 获取网站基础信息
 - master 任务表

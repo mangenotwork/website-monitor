@@ -1,21 +1,10 @@
 const { createApp, ref } = Vue;
-import common from './public.js'
+const common = new Utils;
 const app = createApp({
     data() {
         return {
-            title: "",
-            addWebSite: {
-                api: "/api/website/add",
-                param : {
-                    host: "",
-                    healthUri: "",
-                    rate: 10,
-                    alarmResTime: 3000,
-                    uriDepth: 2,
-                    uriUpdateRate: 24,
-                }
-            },
-            msg: "",
+            mail: Mail,
+            addWebSite: AddWebSite,
             websiteList: {
                 api: function (){ return "/api/website/list"; },
                 page: 1,
@@ -25,26 +14,6 @@ const app = createApp({
                 api: function (){ return "/api/website/delete/" + this.id; },
                 id: "",
                 hostName: "",
-            },
-            hasMail: {
-                api: "/api/mail/init",
-                data: true,
-            },
-            mailConf: {
-                api: "/api/mail/conf",
-                param: {
-                    host: "smtp.qq.com",
-                    port: 25,
-                    from: "",
-                    authCode: "",
-                    toList: "",
-                },
-            },
-            mailInfo: {
-                api: "/api/mail/info",
-            },
-            mailSend: {
-                api: "/api/mail/sendTest",
             },
             point: {
                 hostId: "",
@@ -115,16 +84,19 @@ const app = createApp({
                 list: [],
                 len: 0,
                 del: function (date) { return "/api/website/alert/del/" + this.hostId + "?date="+date; }
-            }
+            },
+
         }
     },
     created:function(){
         let t = this;
         t.getList();
-        t.getMail();
-        t.getMailInfo();
-        t.getAlertList();
-        t.getMonitorErrList();
+        t.mail.hasSet();
+        t.mail.getInfo();
+        // t.getAlertList();
+        // t.getMonitorErrList();
+
+
         // t.timer = window.setInterval(() => {
         //     t.getList();
         // }, 10000);
@@ -201,38 +173,7 @@ const app = createApp({
             t.websiteList.page = pg;
             t.getList();
         },
-        getMail: function () {
-            let t = this;
-            common.AjaxGet(t.hasMail.api, function (data){
-                t.hasMail.data = data.data;
-            })
-        },
-        setMailConf: function () {
-            let t = this;
-            t.mailConf.param.toList = common.MailToListJoin(t.mailConf.param.toList);
-            t.mailConf.param.port = Number(t.mailConf.param.port)
-            common.AjaxPost(t.mailConf.api, t.mailConf.param, function (data){
-                if (data.code === 0) {
-                    $("#mailSetModal").modal('toggle');
-                    t.getMail();
-                }
-                common.ToastShow(data.msg);
-            });
-        },
-        getMailInfo: function () {
-            let t = this;
-            common.AjaxGet(t.mailInfo.api, function (data){
-                t.mailConf.param = data.data;
-            });
-        },
-        mailSendTest: function () {
-            let t = this;
-            t.mailConf.param.toList = common.MailToListJoin(t.mailConf.param.toList);
-            t.mailConf.param.port = Number(t.mailConf.param.port)
-            common.AjaxPost(t.mailSend.api, t.mailConf.param, function (data){
-                common.ToastShow(data.msg);
-            });
-        },
+
         setUriPoint: function (item) {
             let t = this;
             t.point.hostUri = item.HealthUri + "/";

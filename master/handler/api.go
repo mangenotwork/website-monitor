@@ -161,3 +161,17 @@ func GetWebSiteTDKI(c *ginHelper.GinCtx) {
 	c.APIOutPut(data, "")
 	return
 }
+
+func CollectWebSite(c *ginHelper.GinCtx) {
+	host := c.GetQuery("host")
+	data := dao.NewWebsite().Collect(host)
+	c.APIOutPut(data, "")
+	return
+}
+
+func GetIPC(c *ginHelper.GinCtx) {
+	host := c.GetQuery("host")
+	data := dao.GetIPC(host)
+	c.APIOutPut(data, "")
+	return
+}

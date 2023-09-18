@@ -6,7 +6,7 @@
             <div class="row">
                 {[ template "__menu__.html" . ]}
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                    <template v-if="hasMail.data===false">
+                    <template v-if="mail.init.data===false">
                         <div class="alert alert-danger" role="alert">
                             <a aria-current="page" data-bs-toggle="modal" data-bs-target="#mailSetModal">还未设置邮件通知! 请点击 <span style="text-decoration:underline;">邮件设置</span> 进行设置</a>
                         </div>
@@ -101,17 +101,17 @@
                             </table>
                         </div>
                     </div>
-                    {[ template "add_host_modal.html" . ]}
-                    {[ template "set_alert_modal.html" . ]}
-                    {[ template "set_uri_modal.html" . ]}
-                    {[ template "mail_set_modal.html" . ]}
-                    {[ template "website_info_modal.html" . ]}
-                    {[ template "log_modal.html" ]}
-                    {[ template "isok_modal.html" ]}
-                    {[ template "chart_modal.html" ]}
-                    {[ template "alert_modal.html" ]}
-                    {[ template "toast.html" ]}
                 </main>
+                {[ template "add_host_modal.html" . ]}
+                {[ template "set_alert_modal.html" . ]}
+                {[ template "set_uri_modal.html" . ]}
+                {[ template "mail_set_modal.html" . ]}
+                {[ template "website_info_modal.html" . ]}
+                {[ template "log_modal.html" ]}
+                {[ template "isok_modal.html" ]}
+                {[ template "chart_modal.html" ]}
+                {[ template "alert_modal.html" ]}
+                {[ template "toast.html" ]}
             </div>
         </div>
 
@@ -122,6 +122,6 @@
 <script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script type="module" src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
-<script type="module" src="/static/js/home.js?v={[ .TimeStamp ]}"></script>
+<script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
+<script src="/static/js/home.js?v={[ .TimeStamp ]}"></script>
 {[ template "__end__.html" . ]}

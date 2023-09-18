@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	gt "github.com/mangenotwork/gathertool"
+	"net/http"
 	"website-monitor/master/entity"
 )
 
@@ -25,20 +26,29 @@ type WebsiteEr interface {
 	// 获取监测Url点
 	GetUrlPoint()
 
-	// 采集网站页面基础信息
+	// 采集网站信息
+	Collect(host string) *entity.WebsiteInfo
+
+	// 获取网站信息
+	GetInfo(host string) (*entity.WebsiteInfo, error)
+
+	// 采集网站页面基础信息 - 刷新功能
 	CollectTDK(host string) *entity.TDKI
 
-	// 采集网站DNS信息
-	CollectDNS()
+	// 采集网站DNS信息 - 刷新功能
+	CollectDNS(host string) error
 
-	// 采集网站IP和属地
-	CollectIPAddr()
+	// 采集网站IP和属地 - 刷新功能
+	CollectIPAddr(host string) error
 
-	// 采集网站证书信息
-	CollectSSLCertificateInfo()
+	// 采集网站证书信息 - 刷新功能
+	CollectSSLCertificateInfo(host string) error
 
-	// 采集网站Whois信息
-	CollectWhois()
+	// 采集网站Whois信息 - 刷新功能
+	CollectWhois(host string) error
+
+	// 采集网站ipc信息 - 刷新功能
+	CollectIPC(host string) error
 }
 
 func NewWebsite() WebsiteEr {
@@ -72,9 +82,10 @@ func (w *websiteDao) Add(data *entity.Website, rule *entity.WebsiteAlarmRule, sc
 	if err != nil {
 		return err
 	}
-	// TODO 异步执行扫描
+	// 异步获取网站信息
+	go w.saveCollectInfo(data.Host)
 
-	// TODO... 异步获取网站信息
+	// TODO 异步执行扫描
 
 	return err
 }
@@ -113,6 +124,64 @@ func (w *websiteDao) Select() {
 
 }
 
+func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
+
+	info := &entity.WebsiteInfo{
+		Host: host,
+	}
+	tdki := w.CollectTDK(host)
+	info.Title = tdki.Title
+	info.Keywords = tdki.Keywords
+	info.Description = tdki.Description
+	info.Icon = tdki.Icon
+
+	// dns
+	info.DNS = NsLookUpLocal(host)
+
+	// IPAddr
+	info.IPAddr = make([]*entity.IPAddr, 0)
+	for _, v := range info.DNS.IPs {
+		addr := GetIP(v)
+		info.IPAddr = append(info.IPAddr, &entity.IPAddr{v, addr})
+	}
+
+	// SSLCertificateInfo
+	info.SSLCertificateInfo, _ = GetCertificateInfo(host)
+
+	// Whois
+	info.Whois = Whois(host)
+
+	// ipc
+	info.IPC = GetIPC(host)
+
+	header := w.responseHeaders(host)
+	info.Server = header.Get("Server")
+	info.ContentEncoding = header.Get("Content-Encoding")
+	info.ContentLanguage = header.Get("Content-Language")
+
+	return info
+}
+
+// 保存采集的网站信息
+func (w *websiteDao) saveCollectInfo(host string) error {
+	info := w.Collect(host)
+	return DB.Set(WebSiteInfoTable, host, info)
+}
+
+func (w *websiteDao) GetInfo(host string) (*entity.WebsiteInfo, error) {
+	info := &entity.WebsiteInfo{}
+	err := DB.Get(WebSiteInfoTable, host, info)
+	return info, err
+}
+
+func (w *websiteDao) responseHeaders(url string) http.Header {
+	ctx, _ := gt.Get(url, gt.Header{
+		"Accept-Encoding": "gzip, deflate, br",
+		"Accept-Language": "zh-CN,zh;q=0.9",
+	})
+	return ctx.Resp.Header
+}
+
 func (w *websiteDao) CollectTDK(host string) *entity.TDKI {
 	tdki := &entity.TDKI{
 		Icon: host + "/favicon.ico",
@@ -133,20 +202,54 @@ func (w *websiteDao) CollectTDK(host string) *entity.TDKI {
 	return tdki
 }
 
-func (w *websiteDao) CollectDNS() {
-
+func (w *websiteDao) CollectDNS(host string) error {
+	info, err := w.GetInfo(host)
+	if err != nil {
+		return err
+	}
+	info.DNS = NsLookUpLocal(host)
+	return DB.Set(WebSiteInfoTable, host, info)
 }
 
-func (w *websiteDao) CollectIPAddr() {
-
+func (w *websiteDao) CollectIPAddr(host string) error {
+	info, err := w.GetInfo(host)
+	if err != nil {
+		return err
+	}
+	ipAddr := make([]*entity.IPAddr, 0)
+	for _, v := range info.DNS.IPs {
+		addr := GetIP(v)
+		ipAddr = append(ipAddr, &entity.IPAddr{v, addr})
+	}
+	info.IPAddr = ipAddr
+	return DB.Set(WebSiteInfoTable, host, info)
 }
 
-func (w *websiteDao) CollectSSLCertificateInfo() {
-
+func (w *websiteDao) CollectSSLCertificateInfo(host string) error {
+	info, err := w.GetInfo(host)
+	if err != nil {
+		return err
+	}
+	info.SSLCertificateInfo, _ = GetCertificateInfo(host)
+	return DB.Set(WebSiteInfoTable, host, info)
 }
 
-func (w *websiteDao) CollectWhois() {
+func (w *websiteDao) CollectWhois(host string) error {
+	info, err := w.GetInfo(host)
+	if err != nil {
+		return err
+	}
+	info.Whois = Whois(host)
+	return DB.Set(WebSiteInfoTable, host, info)
+}
 
+func (w *websiteDao) CollectIPC(host string) error {
+	info, err := w.GetInfo(host)
+	if err != nil {
+		return err
+	}
+	info.IPC = GetIPC(host)
+	return DB.Set(WebSiteInfoTable, host, info)
 }
 
 func (w *websiteDao) AlertList() {

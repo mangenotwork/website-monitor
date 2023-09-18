@@ -12,9 +12,9 @@ import (
 )
 
 // GetCertificateInfo 获取SSL证书信息
-func GetCertificateInfo(caseUrl string) (entity.SSLCertificateInfo, bool) {
+func GetCertificateInfo(caseUrl string) (*entity.SSLCertificateInfo, bool) {
 	caseUrl = urlStr(caseUrl)
-	var info = entity.SSLCertificateInfo{
+	var info = &entity.SSLCertificateInfo{
 		Url: caseUrl,
 	}
 	var cert *x509.Certificate

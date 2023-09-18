@@ -1,0 +1,34 @@
+{[ template "__start__.html" . ]}
+<body>
+<div id="app">
+    {[ template "__header__.html" . ]}
+    <div class="container-fluid">
+        <div class="row">
+            {[ template "__menu__.html" . ]}
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <template v-for="item in func">
+                    <div class="card" style="width: 16rem;height: 12rem; margin: 1.2rem;float: left;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.title }}</h5>
+                            <p class="card-text">{{ item.content }}</p>
+                            <a href="#" class="btn btn-primary" @click="open(item.fid)">打开工具</a>
+                        </div>
+                    </div>
+                </template>
+            </main>
+            {[ template "add_host_modal.html" . ]}
+            {[ template "mail_set_modal.html" . ]}
+            {[ template "toast.html" ]}
+        </div>
+    </div>
+
+</div>
+</body>
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
+<script src="/static/js/tool.js?v={[ .TimeStamp ]}"></script>
+{[ template "__end__.html" . ]}

@@ -1,5 +1,5 @@
 const { createApp, ref } = Vue;
-import common from './public.js'
+const common = new Utils;
 const FidWebsiteQuery = 1;
 const FidIpQuery = 2;
 const FidGetExternal = 3;
@@ -10,6 +10,8 @@ const FidNsLookUp = 7;
 const app = createApp({
     data() {
         return {
+            mail: Mail,
+            addWebSite: AddWebSite,
             func: [
                 {fid: FidWebsiteQuery, title: "网站服务器查询", content: "查询网站的服务器IP地址，IP属地，服务器类型."},
                 {fid: FidIpQuery, title: "IP属地查询", content: "查询IP属地."},
@@ -23,6 +25,7 @@ const app = createApp({
     },
     created:function(){
         let t = this;
+        t.mail.getInfo();
     },
     destroyed:function () {
     },

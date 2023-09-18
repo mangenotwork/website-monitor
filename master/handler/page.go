@@ -63,3 +63,73 @@ func HomePage(c *gin.Context) {
 		}),
 	)
 }
+
+func MonitorPage(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"monitor.html",
+		ginH(gin.H{
+			"nav": "monitor",
+		}),
+	)
+}
+
+func ToolPage(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"tool.html",
+		ginH(gin.H{
+			"nav": "tool",
+		}),
+	)
+}
+
+func TestAPI(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"testAPI.html",
+		ginH(gin.H{
+			"nav": "api-test",
+		}),
+	)
+}
+
+func TestStress(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"testStress.html",
+		ginH(gin.H{
+			"nav": "stress-test",
+		}),
+	)
+}
+
+func TestPenetration(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"testPenetration.html",
+		ginH(gin.H{
+			"nav": "penetration-test",
+		}),
+	)
+}
+
+func Operation(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"operation.html",
+		ginH(gin.H{
+			"nav": "operation",
+		}),
+	)
+}
+
+func Instructions(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"instructions.html",
+		ginH(gin.H{
+			"nav": "instructions",
+		}),
+	)
+}
