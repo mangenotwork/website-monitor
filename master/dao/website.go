@@ -183,6 +183,7 @@ func (w *websiteDao) responseHeaders(url string) http.Header {
 }
 
 func (w *websiteDao) CollectTDK(host string) *entity.TDKI {
+	host = urlStr(host)
 	tdki := &entity.TDKI{
 		Icon: host + "/favicon.ico",
 	}

@@ -4,8 +4,16 @@
     </div>
     <div class="col-lg-10">
         <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addHostModal" style="color: #FFFFFF;float: left;margin-left: 4px;">
-            {[ SVG "plus-lg" 18 18 ]}
+            {[ SVG "plus-lg" 18 18 ]} 创建监测
         </button>
+        <button type="button" class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#addHostModal" style="color: #FFFFFF;float: left;margin-left: 4px;">
+            {[ SVG "bell" 18 18 ]} 报警通知
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                99+
+                <span class="visually-hidden">unread messages</span>
+              </span>
+        </button>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark" style="margin-right: 24px;float: right;">
             <span class="navbar-toggler-icon"></span>
         </button>

@@ -75,7 +75,7 @@ func API() {
 	api.GET("/tool/website/tdki", ginHelper.Handle(handler.GetWebSiteTDKI))        // 获取网站的T, D, K, 图标
 	api.GET("/tool/website/collectInfo", ginHelper.Handle(handler.CollectWebSite)) // 采集网站信息
 	api.GET("/tool/icp", ginHelper.Handle(handler.GetICP))                         // 查询备案
-
+	api.GET("/tool/ping", ginHelper.Handle(handler.Ping))                          // TODO ping
 }
 
 // AuthPG 权限验证中间件

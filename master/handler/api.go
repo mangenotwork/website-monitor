@@ -175,3 +175,7 @@ func GetICP(c *ginHelper.GinCtx) {
 	c.APIOutPut(data, "")
 	return
 }
+
+func Ping(c *ginHelper.GinCtx) {
+
+}

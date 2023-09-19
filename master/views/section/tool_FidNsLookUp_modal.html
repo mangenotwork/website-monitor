@@ -1,0 +1,79 @@
+<div class="modal fade" id="FidNsLookUpModal"  tabindex="-1" aria-labelledby="FidNsLookUpModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="FidNsLookUpModalLabel">DNS查询</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-top: 52px;">
+                    <div class="input-group" style="width: 60%; margin: 0 auto;">
+                        <input type="text" class="form-control" placeholder="输入域名" v-model="objFidNsLookUp.host" aria-label="Recipient's username" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="button" @click="submitFidNsLookUp">确认执行...</button>
+                    </div>
+                    <div style="margin-top:52px;">
+                        <div class="card text-bg-light mb-3" style="width: 80%; margin: 0 auto;">
+                            <div class="card-header">结果</div>
+                            <div class="card-body">
+                                <div id="FidNsLookUpLoading" style="display: none;">
+                                    <div class="spinner-grow" role="status"  >
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div><br>
+                                    在多个DNS服务器查询中...
+                                </div>
+                                <div id="FidNsLookUpRse" style="display: none;">
+                                    <p>IP: {{objFidNsLookUp.rse.ips}}</p>
+                                    <div style="height: 320px; overflow: auto;">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">IPs</th>
+                                                <th scope="col">CNAME</th>
+                                                <th scope="col">dnsServerIP</th>
+                                                <th scope="col">dnsServerName</th>
+                                                <th scope="col">isCDN</th>
+                                                <th scope="col">ms</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody >
+                                            <template v-for="item in objFidNsLookUp.rse.list">
+                                                <tr>
+                                                    <td>{{item.ips}}</td>
+                                                    <td>{{item.cname}}</td>
+                                                    <td>{{item.dnsServerIP}}</td>
+                                                    <td>{{item.dnsServerName}}</td>
+                                                    <td>{{item.isCDN}}</td>
+                                                    <td>{{item.ms}}</td>
+                                                </tr>
+                                            </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 48px;">
+                        <div  style="width: 80%; margin: 0 auto;">
+                            历史记录:
+                            <ul class="list-group list-group-flush" style="height: 160px;overflow: auto;padding: 2px;">
+                                <li class="list-group-item">An item</li>
+                                <li class="list-group-item">A second item</li>
+                                <li class="list-group-item">A third item</li>
+                                <li class="list-group-item">A fourth item</li>
+                                <li class="list-group-item">And a fifth one</li>
+                                <li class="list-group-item">A fourth item</li>
+                                <li class="list-group-item">And a fifth one</li>
+                                <li class="list-group-item">A fourth item</li>
+                                <li class="list-group-item">And a fifth one</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">退出</button>
+            </div>
+        </div>
+    </div>
+</div>

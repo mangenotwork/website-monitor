@@ -1,0 +1,52 @@
+<div class="modal fade" id="FidWebsiteTDKIModal"  tabindex="-1" aria-labelledby="FidWebsiteTDKIModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="FidWebsiteTDKIModalLabel">获取网页的TDK</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="width: 60%; margin: 0 auto;margin-top: 52px;">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="输入网址" v-model="objFidWebsiteTDKI.url" aria-label="Recipient's username" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="button" @click="submitFidWebsiteTDKI">确认执行...</button>
+                    </div>
+
+                        <div class="card text-bg-light mb-3" style="margin-top:52px;">
+                            <div class="card-header">结果</div>
+                            <div class="card-body">
+                                <template v-if='JSON.stringify(objFidWebsiteTDKI.rse) != "{}"' >
+                                ICON:  <img :src="objFidWebsiteTDKI.rse.icon" width="32" height="32" style="margin-bottom: 12px;">
+                                <p class="card-text">Title:  {{objFidWebsiteTDKI.rse.title}}</p>
+                                <p class="card-text">Keywords: {{objFidWebsiteTDKI.rse.keywords}}</p>
+                                <p class="card-text">Description: {{objFidWebsiteTDKI.rse.description}}</p>
+                                </template>
+                            </div>
+                        </div>
+
+
+                    <div style="margin-top: 48px;">
+                        历史记录:
+                        <ul class="list-group list-group-flush" style="height: 160px;overflow: auto;padding: 2px;">
+                            <li class="list-group-item">An item</li>
+                            <li class="list-group-item">A second item</li>
+                            <li class="list-group-item">A third item</li>
+                            <li class="list-group-item">A fourth item</li>
+                            <li class="list-group-item">And a fifth one</li>
+                            <li class="list-group-item">A fourth item</li>
+                            <li class="list-group-item">And a fifth one</li>
+                            <li class="list-group-item">A fourth item</li>
+                            <li class="list-group-item">And a fifth one</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">退出</button>
+            </div>
+        </div>
+    </div>
+</div>

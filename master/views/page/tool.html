@@ -7,7 +7,7 @@
             {[ template "__menu__.html" . ]}
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <template v-for="item in func">
-                    <div class="card box" @click="open(item.fid)" style="width: 266px;height: 102px; margin: 12px;float: left;border-radius: 26px;">
+                    <div class="card box" @click="open(item.fid)" style="width: 266px;height: 102px; margin: 12px;float: left;border-radius: 26px;cursor: pointer;">
                         <div class="card-body">
                             <div style="width: 100%;margin-bottom: 8px;">
                                 <div v-html="item.svg" style="float: left;"></div>
@@ -21,6 +21,14 @@
                 {[ template "add_host_modal.html" . ]}
                 {[ template "mail_set_modal.html" . ]}
                 {[ template "toast.html" ]}
+                {[ template "tool_FidWebsiteTDKI_modal.html" ]}
+                {[ template "tool_FidIp_modal.html" ]}
+                {[ template "tool_FidNsLookUp_modal.html" ]}
+                {[ template "tool_FidWhois_modal.html" ]}
+                {[ template "tool_FidICP_modal.html" ]}
+                {[ template "tool_FidPing_modal.html" ]}
+                {[ template "tool_FidSSL_modal.html" ]}
+                {[ template "tool_FidWebsiteInfo_modal.html" ]}
             </main>
         </div>
     </div>
