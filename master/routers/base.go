@@ -67,14 +67,14 @@ func API() {
 
 	// tool
 	api.GET("/tool/certificate", ginHelper.Handle(handler.GetSSLCertificate))      // 获取证书
-	api.GET("/tool/dnslookup", ginHelper.Handle(handler.DNSLookUp))                // 查询dns
-	api.GET("/tool/dnslookup/all", ginHelper.Handle(handler.DNSLookUpAll))         // 查询dns
+	api.GET("/tool/nsLookUp", ginHelper.Handle(handler.DNSLookUp))                 // 查询dns
+	api.GET("/tool/nsLookUp/all", ginHelper.Handle(handler.DNSLookUpAll))          // 查询dns
 	api.GET("/tool/whois", ginHelper.Handle(handler.Whois))                        // Whois查询
 	api.GET("/tool/ip", ginHelper.Handle(handler.IPInfo))                          // ip信息查询
-	api.GET("/tool/myip", ginHelper.Handle(handler.MyIPInfo))                      // 本机ip信息
+	api.GET("/tool/myIP", ginHelper.Handle(handler.MyIPInfo))                      // 本机ip信息
 	api.GET("/tool/website/tdki", ginHelper.Handle(handler.GetWebSiteTDKI))        // 获取网站的T, D, K, 图标
-	api.GET("/tool/website/collectInof", ginHelper.Handle(handler.CollectWebSite)) // 采集网站信息
-	api.GET("/tool/ipc", ginHelper.Handle(handler.GetIPC))                         // 查询备案
+	api.GET("/tool/website/collectInfo", ginHelper.Handle(handler.CollectWebSite)) // 采集网站信息
+	api.GET("/tool/icp", ginHelper.Handle(handler.GetICP))                         // 查询备案
 
 }
 

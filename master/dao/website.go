@@ -14,41 +14,41 @@ type WebsiteEr interface {
 	SelectList()
 	Select()
 
-	// 报警列表
+	// AlertList 报警列表
 	AlertList()
 
-	// 获取采集的网站Url
+	// GetWebSiteUrl 获取采集的网站Url
 	GetWebSiteUrl()
 
-	// 设置指定监测Url点
+	// SetUrlPoint 设置指定监测Url点
 	SetUrlPoint()
 
-	// 获取监测Url点
+	// GetUrlPoint 获取监测Url点
 	GetUrlPoint()
 
-	// 采集网站信息
+	// Collect 采集网站信息
 	Collect(host string) *entity.WebsiteInfo
 
-	// 获取网站信息
+	// GetInfo 获取网站信息
 	GetInfo(host string) (*entity.WebsiteInfo, error)
 
-	// 采集网站页面基础信息 - 刷新功能
+	// CollectTDK 采集网站页面基础信息 - 刷新功能
 	CollectTDK(host string) *entity.TDKI
 
-	// 采集网站DNS信息 - 刷新功能
+	// CollectDNS 采集网站DNS信息 - 刷新功能
 	CollectDNS(host string) error
 
-	// 采集网站IP和属地 - 刷新功能
+	// CollectIPAddr 采集网站IP和属地 - 刷新功能
 	CollectIPAddr(host string) error
 
-	// 采集网站证书信息 - 刷新功能
+	// CollectSSLCertificateInfo 采集网站证书信息 - 刷新功能
 	CollectSSLCertificateInfo(host string) error
 
-	// 采集网站Whois信息 - 刷新功能
+	// CollectWhois 采集网站Whois信息 - 刷新功能
 	CollectWhois(host string) error
 
-	// 采集网站ipc信息 - 刷新功能
-	CollectIPC(host string) error
+	// CollectICP 采集网站ipc信息 - 刷新功能
+	CollectICP(host string) error
 }
 
 func NewWebsite() WebsiteEr {
@@ -152,7 +152,7 @@ func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
 	info.Whois = Whois(host)
 
 	// ipc
-	info.IPC = GetIPC(host)
+	info.IPC = GetICP(host)
 
 	header := w.responseHeaders(host)
 	info.Server = header.Get("Server")
@@ -243,12 +243,12 @@ func (w *websiteDao) CollectWhois(host string) error {
 	return DB.Set(WebSiteInfoTable, host, info)
 }
 
-func (w *websiteDao) CollectIPC(host string) error {
+func (w *websiteDao) CollectICP(host string) error {
 	info, err := w.GetInfo(host)
 	if err != nil {
 		return err
 	}
-	info.IPC = GetIPC(host)
+	info.IPC = GetICP(host)
 	return DB.Set(WebSiteInfoTable, host, info)
 }
 

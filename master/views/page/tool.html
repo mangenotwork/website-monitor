@@ -7,11 +7,14 @@
             {[ template "__menu__.html" . ]}
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <template v-for="item in func">
-                    <div class="card" style="width: 16rem;height: 12rem; margin: 1.2rem;float: left;">
+                    <div class="card box" @click="open(item.fid)" style="width: 266px;height: 102px; margin: 12px;float: left;border-radius: 26px;">
                         <div class="card-body">
-                            <h5 class="card-title">{{ item.title }}</h5>
-                            <p class="card-text">{{ item.content }}</p>
-                            <a href="#" class="btn btn-primary" @click="open(item.fid)">打开工具</a>
+                            <div style="width: 100%;margin-bottom: 8px;">
+                                <div v-html="item.svg" style="float: left;"></div>
+                                <h5 class="card-title" style="float: left;margin-left: 12px;">  {{ item.title }}</h5>
+                            </div>
+                            <br>
+                            <p class="card-text" style="float: left;width: 100%;">{{ item.content }}</p>
                         </div>
                     </div>
                 </template>
@@ -23,6 +26,26 @@
     </div>
 </div>
 </body>
+<script>
+    const FidWebsiteTDKI = 1; // 获取网站的T, D, K, 图标
+    const FidIp = 2; // ip信息查询
+    const FidNsLookUp = 3; // 查询dns
+    const FidWhois = 4; // Whois查询
+    const FidICP = 5; // 查询备案
+    const FidPing = 6; // 在线ping
+    const FidSSL = 7; // 获取证书
+    const FidWebsiteInfo = 8; // 网站信息获取
+    const funcData = [
+        {fid: FidWebsiteTDKI, title: "获取网页的TDK", content: "Title Keywords Description Icon .", svg: '{[ SVG "window" 24 24 ]}'},
+        {fid: FidIp, title: "IP属地查询", content: "查询IP属地.", svg: '{[ SVG "hdd-network" 24 24 ]}'},
+        {fid: FidNsLookUp, title: "DNS查询", content: "在线nslookup.", svg: '{[ SVG "hdd-rack" 24 24 ]}'},
+        {fid: FidWhois, title: "Whois查询", content: "Whois查询.", svg: '{[ SVG "globe" 24 24 ]}'},
+        {fid: FidICP, title: "ICP查询", content: "网站备案查询.", svg: '{[ SVG "menu-button-wide" 24 24 ]}'},
+        {fid: FidPing, title: "Ping", content: "在线ping功能.", svg: '{[ SVG "terminal" 24 24 ]}'},
+        {fid: FidSSL, title: "SSL证书信息查询", content: "获取网站的证书信息.", svg: '{[ SVG "shield-check" 24 24 ]}'},
+        {fid: FidWebsiteInfo, title: "获取网站信息", content: "获取网站信息.", svg: '{[ SVG "tv" 24 24 ]}'}
+    ]
+</script>
 <script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
 <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 <script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>

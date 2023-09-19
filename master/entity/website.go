@@ -67,7 +67,7 @@ type WebsiteInfo struct {
 	SSLCertificateInfo *SSLCertificateInfo `json:"SSLCertificateInfo"` // 证书信息
 	Filing             string              `json:"filing"`             // 网站备案信息
 	Whois              *WhoisInfo          `json:"whois"`              // Whois信息
-	IPC                *IPCInfo            `json:"IPC"`                // ipc 信息
+	IPC                *ICPInfo            `json:"IPC"`                // ipc 信息
 }
 
 // WebSiteUrl 网站的URL存储
@@ -137,7 +137,7 @@ func (s SSLCertificateInfo) Expire() int64 {
 	return s.NotAfter - time.Now().Unix()
 }
 
-// DNS 信息
+// DNSInfo 信息
 type DNSInfo struct {
 	IPs           []string `json:"ips"`
 	LookupCNAME   string   `json:"cname"`
@@ -160,8 +160,8 @@ type TDKI struct {
 	Icon        string `json:"icon"`
 }
 
-// IPCInfo ipc信息
-type IPCInfo struct {
+// ICPInfo icp信息
+type ICPInfo struct {
 	Host           string `json:"host"`           // 网站
 	Company        string `json:"company"`        // 公司
 	Nature         string `json:"nature"`         // 性质
