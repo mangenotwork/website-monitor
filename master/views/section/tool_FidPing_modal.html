@@ -6,15 +6,35 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="输入IP" aria-label="Recipient's username" aria-describedby="button-addon2">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">确认</button>
-                </div>
-
-                <div class="card text-bg-light mb-3" style="margin-top:68px;">
-                    <div class="card-header">结果</div>
-                    <div class="card-body">
-                        TODO...
+                <div style="width: 60%; margin: 0 auto;margin-top: 52px;">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="输入网址" v-model="objFidPing.ip" aria-label="Recipient's username" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="button" @click="submitFidPing">确认执行...</button>
+                    </div>
+                    <div class="card text-bg-light mb-3" style="margin-top:52px;">
+                        <div class="card-header">结果</div>
+                        <div class="card-body">
+                            <div id="FidPingLoading" style="display: none;">
+                                <div class="spinner-grow" role="status"  >
+                                    <span class="visually-hidden">Loading...</span>
+                                </div><br>
+                                ping 4次，每次 500ms间隔 ...
+                            </div>
+                            <div id="FidPingRse" style="display: none;">
+                                <template v-for="item in objFidPing.rse">
+                                    <p>第{{item.item}}次 | {{item.date}} | {{item.ms}} | 错误: {{item.err}} . </p>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 48px;">
+                        <span style="font-size: 21px;">历史记录</span>
+                        <a @click="clearFidPingHistory"  data-bs-toggle="tooltip" data-bs-title="清空历史记录" style="margin-left: 24px;cursor: pointer;">{[ SVG "trash-fill" 18 18 ]}</a>
+                        <ul class="list-group list-group-flush" style="height: 160px;overflow: auto;padding: 2px;">
+                            <template v-for="item in history.data">
+                                <li class="list-group-item" @click="gotoFidPing(item)" style="cursor: pointer;">{{item}}</li>
+                            </template>
+                        </ul>
                     </div>
                 </div>
             </div>

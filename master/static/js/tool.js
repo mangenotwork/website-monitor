@@ -9,6 +9,7 @@ const app = createApp({
             history: {
                 add: function (id, value) { return "/api/tool/history?toolID="+id+"&value="+value; },
                 get: function (id) { return "/api/tool/history?toolID="+id; },
+                clear: function (id) {return "/api/tool/history/clear?toolID="+id; },
                 data: [],
             },
             objFidWebsiteTDKI: {
@@ -41,10 +42,10 @@ const app = createApp({
                 api: function (){ return "/api/tool/icp?host=" + this.host; },
                 rse: {},
             },
-            objFidPing: { // TODO...
+            objFidPing: {
                 id: FidPing,
-                host: "",
-                api: function (){ return "/api/tool/icp?host=" + this.host; },
+                ip: "",
+                api: function (){ return "/api/tool/ping?ip=" + this.ip; },
                 rse: {},
             },
             objFidSSL: {
@@ -78,6 +79,12 @@ const app = createApp({
             let t = this;
             common.AjaxPost(t.history.add(id, value), "", function (data){
                 console.log(data)
+            });
+        },
+        clearHistory: function (id) {
+            let t = this;
+            common.AjaxGet(t.history.clear(id), function (data){
+                t.history.data = data.data;
             });
         },
         open: function (fid) {
@@ -138,6 +145,12 @@ const app = createApp({
             t.submitFidWebsiteTDKI();
         },
 
+        clearFidWebsiteTDKIHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidWebsiteTDKI.id);
+            t.getHistory(t.objFidWebsiteTDKI.id);
+        },
+
         submitFidIp: function () {
             let t = this;
             if (t.objFidIp.ip === "") {
@@ -155,6 +168,12 @@ const app = createApp({
             let t = this;
             t.objFidIp.ip = value;
             t.submitFidIp();
+        },
+
+        clearFidIpHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidIp.id);
+            t.getHistory(t.objFidIp.id);
         },
 
         submitFidNsLookUp: function () {
@@ -180,6 +199,12 @@ const app = createApp({
             t.submitFidNsLookUp();
         },
 
+        clearFidNsLookUpHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidNsLookUp.id);
+            t.getHistory(t.objFidNsLookUp.id);
+        },
+
         submitFidWhois: function () {
             let t = this;
             if (t.objFidWhois.host === "") {
@@ -197,6 +222,12 @@ const app = createApp({
             let t = this;
             t.objFidWhois.host = value;
             t.submitFidWhois();
+        },
+
+        clearFidWhoisHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidWhois.id);
+            t.getHistory(t.objFidWhois.id);
         },
 
         submitFidICP: function () {
@@ -218,23 +249,39 @@ const app = createApp({
             t.submitFidICP();
         },
 
+        clearFidICPHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidICP.id);
+            t.getHistory(t.objFidICP.id);
+        },
+
         submitFidPing: function () {
             let t = this;
-            if (t.objFidPing.host === "") {
-                common.ToastShow("请输入Host！");
+            if (t.objFidPing.ip === "") {
+                common.ToastShow("请输入IP！");
                 return
             }
+            $("#FidPingRse").hide();
+            $("#FidPingLoading").show();
             common.AjaxGet(t.objFidPing.api(), function (data){
                 t.objFidPing.rse = data.data;
-                t.setHistory(t.objFidPing.id, t.objFidPing.host);
+                $("#FidPingRse").show();
+                $("#FidPingLoading").hide();
+                t.setHistory(t.objFidPing.id, t.objFidPing.ip);
                 t.getHistory(t.objFidPing.id);
             });
         },
 
         gotoFidPing: function (value) {
             let t = this;
-            t.objFidPing.host = value;
+            t.objFidPing.ip = value;
             t.submitFidPing();
+        },
+
+        clearFidPingHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidPing.id);
+            t.getHistory(t.objFidPing.id);
         },
 
         submitFidSSL: function () {
@@ -256,6 +303,12 @@ const app = createApp({
             t.submitFidSSL();
         },
 
+        clearFidSSLHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidSSL.id);
+            t.getHistory(t.objFidSSL.id);
+        },
+
         submitFidWebsiteInfo: function () {
             let t = this;
             if (t.objFidWebsiteInfo.host === "") {
@@ -273,6 +326,12 @@ const app = createApp({
             let t = this;
             t.objFidWebsiteInfo.host = value;
             t.submitFidWebsiteInfo();
+        },
+
+        clearFidWebsiteInfoHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidWebsiteInfo.id);
+            t.getHistory(t.objFidWebsiteInfo.id);
         },
 
     },

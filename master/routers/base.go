@@ -68,6 +68,7 @@ func API() {
 	// tool
 	api.POST("/tool/history", ginHelper.Handle(handler.ToolHistorySet))            // 记录历史记录
 	api.GET("/tool/history", ginHelper.Handle(handler.ToolHistoryGet))             // 获取历史记录
+	api.GET("/tool/history/clear", ginHelper.Handle(handler.ToolHistoryClear))     // 清空历史记录
 	api.GET("/tool/certificate", ginHelper.Handle(handler.GetSSLCertificate))      // 获取证书
 	api.GET("/tool/nsLookUp", ginHelper.Handle(handler.DNSLookUp))                 // 查询dns
 	api.GET("/tool/nsLookUp/all", ginHelper.Handle(handler.DNSLookUpAll))          // 查询dns

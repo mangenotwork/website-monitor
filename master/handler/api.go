@@ -147,6 +147,22 @@ func ToolHistoryGet(c *ginHelper.GinCtx) {
 	return
 }
 
+func ToolHistoryClear(c *ginHelper.GinCtx) {
+	toolID := c.GetQueryInt("toolID")
+	h, err := dao.NewHistory(toolID)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	err = h.Clear()
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut("", "成功")
+	return
+}
+
 func GetSSLCertificate(c *ginHelper.GinCtx) {
 	caseUrl := c.GetQuery("url")
 	if len(caseUrl) < 1 {
@@ -250,5 +266,12 @@ func GetICP(c *ginHelper.GinCtx) {
 }
 
 func Ping(c *ginHelper.GinCtx) {
-
+	ip := c.GetQuery("ip")
+	if len(ip) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
+	data := dao.Ping(ip)
+	c.APIOutPut(data, "")
+	return
 }

@@ -7,6 +7,7 @@ import (
 type History interface {
 	Set(value any) error
 	Get() ([]any, error)
+	Clear() error
 }
 
 const (
@@ -65,6 +66,11 @@ func (h *historyWebsiteTDKI) Get() ([]any, error) {
 	return value, err
 }
 
+func (h *historyWebsiteTDKI) Clear() error {
+	list := make([]any, 0)
+	return DB.Set(HistoryWebsiteTDKITable, HistoryWebsiteTDKIKeyName, list)
+}
+
 type historyIP struct{}
 
 func (h *historyIP) Set(value any) error {
@@ -77,6 +83,11 @@ func (h *historyIP) Get() ([]any, error) {
 	value := make([]any, 0)
 	err := DB.Get(HistoryIpTable, HistoryIpKeyName, &value)
 	return value, err
+}
+
+func (h *historyIP) Clear() error {
+	list := make([]any, 0)
+	return DB.Set(HistoryIpTable, HistoryIpKeyName, list)
 }
 
 type historyNsLookUp struct{}
@@ -93,6 +104,11 @@ func (h *historyNsLookUp) Get() ([]any, error) {
 	return value, err
 }
 
+func (h *historyNsLookUp) Clear() error {
+	list := make([]any, 0)
+	return DB.Set(HistoryNsLookUpTable, HistoryNsLookUpKeyName, list)
+}
+
 type historyWhois struct{}
 
 func (h *historyWhois) Set(value any) error {
@@ -105,6 +121,11 @@ func (h *historyWhois) Get() ([]any, error) {
 	value := make([]any, 0)
 	err := DB.Get(HistoryWhoisTable, HistoryWhoisKeyName, &value)
 	return value, err
+}
+
+func (h *historyWhois) Clear() error {
+	list := make([]any, 0)
+	return DB.Set(HistoryWhoisTable, HistoryWhoisKeyName, list)
 }
 
 type historyICP struct{}
@@ -121,6 +142,11 @@ func (h *historyICP) Get() ([]any, error) {
 	return value, err
 }
 
+func (h *historyICP) Clear() error {
+	list := make([]any, 0)
+	return DB.Set(HistoryICPTable, HistoryICPKeyName, list)
+}
+
 type historyPing struct{}
 
 func (h *historyPing) Set(value any) error {
@@ -133,6 +159,11 @@ func (h *historyPing) Get() ([]any, error) {
 	value := make([]any, 0)
 	err := DB.Get(HistoryPingTable, HistoryPingKeyName, &value)
 	return value, err
+}
+
+func (h *historyPing) Clear() error {
+	list := make([]any, 0)
+	return DB.Set(HistoryPingTable, HistoryPingKeyName, list)
 }
 
 type historySSL struct{}
@@ -149,6 +180,11 @@ func (h *historySSL) Get() ([]any, error) {
 	return value, err
 }
 
+func (h *historySSL) Clear() error {
+	list := make([]any, 0)
+	return DB.Set(HistorySSLTable, HistorySSLKeyName, list)
+}
+
 type historyWebsiteInfo struct{}
 
 func (h *historyWebsiteInfo) Set(value any) error {
@@ -161,4 +197,8 @@ func (h *historyWebsiteInfo) Get() ([]any, error) {
 	value := make([]any, 0)
 	err := DB.Get(HistoryWebsiteInfoTable, HistoryWebsiteInfoKeyName, &value)
 	return value, err
+}
+
+func (h *historyWebsiteInfo) Clear() error {
+	return DB.Set(HistoryWebsiteInfoTable, HistoryWebsiteInfoKeyName, make([]any, 0))
 }

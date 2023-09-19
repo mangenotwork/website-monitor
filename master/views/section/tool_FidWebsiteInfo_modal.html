@@ -18,7 +18,8 @@
                         </div>
                     </div>
                     <div style="margin-top: 48px;">
-                        历史记录:
+                        <span style="font-size: 21px;">历史记录</span>
+                        <a @click="clearFidWebsiteInfoHistory"  data-bs-toggle="tooltip" data-bs-title="清空历史记录" style="margin-left: 24px;cursor: pointer;">{[ SVG "trash-fill" 18 18 ]}</a>
                         <ul class="list-group list-group-flush" style="height: 160px;overflow: auto;padding: 2px;">
                             <template v-for="item in history.data">
                                 <li class="list-group-item" @click="gotoFidWebsiteInfo(item)" style="cursor: pointer;">{{item}}</li>
