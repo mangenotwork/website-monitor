@@ -87,12 +87,12 @@
                                         <td>{{ item.ContrastMs }}ms</td>
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-                                                <button type="button" class="btn btn-outline-dark btn-sm" @click="openEditWebsiteConf(item)">{[ SVG "gear-fill" 18 18]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" @click="openWebsiteInfo(item.ID)">{[ SVG "house-fill" 18 18 ]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" @click="setUriPoint(item)">{[ SVG "broadcast" 18 18 ]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" @click="logShow(item.ID)">{[ SVG "file-text-fill" 18 18 ]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" @click="openChart(item)">{[ SVG "graph-up" 18 18 ]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" @click="deleteWebsiteOpen(item)">{[ SVG "trash-fill" 18 18 ]}</button>
+                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="修改网站监测配置" @click="openEditWebsiteConf(item)">{[ SVG "gear-fill" 18 18]}</button>
+                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="查看网站信息" @click="openWebsiteInfo(item.ID)">{[ SVG "house-fill" 18 18 ]}</button>
+                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="设置网站监测点(Url)" @click="setUriPoint(item)">{[ SVG "broadcast" 18 18 ]}</button>
+                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测日志" @click="logShow(item.ID)">{[ SVG "file-text-fill" 18 18 ]}</button>
+                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测图" @click="openChart(item)">{[ SVG "graph-up" 18 18 ]}</button>
+                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除该网站监测" @click="deleteWebsiteOpen(item)">{[ SVG "trash-fill" 18 18 ]}</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -102,15 +102,15 @@
                         </div>
                     </div>
                     {[ template "add_host_modal.html" . ]}
+                    {[ template "mail_set_modal.html" . ]}
+                    {[ template "toast.html" ]}
                     {[ template "set_alert_modal.html" . ]}
                     {[ template "set_uri_modal.html" . ]}
-                    {[ template "mail_set_modal.html" . ]}
                     {[ template "website_info_modal.html" . ]}
                     {[ template "log_modal.html" ]}
                     {[ template "isok_modal.html" ]}
                     {[ template "chart_modal.html" ]}
                     {[ template "alert_modal.html" ]}
-                    {[ template "toast.html" ]}
                 </main>
             </div>
         </div>
@@ -124,4 +124,8 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 <script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
 <script src="/static/js/home.js?v={[ .TimeStamp ]}"></script>
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
 {[ template "__end__.html" . ]}

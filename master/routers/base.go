@@ -66,6 +66,8 @@ func API() {
 	api.POST("/mail/sendTest", ginHelper.Handle(handler.MailSendTest)) // 测试发生邮件
 
 	// tool
+	api.POST("/tool/history", ginHelper.Handle(handler.ToolHistorySet))            // 记录历史记录
+	api.GET("/tool/history", ginHelper.Handle(handler.ToolHistoryGet))             // 获取历史记录
 	api.GET("/tool/certificate", ginHelper.Handle(handler.GetSSLCertificate))      // 获取证书
 	api.GET("/tool/nsLookUp", ginHelper.Handle(handler.DNSLookUp))                 // 查询dns
 	api.GET("/tool/nsLookUp/all", ginHelper.Handle(handler.DNSLookUpAll))          // 查询dns
@@ -76,6 +78,7 @@ func API() {
 	api.GET("/tool/website/collectInfo", ginHelper.Handle(handler.CollectWebSite)) // 采集网站信息
 	api.GET("/tool/icp", ginHelper.Handle(handler.GetICP))                         // 查询备案
 	api.GET("/tool/ping", ginHelper.Handle(handler.Ping))                          // TODO ping
+
 }
 
 // AuthPG 权限验证中间件

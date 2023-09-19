@@ -57,15 +57,9 @@
                         <div  style="width: 80%; margin: 0 auto;">
                             历史记录:
                             <ul class="list-group list-group-flush" style="height: 160px;overflow: auto;padding: 2px;">
-                                <li class="list-group-item">An item</li>
-                                <li class="list-group-item">A second item</li>
-                                <li class="list-group-item">A third item</li>
-                                <li class="list-group-item">A fourth item</li>
-                                <li class="list-group-item">And a fifth one</li>
-                                <li class="list-group-item">A fourth item</li>
-                                <li class="list-group-item">And a fifth one</li>
-                                <li class="list-group-item">A fourth item</li>
-                                <li class="list-group-item">And a fifth one</li>
+                                <template v-for="item in history.data">
+                                    <li class="list-group-item" @click="gotoFidNsLookUp(item)" style="cursor: pointer;">{{item}}</li>
+                                </template>
                             </ul>
                         </div>
                     </div>

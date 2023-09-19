@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -105,9 +106,53 @@ func MailSendTest(c *ginHelper.GinCtx) {
 	return
 }
 
+func ToolHistorySet(c *ginHelper.GinCtx) {
+	toolID := c.GetQueryInt("toolID")
+	value := c.GetQuery("value")
+	if len(value) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数不能为空"), "参数不能为空")
+		return
+	}
+	h, err := dao.NewHistory(toolID)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	err = h.Set(value)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut("", "成功")
+	return
+}
+
+func ToolHistoryGet(c *ginHelper.GinCtx) {
+	toolID := c.GetQueryInt("toolID")
+	h, err := dao.NewHistory(toolID)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	data, err := h.Get()
+	if err != nil && err != dao.ISNULL {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	rse := make([]any, 0)
+	for i := len(data) - 1; i >= 0; i-- {
+		rse = append(rse, data[i])
+	}
+	c.APIOutPut(rse, "成功")
+	return
+}
+
 func GetSSLCertificate(c *ginHelper.GinCtx) {
 	caseUrl := c.GetQuery("url")
-	log.Info(caseUrl)
+	if len(caseUrl) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 	data, _ := dao.GetCertificateInfo(caseUrl)
 	c.APIOutPut(data, "")
 	return
@@ -120,6 +165,10 @@ type DNSLookUpAllOut struct {
 
 func DNSLookUp(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
+	if len(host) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 	data := dao.NsLookUpLocal(host)
 	c.APIOutPut(data, "")
 	return
@@ -127,6 +176,10 @@ func DNSLookUp(c *ginHelper.GinCtx) {
 
 func DNSLookUpAll(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
+	if len(host) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 	list, allIP := dao.NsLookUpAll(host)
 	c.APIOutPut(&DNSLookUpAllOut{
 		List: list,
@@ -137,6 +190,10 @@ func DNSLookUpAll(c *ginHelper.GinCtx) {
 
 func Whois(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
+	if len(host) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 	data := dao.Whois(host)
 	c.APIOutPut(data, "")
 	return
@@ -144,6 +201,10 @@ func Whois(c *ginHelper.GinCtx) {
 
 func IPInfo(c *ginHelper.GinCtx) {
 	ip := c.GetQuery("ip")
+	if len(ip) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 	data := dao.GetIP(ip)
 	c.APIOutPut(data, "")
 	return
@@ -157,6 +218,10 @@ func MyIPInfo(c *ginHelper.GinCtx) {
 
 func GetWebSiteTDKI(c *ginHelper.GinCtx) {
 	url := c.GetQuery("url")
+	if len(url) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 	data := dao.NewWebsite().CollectTDK(url)
 	c.APIOutPut(data, "")
 	return
@@ -164,6 +229,10 @@ func GetWebSiteTDKI(c *ginHelper.GinCtx) {
 
 func CollectWebSite(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
+	if len(host) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 	data := dao.NewWebsite().Collect(host)
 	c.APIOutPut(data, "")
 	return
@@ -171,6 +240,10 @@ func CollectWebSite(c *ginHelper.GinCtx) {
 
 func GetICP(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
+	if len(host) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 	data := dao.GetICP(host)
 	c.APIOutPut(data, "")
 	return

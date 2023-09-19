@@ -21,20 +21,40 @@ const (
 	WebSiteAlertTable       = "website_alert_table"
 	IPTable                 = "ip_table"
 	MasterConfTable         = "master_conf_table"
+	HistoryWebsiteTDKITable = "History_WebsiteTDKI_table"
+	HistoryIpTable          = "History_Ip_table"
+	HistoryNsLookUpTable    = "History_NsLookUp_table"
+	HistoryWhoisTable       = "History_Whois_table"
+	HistoryICPTable         = "History_ICP_table"
+	HistoryPingTable        = "History_Ping_table"
+	HistorySSLTable         = "History_SSL_table"
+	HistoryWebsiteInfoTable = "History_WebsiteInfo_table"
 )
 
 // KeyName
 const (
-	MailConfKeyName       = "mail_conf"
-	MonitorErrInfoKeyName = "MonitorErrInfo"
-	IncrementKeyName      = "Increment"
-	MasterConfKeyName     = "master_conf"
+	MailConfKeyName           = "mail_conf"
+	MonitorErrInfoKeyName     = "MonitorErrInfo"
+	IncrementKeyName          = "Increment"
+	MasterConfKeyName         = "master_conf"
+	HistoryWebsiteTDKIKeyName = "History_WebsiteTDKI_KEY"
+	HistoryIpKeyName          = "History_Ip_KEY"
+	HistoryNsLookUpKeyName    = "History_NsLookUp_KEY"
+	HistoryWhoisKeyName       = "History_Whois_KEY"
+	HistoryICPKeyName         = "History_ICP_KEY"
+	HistoryPingKeyName        = "History_Ping_KEY"
+	HistorySSLKeyName         = "History_SSL_KEY"
+	HistoryWebsiteInfoKeyName = "History_WebsiteInfo_KEY"
 )
 
 var (
 	DBPath = "./data.db"
-	Tables = []string{MailTable, WebSiteTable, WebSiteInfoTable, WebsiteAlarmRuleTable, WebsiteScanCheckUpTable,
-		WebSiteURITable, WebSiteUrlPointTable, WebSiteAlertTable, IPTable, MasterConfTable}
+	Tables = []string{
+		MailTable, WebSiteTable, WebSiteInfoTable, WebsiteAlarmRuleTable, WebsiteScanCheckUpTable,
+		WebSiteURITable, WebSiteUrlPointTable, WebSiteAlertTable, IPTable, MasterConfTable,
+		HistoryWebsiteTDKITable, HistoryIpTable, HistoryNsLookUpTable, HistoryWhoisTable, HistoryICPTable,
+		HistoryPingTable, HistorySSLTable, HistoryWebsiteInfoTable,
+	}
 	DB     = NewLocalDB(DBPath, Tables)
 	ISNULL = fmt.Errorf("ISNULL")
 )
