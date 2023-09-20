@@ -19,3 +19,7 @@
 
 # Go workspace file
 go.work
+
+*.db
+*.log
+log

@@ -49,6 +49,7 @@ type WebsiteScanCheckUp struct {
 	ScanRate     int64  `json:"scanRate"`     // 扫描网站频率  单位秒
 	ScanExtLinks bool   `json:"scanExtLinks"` // 是否检查外链,对比上一次扫描数据判别外链是否变化
 	ScanBadLink  bool   `json:"scanBadLink"`  // 是否扫描死链接
+	ScanTDK      bool   `json:"scanTDK"`      // 是否扫描进行TDK检查
 	// TODO... 安全扫描， Sql注入, XSS等等...
 }
 

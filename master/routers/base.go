@@ -59,6 +59,17 @@ func API() {
 	api := Router.Group("/api").Use(AuthAPI())
 	api.GET("/out", handler.Out)
 
+	// website
+	api.POST("/website/add", ginHelper.Handle(handler.WebsiteAdd))                   // 创建网站监测
+	api.GET("/website/list", ginHelper.Handle(handler.WebsiteList))                  // TODO 监测网站列表
+	api.GET("/website/delete/:hostId", ginHelper.Handle(handler.WebsiteDelete))      // TODO 删除网站监测
+	api.GET("/website/info/:hostId", ginHelper.Handle(handler.WebsiteInfo))          // TODO 监测网站详情
+	api.GET("/website/urls/:hostId", ginHelper.Handle(handler.WebsiteUrls))          // TODO 监测网站采集到url
+	api.POST("/website/edit", ginHelper.Handle(handler.WebsiteEdit))                 // TODO 监测设置
+	api.GET("/website/chart/:hostId", ginHelper.Handle(handler.WebsiteChart))        // TODO 图表
+	api.GET("/website/alert/:hostId", ginHelper.Handle(handler.WebsiteAlertList))    // TODO 报警信息
+	api.GET("/website/alert/del/:hostId", ginHelper.Handle(handler.WebsiteAlertDel)) // TODO 报警信息
+
 	// mail
 	api.GET("/mail/init", ginHelper.Handle(handler.MailInit))          // 是否设置邮件
 	api.POST("/mail/conf", ginHelper.Handle(handler.MailConf))         // 设置邮件配置

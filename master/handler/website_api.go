@@ -1,0 +1,140 @@
+package handler
+
+import (
+	"github.com/mangenotwork/common/ginHelper"
+	"github.com/mangenotwork/common/log"
+	"time"
+	"website-monitor/master/constname"
+	"website-monitor/master/dao"
+	"website-monitor/master/entity"
+)
+
+type WebsiteAddParam struct {
+	Host                     string `json:"host"`
+	Notes                    string `json:"notes"`
+	MonitorRate              int64  `json:"monitorRate"`
+	ContrastUrl              string `json:"contrastUrl"`
+	ContrastTime             int64  `json:"contrastTime"`
+	Ping                     string `json:"ping"`
+	PingTime                 int64  `json:"pingTime"`
+	UriDepth                 int64  `json:"uriDepth"`
+	ScanRate                 int64  `json:"scanRate"`
+	ScanBadLink              bool   `json:"scanBadLink"`
+	ScanTDK                  bool   `json:"scanTDK"`
+	ScanExtLinks             bool   `json:"scanExtLinks"`
+	WebsiteSlowResponseTime  int64  `json:"websiteSlowResponseTime"`
+	WebsiteSlowResponseCount int64  `json:"websiteSlowResponseCount"`
+	SSLCertificateExpire     int64  `json:"SSLCertificateExpire"`
+}
+
+func WebsiteAdd(c *ginHelper.GinCtx) {
+	param := &WebsiteAddParam{}
+	err := c.GetPostArgs(param)
+	if err != nil {
+		c.APIOutPutError(err, "参数或参数类型错误")
+		return
+	}
+	if len(param.Host) < 1 {
+		c.APIOutPutError(nil, "参数错误: host不能为空")
+		return
+	}
+	if param.MonitorRate < 1 {
+		param.MonitorRate = constname.DefaultMonitorRate
+	}
+	if len(param.ContrastUrl) < 1 {
+		param.ContrastUrl = constname.DefaultContrastUrl
+	}
+	if param.ContrastTime < 1 {
+		param.ContrastTime = constname.DefaultContrastTime
+	}
+	if len(param.Ping) < 1 {
+		param.Ping = constname.DefaultPing
+	}
+	if param.PingTime < 1 {
+		param.PingTime = constname.DefaultPingTime
+	}
+	if param.UriDepth < 1 {
+		param.UriDepth = constname.DefaultUriDepth
+	}
+	if param.ScanRate < 1 {
+		param.ScanRate = constname.DefaultScanRate
+	}
+	if param.WebsiteSlowResponseTime < 100 {
+		c.APIOutPutError(nil, "网站响应慢不能小于100ms")
+		return
+	}
+	if param.WebsiteSlowResponseCount < 1 {
+		param.WebsiteSlowResponseCount = constname.DefaultWebsiteSlowResponseCount
+	}
+	if param.SSLCertificateExpire < 1 {
+		param.SSLCertificateExpire = constname.DefaultSSLCertificateExpire
+	}
+
+	log.Info("param = ", param)
+	website := &entity.Website{
+		Host:         param.Host,
+		MonitorRate:  param.MonitorRate,
+		ContrastUrl:  param.ContrastUrl,
+		ContrastTime: param.ContrastTime,
+		Ping:         param.Ping,
+		PingTime:     param.PingTime,
+		Notes:        param.Notes,
+		Created:      time.Now().Unix(),
+	}
+	alarmRule := &entity.WebsiteAlarmRule{
+		Host:                     param.Host,
+		WebsiteSlowResponseTime:  param.WebsiteSlowResponseTime,
+		WebsiteSlowResponseCount: param.WebsiteSlowResponseCount,
+		SSLCertificateExpire:     param.SSLCertificateExpire,
+		NotTDK:                   param.ScanTDK,
+		BadLink:                  param.ScanBadLink,
+		ExtLinkChange:            param.ScanExtLinks,
+	}
+	scan := &entity.WebsiteScanCheckUp{
+		Host:         param.Host,
+		ScanDepth:    param.UriDepth,
+		ScanRate:     param.ScanRate,
+		ScanTDK:      param.ScanTDK,
+		ScanBadLink:  param.ScanBadLink,
+		ScanExtLinks: param.ScanExtLinks,
+	}
+	err = dao.NewWebsite().Add(website, alarmRule, scan)
+	if err != nil {
+		c.APIOutPutError(err, "创建失败, err = "+err.Error())
+		return
+	}
+	c.APIOutPut("创建成功", "创建成功")
+	return
+}
+
+func WebsiteList(c *ginHelper.GinCtx) {
+
+}
+
+func WebsiteDelete(c *ginHelper.GinCtx) {
+
+}
+
+func WebsiteInfo(c *ginHelper.GinCtx) {
+
+}
+
+func WebsiteUrls(c *ginHelper.GinCtx) {
+
+}
+
+func WebsiteEdit(c *ginHelper.GinCtx) {
+
+}
+
+func WebsiteChart(c *ginHelper.GinCtx) {
+
+}
+
+func WebsiteAlertList(c *ginHelper.GinCtx) {
+
+}
+
+func WebsiteAlertDel(c *ginHelper.GinCtx) {
+
+}

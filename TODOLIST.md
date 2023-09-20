@@ -11,8 +11,15 @@
 - tool : 在线ping ok
 - tool : 获取证书  ok
 - tool : 网站信息获取  ok
-- master 添加网站
+- master 添加网站 ok
+- master 监测网站列表
 - master 获取网站基础信息
+- master 删除网站监测
+- master 监测网站采集到url
+- master 监测设置
+- master 图表
+- master 报警信息
+- master 报警信息
 - master 任务表
 - monitor 每次启动拉一次监测任务表
 - master 获取monitor在线情况

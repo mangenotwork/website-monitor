@@ -218,3 +218,7 @@ thead tr th {
 .box:hover {
     box-shadow: 4px 16px 32px 4px rgba(48, 55, 66, 0.3);/* 盒子悬浮时阴影 */
 }
+
+.addTipNow {
+    color: #0a53be;
+}
