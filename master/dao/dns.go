@@ -10,6 +10,9 @@ import (
 )
 
 func NsLookUpLocal(host string) *entity.DNSInfo {
+	log.Info("NsLookUpLocal...")
+	host = strings.Replace(host, "https://", "", -1)
+	host = strings.Replace(host, "http://", "", -1)
 	dnsInfo := &entity.DNSInfo{
 		DnsServerIP:   "Local",
 		DnsServerName: "Local",
@@ -17,12 +20,16 @@ func NsLookUpLocal(host string) *entity.DNSInfo {
 	}
 	start := time.Now().UnixNano()
 	ips, err := net.LookupHost(host)
-	if err == nil {
+	if err != nil {
+		log.Error(err)
+	} else {
 		dnsInfo.IPs = ips
 	}
 	dnsInfo.Ms = float64(time.Now().UnixNano()-start) / 100000
 	cname, err := net.LookupCNAME(host)
-	if err == nil {
+	if err != nil {
+		log.Error(err)
+	} else {
 		dnsInfo.LookupCNAME = cname
 	}
 	if len(dnsInfo.LookupCNAME) > 0 && strings.Index(dnsInfo.LookupCNAME, host) == -1 {

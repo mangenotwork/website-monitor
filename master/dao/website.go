@@ -1,7 +1,11 @@
 package dao
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/boltdb/bolt"
+	"github.com/mangenotwork/common/log"
+	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
 	"net/http"
 	"website-monitor/master/entity"
@@ -11,8 +15,14 @@ type WebsiteEr interface {
 	Add(data *entity.Website, alarmRule *entity.WebsiteAlarmRule, scan *entity.WebsiteScanCheckUp) error
 	Del()
 	Update()
-	SelectList()
-	Select()
+	SelectList() ([]*entity.Website, int, error)
+	Select(hostID string) (*entity.Website, error)
+
+	// GetAlarmRule 获取监测报警规则
+	GetAlarmRule(hostID string) (*entity.WebsiteAlarmRule, error)
+
+	// GetScanCheckUp 获取扫描规则
+	GetScanCheckUp(hostID string) (*entity.WebsiteScanCheckUp, error)
 
 	// AlertList 报警列表
 	AlertList()
@@ -28,9 +38,10 @@ type WebsiteEr interface {
 
 	// Collect 采集网站信息
 	Collect(host string) *entity.WebsiteInfo
+	SaveCollectInfo(host, hostID string) error
 
 	// GetInfo 获取网站信息
-	GetInfo(host string) (*entity.WebsiteInfo, error)
+	GetInfo(hostID string) (*entity.WebsiteInfo, error)
 
 	// CollectTDK 采集网站页面基础信息 - 刷新功能
 	CollectTDK(host string) *entity.TDKI
@@ -66,46 +77,69 @@ func (w *websiteDao) Add(data *entity.Website, rule *entity.WebsiteAlarmRule, sc
 	if !InspectCode(ctx.StateCode) {
 		return fmt.Errorf("网站:%s 请求状态码为 %d , 无法添加。", data.Host, ctx.StateCode)
 	}
+	hostKey := utils.GetMD5Encode(data.Host)
+	data.HostID = hostKey
+	// 判断是否存在
+	has, _ := w.Select(hostKey)
+	if has.Host == data.Host {
+		return fmt.Errorf("网站:%s 已创建监测, 无法重复添加。", data.Host)
+	}
 	err = w.addWebsite(data)
 	if err != nil {
 		return err
 	}
 	// 保存报警规则信息
 	rule.Host = data.Host
+	rule.HostID = hostKey
 	err = w.addWebsiteAlarmRule(rule)
 	if err != nil {
 		return err
 	}
 	// 保存扫描规则信息
 	scan.Host = data.Host
+	scan.HostID = hostKey
 	err = w.addWebsiteScanCheckUp(scan)
 	if err != nil {
 		return err
 	}
 	// 异步获取网站信息
-	go w.saveCollectInfo(data.Host)
+	go func() {
+		_ = w.SaveCollectInfo(data.Host, hostKey)
+	}()
 
 	// TODO 异步执行扫描
 
 	return err
 }
 
+func (w *websiteDao) GetAlarmRule(hostID string) (*entity.WebsiteAlarmRule, error) {
+	value := &entity.WebsiteAlarmRule{}
+	err := DB.Get(WebsiteAlarmRuleTable, hostID, &value)
+	return value, err
+}
+
+func (w *websiteDao) GetScanCheckUp(hostID string) (*entity.WebsiteScanCheckUp, error) {
+	value := &entity.WebsiteScanCheckUp{}
+	err := DB.Get(WebsiteScanCheckUpTable, hostID, &value)
+	return value, err
+}
+
 func (w *websiteDao) addWebsite(data *entity.Website) error {
-	return DB.Set(WebSiteTable, data.Host, data)
+	return DB.Set(WebSiteTable, data.HostID, data)
 }
 
 func (w *websiteDao) addWebsiteAlarmRule(alarmRule *entity.WebsiteAlarmRule) error {
 	if alarmRule.Host == "" {
 		return fmt.Errorf("没有host")
 	}
-	return DB.Set(WebsiteAlarmRuleTable, alarmRule.Host, alarmRule)
+	return DB.Set(WebsiteAlarmRuleTable, alarmRule.HostID, alarmRule)
 }
 
 func (w *websiteDao) addWebsiteScanCheckUp(scan *entity.WebsiteScanCheckUp) error {
 	if scan.Host == "" {
 		return fmt.Errorf("没有host")
 	}
-	return DB.Set(WebsiteScanCheckUpTable, scan.Host, scan)
+	return DB.Set(WebsiteScanCheckUpTable, scan.HostID, scan)
 }
 
 func (w *websiteDao) Del() {
@@ -116,16 +150,41 @@ func (w *websiteDao) Update() {
 
 }
 
-func (w *websiteDao) SelectList() {
-
+func (w *websiteDao) SelectList() ([]*entity.Website, int, error) {
+	DB.Open()
+	defer func() {
+		_ = DB.Conn.Close()
+	}()
+	count := 0
+	data := make([]*entity.Website, 0)
+	err := DB.Conn.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(WebSiteTable))
+		if b == nil {
+			return fmt.Errorf(WebSiteTable + "表不存在")
+		}
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			count++
+			value := &entity.Website{}
+			e := json.Unmarshal(v, value)
+			if e != nil {
+				log.Error("数据解析错误")
+			}
+			data = append(data, value)
+		}
+		return nil
+	})
+	return data, count, err
 }
 
-func (w *websiteDao) Select() {
-
+func (w *websiteDao) Select(host string) (*entity.Website, error) {
+	website := &entity.Website{}
+	err := DB.Get(WebSiteTable, host, &website)
+	return website, err
 }
 
 func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
-
+	log.Info("Collect --> ", host)
 	info := &entity.WebsiteInfo{
 		Host: host,
 	}
@@ -144,7 +203,6 @@ func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
 		addr := GetIP(v)
 		info.IPAddr = append(info.IPAddr, &entity.IPAddr{v, addr})
 	}
-
 	// SSLCertificateInfo
 	info.SSLCertificateInfo, _ = GetCertificateInfo(host)
 
@@ -162,15 +220,17 @@ func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
 	return info
 }
 
-// 保存采集的网站信息
-func (w *websiteDao) saveCollectInfo(host string) error {
+// SaveCollectInfo 保存采集的网站信息
+func (w *websiteDao) SaveCollectInfo(host, hostID string) error {
+	log.Info("data = ", host)
 	info := w.Collect(host)
-	return DB.Set(WebSiteInfoTable, host, info)
+	info.HostID = hostID
+	return DB.Set(WebSiteInfoTable, hostID, info)
 }
 
-func (w *websiteDao) GetInfo(host string) (*entity.WebsiteInfo, error) {
+func (w *websiteDao) GetInfo(hostID string) (*entity.WebsiteInfo, error) {
 	info := &entity.WebsiteInfo{}
-	err := DB.Get(WebSiteInfoTable, host, info)
+	err := DB.Get(WebSiteInfoTable, hostID, info)
 	return info, err
 }
 

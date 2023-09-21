@@ -5,6 +5,7 @@ class Utils {
             url: url,
             data: "",
             dataType: 'json',
+            async: true,
             success: function(data){
                 func(data);
             },
@@ -36,6 +37,7 @@ class Utils {
             url: url,
             data: JSON.stringify(param),
             dataType: 'json',
+            async: true,
             success: function(data){
                 func(data);
             },
@@ -54,6 +56,7 @@ class Utils {
     }
 }
 
+// Mail
 let Mail= {
     init: {
         api: "/api/mail/init",
@@ -113,9 +116,12 @@ let Mail= {
     },
 }
 
+// add website
 let AddWebSite = {
     api: "/api/website/add",
+    apiGet: "/api/website/list",
     param : {},
+    list : [],
     common: new Utils(),
     next1Param: {
         hostProtocol: "https://",
@@ -242,8 +248,20 @@ let AddWebSite = {
             console.log(data);
             if (data.code === 0) {
                 $("#addHostModal").modal('toggle');
+                AddWebSite.getList();
             }
             common.ToastShow(data.msg);
+        });
+
+    },
+    getList: function () {
+        common.AjaxGet(AddWebSite.apiGet, function (data){
+            console.log(data);
+            if (data.code === 0) {
+                AddWebSite.list = data.data;
+            } else {
+                common.ToastShow(data.msg);
+            }
         });
     }
 }

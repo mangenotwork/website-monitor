@@ -222,3 +222,7 @@ thead tr th {
 .addTipNow {
     color: #0a53be;
 }
+
+.custom-tooltip {
+    --bs-tooltip-bg: var(--bs-primary);
+}

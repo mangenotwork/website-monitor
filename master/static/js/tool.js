@@ -4,7 +4,7 @@ const app = createApp({
     data() {
         return {
             mail: Mail,
-            addWebSite: AddWebSite,
+            webSite: AddWebSite,
             func: funcData,
             history: {
                 add: function (id, value) { return "/api/tool/history?toolID="+id+"&value="+value; },

@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/mangenotwork/common/ginHelper"
 	"github.com/mangenotwork/common/log"
+	"github.com/mangenotwork/common/utils"
 	"time"
 	"website-monitor/master/constname"
 	"website-monitor/master/dao"
@@ -108,15 +109,60 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 }
 
 func WebsiteList(c *ginHelper.GinCtx) {
-
+	data, _, err := dao.NewWebsite().SelectList()
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut(data, "")
+	return
 }
 
 func WebsiteDelete(c *ginHelper.GinCtx) {
 
 }
 
-func WebsiteInfo(c *ginHelper.GinCtx) {
+type WebsiteInfoOutPut struct {
+	Base        WebsiteOutPut              `json:"base"`
+	Info        *entity.WebsiteInfo        `json:"info"`
+	AlarmRule   *entity.WebsiteAlarmRule   `json:"alarmRule"`
+	ScanCheckUp *entity.WebsiteScanCheckUp `json:"scanCheckUp"`
+}
 
+type WebsiteOutPut struct {
+	*entity.Website
+	Date string `json:"date"`
+}
+
+func WebsiteInfo(c *ginHelper.GinCtx) {
+	host := c.Param("host")
+	website := dao.NewWebsite()
+	output := &WebsiteInfoOutPut{}
+	var err error
+	base, err := website.Select(host)
+	output.Base = WebsiteOutPut{base, utils.Timestamp2Date(base.Created)}
+	output.Info, err = website.GetInfo(host)
+	output.AlarmRule, err = website.GetAlarmRule(host)
+	output.ScanCheckUp, err = website.GetScanCheckUp(host)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut(output, "")
+	return
+}
+
+func WebsiteInfoRefresh(c *ginHelper.GinCtx) {
+	host := c.GetQuery("host")
+	hostId := c.GetQuery("id")
+	log.Info("WebsiteInfoRefresh")
+	err := dao.NewWebsite().SaveCollectInfo(host, hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut("ok", "")
+	return
 }
 
 func WebsiteUrls(c *ginHelper.GinCtx) {

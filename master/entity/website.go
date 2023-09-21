@@ -11,6 +11,8 @@ type Website struct {
 	// 默认取根url进行检测，主键
 	Host string `json:"host"`
 
+	HostID string `json:"hostID"` // host MD5值
+
 	// 监测频率  单位 ms
 	MonitorRate int64 `json:"monitorRate"`
 
@@ -34,6 +36,7 @@ type Website struct {
 // WebsiteAlarmRule 报警规则
 type WebsiteAlarmRule struct {
 	Host                     string `json:"host"`                     // 主键与website Host对应
+	HostID                   string `json:"hostID"`                   // key 键
 	WebsiteSlowResponseTime  int64  `json:"websiteSlowResponseTime"`  // 单位ms  网站响应有多慢才记录报警
 	WebsiteSlowResponseCount int64  `json:"websiteSlowResponseCount"` // 连续几次慢就发送邮件通知
 	SSLCertificateExpire     int64  `json:"SSLCertificateExpire"`     // 单位天 证书还有几天过期就触发报警
@@ -45,6 +48,7 @@ type WebsiteAlarmRule struct {
 // WebsiteScanCheckUp 网站扫描检查内容
 type WebsiteScanCheckUp struct {
 	Host         string `json:"host"`         // 主键与website Host对应
+	HostID       string `json:"hostID"`       // key 键
 	ScanDepth    int64  `json:"uriDepth"`     // 扫描站点深度 默认 2
 	ScanRate     int64  `json:"scanRate"`     // 扫描网站频率  单位秒
 	ScanExtLinks bool   `json:"scanExtLinks"` // 是否检查外链,对比上一次扫描数据判别外链是否变化
@@ -56,6 +60,7 @@ type WebsiteScanCheckUp struct {
 // WebsiteInfo 网站基本信息
 type WebsiteInfo struct {
 	Host               string              `json:"host"`               // 主键与website Host对应
+	HostID             string              `json:"hostID"`             // key 键
 	Title              string              `json:"title"`              // Title
 	Description        string              `json:"description"`        // Description
 	Keywords           string              `json:"keywords"`           // Keywords
@@ -74,6 +79,7 @@ type WebsiteInfo struct {
 // WebSiteUrl 网站的URL存储
 type WebSiteUrl struct {
 	Host    string   `json:"host"`    // 主键与website Host对应
+	HostID  string   `json:"hostID"`  // key 键
 	AllUri  []string `json:"allUri"`  // 抓取到的所有链接
 	ExtLink []string `json:"extLink"` // 外链
 	BadLink []string `json:"badLink"` // 死链
@@ -83,14 +89,16 @@ type WebSiteUrl struct {
 
 // WebSiteUrlPoint 指定网站监测Url
 type WebSiteUrlPoint struct {
-	Host string   `json:"host"` // 主键与website Host对应
-	Url  []string `json:"url"`
+	Host   string   `json:"host"`   // 主键与website Host对应
+	HostID string   `json:"hostID"` // key 键
+	Url    []string `json:"url"`
 }
 
 // WebSiteAlert 监控报警信息
 type WebSiteAlert struct {
-	Host string       `json:"host"` // 主键与website Host对应
-	List []*AlertData `json:"list"`
+	Host   string       `json:"host"`   // 主键与website Host对应
+	HostID string       `json:"hostID"` // key 键
+	List   []*AlertData `json:"list"`
 }
 
 // TODO 请求的时候要设置 Accept-Encoding ： gzip, deflate, br

@@ -12,9 +12,10 @@
 - tool : 获取证书  ok
 - tool : 网站信息获取  ok
 - master 添加网站 ok
-- master 监测网站列表
-- master 获取网站基础信息
+- master 监测网站列表 ok
+- master 获取网站基础信息 ok
 - master 删除网站监测
+- master 扫描网站Url
 - master 监测网站采集到url
 - master 监测设置
 - master 图表

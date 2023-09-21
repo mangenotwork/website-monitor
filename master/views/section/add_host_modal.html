@@ -17,45 +17,45 @@
                 <div id="next1Forms" style="padding-left: 8%;padding-right: 8%;">
                     <div class="input-group mb-3">
                         <label class="input-group-text" style="width: 10%;">网站URL</label>
-                        <select class="form-select" v-model="addWebSite.next1Param.hostProtocol" style="width: 20%;">
+                        <select class="form-select" v-model="webSite.next1Param.hostProtocol" style="width: 20%;">
                             <option value="https://">https://</option>
                             <option value="http://">http://</option>
                         </select>
-                        <input type="text" class="form-control" v-model="addWebSite.next1Param.hostUrl" style="width: 70%;" aria-label="Text input with dropdown button">
+                        <input type="text" class="form-control" v-model="webSite.next1Param.hostUrl" style="width: 70%;" aria-label="Text input with dropdown button">
                     </div>
                     <div class="mb-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next1Param.notes" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next1Param.notes" placeholder="name@example.com">
                             <label>备注</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next1Param.monitorRate" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next1Param.monitorRate" placeholder="name@example.com">
                             <label>监测频率(单位s)</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next1Param.contrastUrl" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next1Param.contrastUrl" placeholder="name@example.com">
                             <label>对照组URL(保证监测的有效性:每次监测前先过对照组+ping来确认当前监测器网络的情况)</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next1Param.contrastTime" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next1Param.contrastTime" placeholder="name@example.com">
                             <label>对照组响应超时(单位ms;超过这个时间判定为当前网络不稳定不执行本次监测请求)</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next1Param.ping" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next1Param.ping" placeholder="name@example.com">
                             <label>Ping(保证监测的有效性:每次监测前先过对照组+ping来确认当前监测器网络的情况)</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next1Param.pingTime" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next1Param.pingTime" placeholder="name@example.com">
                             <label>Ping响应超时(单位ms;超过这个时间判定为当前网络不稳定不执行本次监测请求)</label>
                         </div>
                     </div>
@@ -63,31 +63,31 @@
                 <div id="next2Forms" style="padding-left: 8%;padding-right: 8%;display: none;" >
                     <div class="mb-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next2Param.uriDepth" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next2Param.uriDepth" placeholder="name@example.com">
                             <label>扫描网站深度</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next2Param.scanRate" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next2Param.scanRate" placeholder="name@example.com">
                             <label>扫描网站频率(单位小时)</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" v-model="addWebSite.next2Param.scanBadLink" role="switch" checked>
+                            <input class="form-check-input" type="checkbox" v-model="webSite.next2Param.scanBadLink" role="switch" checked>
                             <label class="form-check-label">死链检查</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" v-model="addWebSite.next2Param.scanTDK" role="switch">
+                            <input class="form-check-input" type="checkbox" v-model="webSite.next2Param.scanTDK" role="switch">
                             <label class="form-check-label">TDK为空检查</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" v-model="addWebSite.next2Param.scanExtLinks" role="switch">
+                            <input class="form-check-input" type="checkbox" v-model="webSite.next2Param.scanExtLinks" role="switch">
                             <label class="form-check-label">外链变化检查</label>
                         </div>
                     </div>
@@ -117,15 +117,15 @@
                             <label class="form-check-label">响应状态码错误报警；例如 404,500...</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next3Param.websiteSlowResponseTime" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next3Param.websiteSlowResponseTime" placeholder="name@example.com">
                             <label>网站响应多慢记录报警(单位ms)</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next3Param.websiteSlowResponseCount" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next3Param.websiteSlowResponseCount" placeholder="name@example.com">
                             <label>连续几次慢就发送邮件通知</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" v-model="addWebSite.next3Param.SSLCertificateExpire" placeholder="name@example.com">
+                            <input type="text" class="form-control" v-model="webSite.next3Param.SSLCertificateExpire" placeholder="name@example.com">
                             <label>证书到期预警邮件通知(单位天)</label>
                         </div>
                         其他: 开启了扫描检查，检查到问题就会有对应的报警通知;例如开启了死链扫描检查检查到死链就会发送报警通知邮件；
@@ -135,17 +135,17 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <div id="next1But">
-                    <a type="button" class="btn btn-primary" @click="addWebSite.addNext1">下一步</a>
+                    <a type="button" class="btn btn-primary" @click="webSite.addNext1">下一步</a>
                 </div>
 
                 <div id="next2But" style="display: none;">
-                    <a type="button" class="btn btn-primary" @click="addWebSite.addReturn1" style="margin-right: 8px;">返回上一步</a>
-                    <a type="button" class="btn btn-primary" @click="addWebSite.addNext2">下一步</a>
+                    <a type="button" class="btn btn-primary" @click="webSite.addReturn1" style="margin-right: 8px;">返回上一步</a>
+                    <a type="button" class="btn btn-primary" @click="webSite.addNext2">下一步</a>
                 </div>
 
                 <div id="next3But" style="display: none;">
-                    <a type="button" class="btn btn-primary" @click="addWebSite.addReturn2" style="margin-right: 8px;">返回上一步</a>
-                    <a type="button" class="btn btn-primary" @click="addWebSite.addSubmit">确认提交</a>
+                    <a type="button" class="btn btn-primary" @click="webSite.addReturn2" style="margin-right: 8px;">返回上一步</a>
+                    <a type="button" class="btn btn-primary" @click="webSite.addSubmit">确认提交</a>
                 </div>
             </div>
         </div>

@@ -7,62 +7,96 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p style="font-size: 12px;margin-bottom: 4px;">主机: {{ websiteInfo.data.Host }} </p>
-                <p style="font-size: 12px;margin-bottom: 4px;">根URI: {{ websiteInfo.data.HealthUri }}</p>
-                <p style="font-size: 12px;margin-bottom: 4px;">IP: {{ websiteInfo.data.HostIP }} => {{ websiteInfo.data.IPAddress }} </p>
-                <p style="font-size: 12px;margin-bottom: 4px;">采集深度: {{ websiteInfo.data.UriDepth }}</p>
-                <p style="font-size: 12px;margin-bottom: 4px;">监测评率: {{ websiteInfo.data.Rate }} s</p>
-                <p style="font-size: 12px;margin-bottom: 4px;">响应慢触发报警: {{ websiteInfo.data.AlarmResTime }} ms</p>
-                <p style="font-size: 12px;margin-bottom: 4px;">监测方式: 根URI+随机URI+监测点/{{ websiteInfo.data.Rate }}s</p>
-                <hr>
-                <p style="font-size: 12px;margin-bottom: 4px;">URI: </p>
-                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
-                    <template v-if="websiteInfo.data.AllUri === null">
-                        <p>采集中...</p>
-                    </template>
-                    <template v-else>
-                        <template v-for="item in websiteInfo.data.AllUri">
-                            <li class="list-group-item list-group-item-action">
-                                <span>{{ item }}</span>
-                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank"><img src="/static/bootstrap/img/window.svg" alt="" width="18" height="18"></a>
-                                <a class="copy" style="float: right; margin-right: 12px;" :data-clipboard-text="item" @click="copy"><img src="/static/bootstrap/img/link.svg" alt="" width="18" height="18"></a>
-                                <a style="float: right; margin-right: 12px;" @click="gotoUriPoint(websiteInfo.data.ID, item)"><img src="/static/bootstrap/img/broadcast-pin.svg" alt="" width="18" height="18"></a>
-                            </li>
-                        </template>
-                    </template>
-                </ul>
-                <hr>
-                <p style="font-size: 12px;margin-bottom: 4px;">外链: </p>
-                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
-                    <template v-if="websiteInfo.data.ExtLink === null">
-                        <p>采集中...</p>
-                    </template>
-                    <template v-else>
-                        <template v-for="item in websiteInfo.data.ExtLink">
-                            <li class="list-group-item list-group-item-action">
-                                <span>{{ item }}</span>
-                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank"><img src="/static/bootstrap/img/window.svg" alt="" width="18" height="18"></a>
-                                <a style="float: right; margin-right: 12px;" @click="copyUri(item)"><img src="/static/bootstrap/img/link.svg" alt="" width="18" height="18"></a>
-                            </li>
-                        </template>
-                    </template>
-                </ul>
-                <hr>
-                <p style="font-size: 12px;margin-bottom: 4px;">死链接: </p>
-                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
-                    <template v-if="websiteInfo.data.BadLink === null">
-                        <p>采集中...</p>
-                    </template>
-                    <template v-else>
-                        <template v-for="item in websiteInfo.data.BadLink">
-                            <li class="list-group-item list-group-item-action">
-                                <span>{{ item }}</span>
-                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank"><img src="/static/bootstrap/img/window.svg" alt="" width="18" height="18"></a>
-                                <a style="float: right; margin-right: 12px;" @click="copyUri(item)"><img src="/static/bootstrap/img/link.svg" alt="" width="18" height="18"></a>
-                            </li>
-                        </template>
-                    </template>
-                </ul>
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">监测信息 <a href="#" class="stretched-link" style="float: right;">修改</a>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 12px;margin-bottom: 4px;">主机: {{ websiteInfo.data.base.host }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">备注: {{ websiteInfo.data.base.notes }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">监测ID: {{ websiteInfo.data.base.hostID }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">监测请求频率: {{ websiteInfo.data.base.monitorRate }}s/次 </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">对照组: {{ websiteInfo.data.base.contrastUrl }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">ping: {{ websiteInfo.data.base.ping }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">创建时间: {{ websiteInfo.data.base.date }} </p>
+                    </div>
+                </div>
+
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">网站信息 <a @click="refreshWebsiteInfo(websiteInfo.data.base.host, websiteInfo.data.base.hostID)" style="float: right;cursor: pointer;">刷新</a></div>
+                    <div class="card-body">
+                        icon : <img :src="websiteInfo.data.info.icon" width="36" height="36">
+                        <p style="font-size: 12px;margin-bottom: 4px;">title: {{ websiteInfo.data.info.title }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">keywords: {{ websiteInfo.data.info.keywords }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">description: {{ websiteInfo.data.info.description }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">IPAddr:  {{ websiteInfo.data.info.IPAddr }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">server:  {{ websiteInfo.data.info.server }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">contentEncoding:  {{ websiteInfo.data.info.contentEncoding }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">contentLanguage:  {{ websiteInfo.data.info.contentLanguage }}  </p>
+                    </div>
+                </div>
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">网站信息 - DNS信息 <a @click="refreshWebsiteInfo(websiteInfo.data.base.host, websiteInfo.data.base.hostID)" style="float: right;cursor: pointer;">刷新</a></div>
+                    <div class="card-body">
+                        <p style="font-size: 12px;margin-bottom: 4px;">DNS-ips:  {{ websiteInfo.data.info.DNS.ips }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">DNS-cname:  {{ websiteInfo.data.info.DNS.cname }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">DNS-isCDN:  {{ websiteInfo.data.info.DNS.isCDN }}  </p>
+                    </div>
+                </div>
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">网站信息 - SSL证书信息 <a @click="refreshWebsiteInfo(websiteInfo.data.base.host, websiteInfo.data.base.hostID)" style="float: right;">刷新</a></div>
+                    <div class="card-body">
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-有效时间:  {{ websiteInfo.data.info.SSLCertificateInfo.effectiveTime }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-DNSName:  {{ websiteInfo.data.info.SSLCertificateInfo.dnsName }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-OCSPServer:  {{ websiteInfo.data.info.SSLCertificateInfo.ocspServer }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-CRL分发点:  {{ websiteInfo.data.info.SSLCertificateInfo.crlDistributionPoints }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-颁发者:  {{ websiteInfo.data.info.SSLCertificateInfo.issuer }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-颁发证书URL:  {{ websiteInfo.data.info.SSLCertificateInfo.issuingCertificateURL }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-公钥算法:  {{ websiteInfo.data.info.SSLCertificateInfo.publicKeyAlgorithm }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-颁发对象:  {{ websiteInfo.data.info.SSLCertificateInfo.subject }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-版本:  {{ websiteInfo.data.info.SSLCertificateInfo.version }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-证书算法:  {{ websiteInfo.data.info.SSLCertificateInfo.signatureAlgorithm }}  </p>
+                    </div>
+                </div>
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">网站信息 - Whois信息 <a @click="refreshWebsiteInfo(websiteInfo.data.base.host, websiteInfo.data.base.hostID)" style="float: right;cursor: pointer;">刷新</a></div>
+                    <div class="card-body">
+                        <pre>whois-rse:  {{ websiteInfo.data.info.whois.rse }}  </pre>
+                        <pre>whois-root:  {{ websiteInfo.data.info.whois.root }}  </pre>
+                    </div>
+                </div>
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">网站信息 - IPC信息 <a @click="refreshWebsiteInfo(websiteInfo.data.base.host, websiteInfo.data.base.hostID)" style="float: right;cursor: pointer;">刷新</a></div>
+                    <div class="card-body">
+                        <p style="font-size: 12px;margin-bottom: 4px;">IPC-公司:  {{ websiteInfo.data.info.IPC.company }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">IPC-性质:  {{ websiteInfo.data.info.IPC.nature }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">IPC-ipc:  {{ websiteInfo.data.info.IPC.ipc }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">IPC-网站名称:  {{ websiteInfo.data.info.IPC.websiteName }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">IPC-网站主页:  {{ websiteInfo.data.info.IPC.websiteIndex }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">IPC-审核日期:  {{ websiteInfo.data.info.IPC.auditDate }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">IPC-是否限制接入:  {{ websiteInfo.data.info.IPC.restrictAccess }}  </p>
+                    </div>
+                </div>
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">扫描规则 <a href="#" class="stretched-link" style="float: right;">修改</a></div>
+                    <div class="card-body">
+                        <p style="font-size: 12px;margin-bottom: 4px;">扫描站点深度:  {{ websiteInfo.data.scanCheckUp.uriDepth }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">扫描网站频率:  {{ websiteInfo.data.scanCheckUp.scanRate }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">是否检查外链:  {{ websiteInfo.data.scanCheckUp.scanExtLinks }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">是否扫描死链接:  {{ websiteInfo.data.scanCheckUp.scanBadLink }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">是否扫描进行TDK检查:  {{ websiteInfo.data.scanCheckUp.scanTDK }} </p>
+                    </div>
+                </div>
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">报警规则 <a href="#" class="stretched-link" style="float: right;">修改</a></div>
+                    <div class="card-body">
+                        <p style="font-size: 12px;margin-bottom: 4px;">网站响应有多慢才记录报警:  {{ websiteInfo.data.alarmRule.websiteSlowResponseTime }}  </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">连续几次慢就发送邮件通知:  {{ websiteInfo.data.alarmRule.websiteSlowResponseCount }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">证书还有几天过期就触发报警:  {{ websiteInfo.data.alarmRule.SSLCertificateExpire }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">在随机监测中发现网站页面没有存在 title, description, keywords 就触发报警:  {{ websiteInfo.data.alarmRule.notTDK }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">扫描的时候存在死链就报警:  {{ websiteInfo.data.alarmRule.badLink }} </p>
+                        <p style="font-size: 12px;margin-bottom: 4px;">扫描间隔判断外链有变化则报警:  {{ websiteInfo.data.alarmRule.extLinkChange }} </p>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
             </div>

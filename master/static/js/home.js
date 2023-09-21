@@ -4,7 +4,7 @@ const app = createApp({
     data() {
         return {
             mail: Mail,
-            addWebSite: AddWebSite,
+            webSite: AddWebSite,
             websiteList: {
                 api: function (){ return "/api/website/list"; },
                 page: 1,
@@ -28,9 +28,80 @@ const app = createApp({
                 nowUri: "",
             },
             websiteInfo: {
+                host: "",
                 hostId: "",
                 api: function() { return "/api/website/info/"+this.hostId; },
-                data: {}
+                refresh: function () { return "/api/website/info/refresh?host="+this.host+"&id="+this.hostId;},
+                data: {
+                    base: {
+                        host: "",
+                        hostID: "",
+                        monitorRate: 0,
+                        contrastUrl: "",
+                        contrastTime: 0,
+                        ping: "",
+                        pingTime: 0,
+                        notes: "",
+                        date: ""
+                    },
+                    info:{
+                        title: "",
+                        description: "",
+                        keywords: "",
+                        icon: "",
+                        DNS: {
+                            ips: "",
+                            cname: "",
+                            isCDN: false,
+                        },
+                        IPAddr: [],
+                        server: "",
+                        contentEncoding: "",
+                        contentLanguage: "",
+                        SSLCertificateInfo: {
+                            url: "",
+                            effectiveTime: "",
+                            dnsName: "",
+                            ocspServer: "",
+                            crlDistributionPoints: "",
+                            issuer: "",
+                            issuingCertificateURL: "",
+                            publicKeyAlgorithm: "",
+                            subject: "",
+                            version: "",
+                            signatureAlgorithm: ""
+                        },
+                        whois: {
+                            root: "",
+                            rse: ""
+                        },
+                        IPC: {
+                            host: "",
+                            company: "",
+                            nature: "",
+                            ipc: "",
+                            websiteName: "",
+                            websiteIndex: "",
+                            auditDate: "",
+                            restrictAccess: ""
+                        }
+                    },
+                    alarmRule: {
+                        websiteSlowResponseTime: 0,
+                        websiteSlowResponseCount: 0,
+                        SSLCertificateExpire: 0,
+                        notTDK: false,
+                        badLink: false,
+                        extLinkChange: false
+                    },
+                    scanCheckUp: {
+                        uriDepth: 0,
+                        scanRate: 0,
+                        scanExtLinks: false,
+                        scanBadLink: false,
+                        scanTDK: false
+                    },
+                }
             },
             alertList: {
                 api: "/api/alert/list",
@@ -90,10 +161,10 @@ const app = createApp({
     },
     created:function(){
         let t = this;
-        t.getList();
+        t.webSite.getList();
         t.mail.hasSet();
         t.mail.getInfo();
-        // t.getAlertList();
+        //t.getAlertList();
         // t.getMonitorErrList();
 
 
@@ -106,28 +177,6 @@ const app = createApp({
         // window.clearInterval(t.timer);
     },
     methods: {
-        addWebSiteMonitor: function () {
-            let t = this;
-            t.addWebSite.param.rate = Number(t.addWebSite.param.rate);
-            t.addWebSite.param.alarmResTime = Number(t.addWebSite.param.alarmResTime);
-            t.addWebSite.param.uriDepth = Number(t.addWebSite.param.uriDepth);
-            common.AjaxPost(t.addWebSite.api, t.addWebSite.param, function (data){
-                if (data.code === 0) {
-                    $("#addHostModal").modal('toggle');
-                    t.getList();
-                }
-                common.ToastShow(data.msg);
-            });
-        },
-        test:function () {
-            console.log("test...")
-        },
-        getList: function () {
-            let t = this;
-            common.AjaxGet(t.websiteList.api(), function (data){
-                t.websiteList.data = data.data;
-            });
-        },
         getAlertList: function () {
             let t = this;
             common.AjaxGet(t.alertList.api, function (data) {
@@ -223,6 +272,7 @@ const app = createApp({
             let t = this;
             t.websiteInfo.hostId = id;
             common.AjaxGet(t.websiteInfo.api(), function (data){
+                console.log(data);
                 if (data.code === 0) {
                     t.websiteInfo.data = data.data;
                     $("#websiteInfoModal").modal('show');
@@ -230,6 +280,21 @@ const app = createApp({
                     common.ToastShow(data.msg);
                 }
             });
+        },
+        refreshWebsiteInfo: function (host, id) {
+            let t = this;
+            t.websiteInfo.host = host;
+            t.websiteInfo.hostId = id;
+            common.AjaxGetNotAsync(t.websiteInfo.refresh(), function (data){
+                if (data.code === 0) {
+                    t.openWebsiteInfo(id);
+                } else {
+                    common.ToastShow(data.msg);
+                }
+            });
+        },
+        gotoWebsite: function (item) {
+            window.open(item.host, '_blank');
         },
         logShow: function (id) {
             let t = this;

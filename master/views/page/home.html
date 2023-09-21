@@ -7,18 +7,14 @@
                 {[ template "__menu__.html" . ]}
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <template v-if="mail.init.data===false">
-                        <div class="alert alert-danger" role="alert">
-                            <a aria-current="page" data-bs-toggle="modal" data-bs-target="#mailSetModal">还未设置邮件通知! 请点击 <span style="text-decoration:underline;">邮件设置</span> 进行设置</a>
-                        </div>
+                        <div class="alert alert-danger" role="alert"><a aria-current="page" data-bs-toggle="modal" data-bs-target="#mailSetModal">还未设置邮件通知! 请点击 <span style="text-decoration:underline;">邮件设置</span> 进行设置</a></div>
                     </template>
                     <div class="row" style="margin-bottom: 24px;">
                         <div class="col">
                             <div class="card box">
                                 <div class="card-header">网站监测报警通知
-                                    <template v-if="alertList.len !== 0">
-                                        <span class="badge text-bg-danger">{{ alertList.len }}</span>
-                                    </template>
-                                    <a @click="alertClear" style="float: right;">{[ SVG "record-circle-fill" 18 18 ]}</a>
+                                    <template v-if="alertList.len !== 0"><span class="badge text-bg-danger">{{ alertList.len }}</span></template>
+                                    <a @click="alertClear" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="确认所有报警信息" >{[ SVG "record-circle-fill" 18 18 ]}</a>
                                 </div>
                                 <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
                                     <ul class="list-group list-group-flush">
@@ -41,7 +37,7 @@
                                 </div>
                                 <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
                                     <ul class="list-group list-group-flush">
-                                        <template v-if="monitorErrList.len === 0"><p style="text-align: center;color: red;">没有连接监测器,请部署检测器!!!</p></template>
+                                        <template v-if="monitorErrList.len === 0"><p style="text-align: center;color: red;">没有连接监测器,请部署监测器!!!</p></template>
                                         <template v-else>
                                             <template v-for="item in monitorErrList.list">
                                                 <li class="list-group-item list-group-item-action"><span>{{item}}</span></li>
@@ -52,47 +48,44 @@
                             </div>
                         </div>
                     </div>
-
                     <div style="margin-top: 24px;padding: 0px;">
                         <div class="box" style="height: calc(100vh - 320px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
                             <table class="table table-hover">
                                 <thead style="z-index: 99;">
                                     <tr>
                                         <th scope="col">网站</th>
+                                        <th scope="col">备注</th>
                                         <th scope="col">报警</th>
-                                        <th scope="col">监测方式</th>
-                                        <th scope="col">根URI</th>
-                                        <th scope="col">状态码</th>
-                                        <th scope="col">响应</th>
+                                        <th scope="col">监测请求频率</th>
                                         <th scope="col">Ping</th>
                                         <th scope="col">对照组</th>
                                         <th scope="col">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <template v-for="item in websiteList.data.List">
+                                <template v-for="item in webSite.list">
                                     <tr>
-                                        <td><a @click="openAlert(item.ID)"><span style="font-size: 14px;"><b>{{ item.Host }}</b></span></a></td>
+                                        <td><a @click="openAlert(item.ID)" style="cursor: pointer;"><span style="font-size: 14px;"><b>{{ item.host }}</b></span></a></td>
+                                        <td><span style="font-size: 14px;">{{ item.notes }}</span></td>
                                         <td>
-                                            <template v-if="item.AlertCount>0">
-                                                <a @click="openAlert(item.ID)"><span class="badge text-bg-danger">报警: {{ item.AlertCount }}</span></a>
-                                            </template>
-                                            <template v-else><span class="badge text-bg-success">Passed</span></template>
+                                            <span class="badge text-bg-success">Passed</span>
+<!--                                            <template v-if="item.AlertCount>0">-->
+<!--                                                <a @click="openAlert(item.ID)"><span class="badge text-bg-danger">报警: TODO </span></a>-->
+<!--                                            </template>-->
+<!--                                            <template v-else><span class="badge text-bg-success">Passed</span></template>-->
                                         </td>
-                                        <td><span style="font-size: 10px;">根URI+随机URI+监测点/{{ item.Rate }}s</span></td>
-                                        <td><span style="font-size: 10px;">{{ item.HealthUri }}</span></td>
-                                        <td>{{ item.Code }}</td>
-                                        <td>{{ item.Ms }}ms</td>
-                                        <td>{{ item.PingMs }}ms</td>
-                                        <td>{{ item.ContrastMs }}ms</td>
+                                        <td><span style="font-size: 14px;">{{ item.monitorRate }}s/次</span></td>
+                                        <td><span style="font-size: 10px;">{{ item.ping }}</span></td>
+                                        <td><span style="font-size: 10px;">{{ item.contrastUrl }}</span></td>
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="修改网站监测配置" @click="openEditWebsiteConf(item)">{[ SVG "gear-fill" 18 18]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="查看网站信息" @click="openWebsiteInfo(item.ID)">{[ SVG "house-fill" 18 18 ]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="设置网站监测点(Url)" @click="setUriPoint(item)">{[ SVG "broadcast" 18 18 ]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测日志" @click="logShow(item.ID)">{[ SVG "file-text-fill" 18 18 ]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测图" @click="openChart(item)">{[ SVG "graph-up" 18 18 ]}</button>
-                                                <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除该网站监测" @click="deleteWebsiteOpen(item)">{[ SVG "trash-fill" 18 18 ]}</button>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="查看网站信息" @click="openWebsiteInfo(item.hostID)">{[ SVG "house-fill" 18 18 ]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="gotoWebsite(item)">{[ SVG "browser-chrome" 18 18 ]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="修改网站监测配置" @click="openEditWebsiteConf(item)">{[ SVG "gear-fill" 18 18]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="设置网站监测点(Url)" @click="setUriPoint(item)">{[ SVG "broadcast" 18 18 ]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测日志" @click="logShow(item)">{[ SVG "file-text-fill" 18 18 ]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测图" @click="openChart(item)">{[ SVG "graph-up" 18 18 ]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除该网站监测" @click="deleteWebsiteOpen(item)">{[ SVG "trash-fill" 18 18 ]}</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -114,14 +107,9 @@
                 </main>
             </div>
         </div>
-
     </div>
 </body>
-<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
-<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-<script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+{[ template "__js__.html" . ]}
 <script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
 <script src="/static/js/home.js?v={[ .TimeStamp ]}"></script>
 {[ template "__end__.html" . ]}

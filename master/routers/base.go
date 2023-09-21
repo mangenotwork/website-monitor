@@ -61,9 +61,10 @@ func API() {
 
 	// website
 	api.POST("/website/add", ginHelper.Handle(handler.WebsiteAdd))                   // 创建网站监测
-	api.GET("/website/list", ginHelper.Handle(handler.WebsiteList))                  // TODO 监测网站列表
+	api.GET("/website/list", ginHelper.Handle(handler.WebsiteList))                  // 监测网站列表
+	api.GET("/website/info/:host", ginHelper.Handle(handler.WebsiteInfo))            // 监测网站详情
+	api.GET("/website/info/refresh", ginHelper.Handle(handler.WebsiteInfoRefresh))   // 监测网站详情刷新
 	api.GET("/website/delete/:hostId", ginHelper.Handle(handler.WebsiteDelete))      // TODO 删除网站监测
-	api.GET("/website/info/:hostId", ginHelper.Handle(handler.WebsiteInfo))          // TODO 监测网站详情
 	api.GET("/website/urls/:hostId", ginHelper.Handle(handler.WebsiteUrls))          // TODO 监测网站采集到url
 	api.POST("/website/edit", ginHelper.Handle(handler.WebsiteEdit))                 // TODO 监测设置
 	api.GET("/website/chart/:hostId", ginHelper.Handle(handler.WebsiteChart))        // TODO 图表
