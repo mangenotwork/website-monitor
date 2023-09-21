@@ -3,7 +3,6 @@ package dao
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/boltdb/bolt"
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"

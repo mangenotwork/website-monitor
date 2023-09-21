@@ -248,7 +248,6 @@ let AddWebSite = {
             console.log(data);
             if (data.code === 0) {
                 $("#addHostModal").modal('toggle');
-                AddWebSite.getList();
             }
             common.ToastShow(data.msg);
         });

@@ -11,8 +11,8 @@ const app = createApp({
                 data: [],
             },
             deleteWebsite: {
-                api: function (){ return "/api/website/delete/" + this.id; },
-                id: "",
+                api: function (){ return "/api/website/delete/" + this.hostId; },
+                hostId: "",
                 hostName: "",
             },
             point: {
@@ -318,8 +318,8 @@ const app = createApp({
         },
         deleteWebsiteOpen: function (item) {
             let t = this;
-            t.deleteWebsite.hostId = item.ID;
-            t.deleteWebsite.hostName = item.Host;
+            t.deleteWebsite.hostId = item.hostID;
+            t.deleteWebsite.hostName = item.host;
             t.isOk = "deleteWebsite";
             $("#isOkModal").modal("show");
         },
@@ -327,9 +327,9 @@ const app = createApp({
             let t = this;
             common.AjaxGet(t.deleteWebsite.api(), function (data){
                 common.ToastShow(data.msg);
-                t.getMonitorErrList();
+                //t.getMonitorErrList();
                 $("#isOkModal").modal('toggle');
-                t.getList();
+                location.reload();
             });
         },
         openEditWebsiteConf: function (item) {

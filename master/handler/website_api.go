@@ -119,7 +119,14 @@ func WebsiteList(c *ginHelper.GinCtx) {
 }
 
 func WebsiteDelete(c *ginHelper.GinCtx) {
-
+	host := c.Param("host")
+	err := dao.NewWebsite().Del(host)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut("ok", "成功删除")
+	return
 }
 
 type WebsiteInfoOutPut struct {
@@ -166,7 +173,14 @@ func WebsiteInfoRefresh(c *ginHelper.GinCtx) {
 }
 
 func WebsiteUrls(c *ginHelper.GinCtx) {
-
+	hostId := c.Param("host")
+	data, err := dao.NewWebsite().GetWebSiteUrl(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut(data, "")
+	return
 }
 
 func WebsiteEdit(c *ginHelper.GinCtx) {

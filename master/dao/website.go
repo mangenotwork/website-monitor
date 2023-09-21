@@ -13,7 +13,7 @@ import (
 
 type WebsiteEr interface {
 	Add(data *entity.Website, alarmRule *entity.WebsiteAlarmRule, scan *entity.WebsiteScanCheckUp) error
-	Del()
+	Del(hostID string) error
 	Update()
 	SelectList() ([]*entity.Website, int, error)
 	Select(hostID string) (*entity.Website, error)
@@ -28,7 +28,7 @@ type WebsiteEr interface {
 	AlertList()
 
 	// GetWebSiteUrl 获取采集的网站Url
-	GetWebSiteUrl()
+	GetWebSiteUrl(hostId string) (*entity.WebSiteUrl, error)
 
 	// SetUrlPoint 设置指定监测Url点
 	SetUrlPoint()
@@ -107,7 +107,10 @@ func (w *websiteDao) Add(data *entity.Website, rule *entity.WebsiteAlarmRule, sc
 		_ = w.SaveCollectInfo(data.Host, hostKey)
 	}()
 
-	// TODO 异步执行扫描
+	// 异步执行扫描
+	go func() {
+		Scan(data.Host, hostKey, scan.ScanDepth)
+	}()
 
 	return err
 }
@@ -142,8 +145,17 @@ func (w *websiteDao) addWebsiteScanCheckUp(scan *entity.WebsiteScanCheckUp) erro
 	return DB.Set(WebsiteScanCheckUpTable, scan.HostID, scan)
 }
 
-func (w *websiteDao) Del() {
-
+func (w *websiteDao) Del(hostID string) error {
+	// TODO... 通知停止监测
+	// 删除 Website
+	err := DB.Delete(WebSiteTable, hostID)
+	// 删除 WebsiteAlarmRule
+	err = DB.Delete(WebsiteAlarmRuleTable, hostID)
+	// 删除 WebsiteScanCheckUp
+	err = DB.Delete(WebsiteScanCheckUpTable, hostID)
+	// 删除 WebsiteInfo
+	err = DB.Delete(WebSiteInfoTable, hostID)
+	return err
 }
 
 func (w *websiteDao) Update() {
@@ -317,8 +329,10 @@ func (w *websiteDao) AlertList() {
 
 }
 
-func (w *websiteDao) GetWebSiteUrl() {
-
+func (w *websiteDao) GetWebSiteUrl(hostId string) (*entity.WebSiteUrl, error) {
+	urlData := &entity.WebSiteUrl{}
+	err := DB.Get(WebSiteURITable, hostId, &urlData)
+	return urlData, err
 }
 
 func (w *websiteDao) SetUrlPoint() {

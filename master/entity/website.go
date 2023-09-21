@@ -78,13 +78,14 @@ type WebsiteInfo struct {
 
 // WebSiteUrl 网站的URL存储
 type WebSiteUrl struct {
-	Host    string   `json:"host"`    // 主键与website Host对应
-	HostID  string   `json:"hostID"`  // key 键
-	AllUri  []string `json:"allUri"`  // 抓取到的所有链接
-	ExtLink []string `json:"extLink"` // 外链
-	BadLink []string `json:"badLink"` // 死链
-	JsLink  []string `json:"jsLink"`  // 资源文件 js
-	CssLink []string `json:"cssLink"` // 资源文件 css
+	Host    string            `json:"host"`    // 主键与website Host对应
+	HostID  string            `json:"hostID"`  // key 键
+	AllUri  []string          `json:"allUri"`  // 抓取到的所有链接
+	ExtLink []string          `json:"extLink"` // 外链
+	BadLink []string          `json:"badLink"` // 死链
+	NoneTDK map[string]string `json:"noneTDK"` // 空TDK的链接
+	JsLink  []string          `json:"jsLink"`  // 资源文件 TODO... js
+	CssLink []string          `json:"cssLink"` // 资源文件 TODO... css
 }
 
 // WebSiteUrlPoint 指定网站监测Url
