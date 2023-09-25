@@ -16,15 +16,18 @@
 - master 获取网站基础信息 ok
 - master 删除网站监测 ok
 - master 扫描网站Url ok
-- master 扫描网站 css, js url
-- master 扫描网站 其他静态资源 url
-- master 网站Url信息
-- master 监测网站采集到url
+- master 扫描网站 css, js url  ok
+- master 扫描网站 其他静态资源 url ok
+- master 定期扫描网站
+- monitor 每次启动拉一次监测任务表
+- monitor 监测网站
 - master 监测设置
-- master 图表
+- master 网站Url信息
+- master 监测点设置
+- master 监测日志
+- master 监测图表
 - master 报警信息
 - master 报警信息
 - master 任务表
-- monitor 每次启动拉一次监测任务表
 - master 获取monitor在线情况
 - 

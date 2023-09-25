@@ -2,8 +2,9 @@ package entity
 
 import (
 	"fmt"
-	"github.com/mangenotwork/common/log"
 	"time"
+
+	"github.com/mangenotwork/common/log"
 )
 
 // Website 监测网站
@@ -84,8 +85,9 @@ type WebSiteUrl struct {
 	ExtLink []string          `json:"extLink"` // 外链
 	BadLink []string          `json:"badLink"` // 死链
 	NoneTDK map[string]string `json:"noneTDK"` // 空TDK的链接
-	JsLink  []string          `json:"jsLink"`  // 资源文件 TODO... js
-	CssLink []string          `json:"cssLink"` // 资源文件 TODO... css
+	JsLink  []string          `json:"jsLink"`  // 资源文件 js
+	CssLink []string          `json:"cssLink"` // 资源文件 css
+	ImgLink []string          `json:"imgLink"` // 采集到的图片文件链接
 }
 
 // WebSiteUrlPoint 指定网站监测Url

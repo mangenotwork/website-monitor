@@ -2,6 +2,7 @@ package udpServer
 
 import (
 	"fmt"
+
 	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/utils"

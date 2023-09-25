@@ -28,6 +28,7 @@ func Routers() *gin.Engine {
 	Login()
 	Page()
 	API()
+	Test()
 	return Router
 }
 
@@ -92,6 +93,11 @@ func API() {
 	api.GET("/tool/icp", ginHelper.Handle(handler.GetICP))                         // 查询备案
 	api.GET("/tool/ping", ginHelper.Handle(handler.Ping))                          // TODO ping
 
+}
+
+func Test() {
+	// test := Router.Group("/test")
+	// test.GET("/css", ginHelper.Handle(handler.GetCss)) // 获取css js
 }
 
 // AuthPG 权限验证中间件

@@ -1,18 +1,23 @@
 package dao
 
 import (
-	"github.com/mangenotwork/common/log"
-	gt "github.com/mangenotwork/gathertool"
 	"math/rand"
 	"strings"
 	"time"
+
 	"website-monitor/master/entity"
+
+	"github.com/mangenotwork/common/log"
+	gt "github.com/mangenotwork/gathertool"
 )
 
 type HostScanUrl struct {
 	Host     string
 	Depth    int64               // 页面深度
 	UrlSet   map[string]struct{} // 采集到host下的链接
+	CssLinks map[string]struct{} // 采集到的css文件链接
+	JsLinks  map[string]struct{} // 采集到的js文件链接
+	ImgLinks map[string]struct{} // 采集到的图片文件链接
 	ExtLinks map[string]struct{} // 采集到外链
 	BadLinks map[string]struct{} // 采集到死链接
 	NoneTDK  map[string]string   // 检查空tdk
@@ -25,6 +30,9 @@ func Scan(host, id string, depth int64) {
 		Host:     host,
 		Depth:    depth,
 		UrlSet:   make(map[string]struct{}),
+		CssLinks: make(map[string]struct{}),
+		JsLinks:  make(map[string]struct{}),
+		ImgLinks: make(map[string]struct{}),
 		ExtLinks: make(map[string]struct{}),
 		BadLinks: make(map[string]struct{}),
 		NoneTDK:  make(map[string]string),
@@ -39,6 +47,7 @@ func Scan(host, id string, depth int64) {
 		NoneTDK: make(map[string]string),
 		JsLink:  make([]string, 0),
 		CssLink: make([]string, 0),
+		ImgLink: make([]string, 0),
 	}
 	log.Info("扫描完成....")
 	for u, _ := range hostScan.UrlSet {
@@ -53,7 +62,15 @@ func Scan(host, id string, depth int64) {
 	for k, v := range hostScan.NoneTDK {
 		websiteUrl.NoneTDK[k] = v
 	}
-
+	for j, _ := range hostScan.JsLinks {
+		websiteUrl.JsLink = append(websiteUrl.JsLink, j)
+	}
+	for c, _ := range hostScan.CssLinks {
+		websiteUrl.CssLink = append(websiteUrl.CssLink, c)
+	}
+	for i, _ := range hostScan.ImgLinks {
+		websiteUrl.ImgLink = append(websiteUrl.ImgLink, i)
+	}
 	err := DB.Set(WebSiteURITable, id, websiteUrl)
 	if err != nil {
 		log.Error("保存扫描的数据失败 err = ", err)
@@ -104,6 +121,23 @@ G:
 			scan.NoneTDK[caseUrl] = rse
 		}
 	}
+	// 采集 img, js
+	srcList := gt.RegHtmlSrcTxt(ctx.Html)
+	for _, v := range srcList {
+		if isImg(v) {
+			scan.ImgLinks[v] = struct{}{}
+		}
+		if isJs(v) {
+			scan.JsLinks[v] = struct{}{}
+		}
+	}
+	// 采集 css
+	hrefList := gt.RegHtmlHrefTxt(ctx.Html)
+	for _, v := range hrefList {
+		if isCss(v) {
+			scan.CssLinks[v] = struct{}{}
+		}
+	}
 	df++
 	scan.UrlSet[caseUrl] = struct{}{}
 	scan.Count++
@@ -146,4 +180,33 @@ var randEr = rand.New(rand.NewSource(time.Now().UnixNano()))
 func sleepMs(min, max int) {
 	r := randEr.Intn(max) + min
 	time.Sleep(time.Duration(r) * time.Millisecond)
+}
+
+func isExt(str string, extList []string) bool {
+	strList := strings.Split(str, "?")
+	sList := strings.Split(strList[0], ".")
+	if len(sList) > 0 {
+		s := sList[len(sList)-1]
+		ext := strings.Split(s, "/")
+		for _, v := range extList {
+			if ext[0] == v {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func isImg(str string) bool {
+	return isExt(str, []string{
+		"jpg", "png", "jpeg", "git", "webp", "svg", "ico",
+	})
+}
+
+func isCss(str string) bool {
+	return isExt(str, []string{"css"})
+}
+
+func isJs(str string) bool {
+	return isExt(str, []string{"js"})
 }

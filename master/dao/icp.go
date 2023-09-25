@@ -2,9 +2,11 @@ package dao
 
 import (
 	"fmt"
+
+	"website-monitor/master/entity"
+
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
-	"website-monitor/master/entity"
 )
 
 var GetICPUrl = func(host string) string { return fmt.Sprintf("https://www.beianx.cn/search/%s", host) }

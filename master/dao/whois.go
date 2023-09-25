@@ -1,13 +1,15 @@
 package dao
 
 import (
-	"github.com/mangenotwork/common/log"
-	"github.com/mangenotwork/common/utils"
 	"io"
 	"net"
 	"regexp"
 	"strings"
+
 	"website-monitor/master/entity"
+
+	"github.com/mangenotwork/common/log"
+	"github.com/mangenotwork/common/utils"
 )
 
 var RootWhoisServers = "whois.iana.org:43"

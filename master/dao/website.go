@@ -3,12 +3,14 @@ package dao
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
+	"website-monitor/master/entity"
+
 	"github.com/boltdb/bolt"
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
-	"net/http"
-	"website-monitor/master/entity"
 )
 
 type WebsiteEr interface {

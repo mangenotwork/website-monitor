@@ -2,9 +2,10 @@ package dao
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
-	"time"
 )
 
 type PingRse struct {

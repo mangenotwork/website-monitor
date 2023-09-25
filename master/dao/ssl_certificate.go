@@ -4,11 +4,13 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/mangenotwork/common/utils"
 	"net/http"
 	"strconv"
 	"strings"
+
 	"website-monitor/master/entity"
+
+	"github.com/mangenotwork/common/utils"
 )
 
 // GetCertificateInfo 获取SSL证书信息

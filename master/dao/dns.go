@@ -2,11 +2,13 @@ package dao
 
 import (
 	"context"
-	"github.com/mangenotwork/common/log"
 	"net"
 	"strings"
 	"time"
+
 	"website-monitor/master/entity"
+
+	"github.com/mangenotwork/common/log"
 )
 
 func NsLookUpLocal(host string) *entity.DNSInfo {

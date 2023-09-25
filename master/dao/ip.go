@@ -2,10 +2,11 @@ package dao
 
 import (
 	"fmt"
-	"github.com/mangenotwork/common/log"
-	gt "github.com/mangenotwork/gathertool"
 	"strings"
 	"sync"
+
+	"github.com/mangenotwork/common/log"
+	gt "github.com/mangenotwork/gathertool"
 )
 
 type IPInfo struct {

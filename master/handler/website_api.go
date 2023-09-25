@@ -1,13 +1,15 @@
 package handler
 
 import (
-	"github.com/mangenotwork/common/ginHelper"
-	"github.com/mangenotwork/common/log"
-	"github.com/mangenotwork/common/utils"
 	"time"
+
 	"website-monitor/master/constname"
 	"website-monitor/master/dao"
 	"website-monitor/master/entity"
+
+	"github.com/mangenotwork/common/ginHelper"
+	"github.com/mangenotwork/common/log"
+	"github.com/mangenotwork/common/utils"
 )
 
 type WebsiteAddParam struct {
