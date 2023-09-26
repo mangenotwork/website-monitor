@@ -18,7 +18,7 @@
 - master 扫描网站Url ok
 - master 扫描网站 css, js url  ok
 - master 扫描网站 其他静态资源 url ok
-- master 定期扫描网站
+- master 定期扫描网站  ok
 - monitor 每次启动拉一次监测任务表
 - monitor 监测网站
 - master 监测设置

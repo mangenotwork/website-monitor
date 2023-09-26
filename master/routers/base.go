@@ -28,6 +28,7 @@ func Routers() *gin.Engine {
 	Login()
 	Page()
 	API()
+	Data()
 	Test()
 	return Router
 }
@@ -66,7 +67,7 @@ func API() {
 	api.GET("/website/info/:host", ginHelper.Handle(handler.WebsiteInfo))          // 监测网站详情
 	api.GET("/website/info/refresh", ginHelper.Handle(handler.WebsiteInfoRefresh)) // 监测网站详情刷新
 	api.GET("/website/delete/:host", ginHelper.Handle(handler.WebsiteDelete))      // 删除网站监测
-	api.GET("/website/urls/:host", ginHelper.Handle(handler.WebsiteUrls))          // TODO 监测网站采集到url
+	api.GET("/website/urls/:host", ginHelper.Handle(handler.WebsiteUrls))          // 监测网站采集到url
 	api.POST("/website/edit", ginHelper.Handle(handler.WebsiteEdit))               // TODO 监测设置
 	api.GET("/website/chart/:host", ginHelper.Handle(handler.WebsiteChart))        // TODO 图表
 	api.GET("/website/alert/:host", ginHelper.Handle(handler.WebsiteAlertList))    // TODO 报警信息
@@ -93,6 +94,12 @@ func API() {
 	api.GET("/tool/icp", ginHelper.Handle(handler.GetICP))                         // 查询备案
 	api.GET("/tool/ping", ginHelper.Handle(handler.Ping))                          // TODO ping
 
+}
+
+func Data() {
+	data := Router.Group("/data")
+	data.GET("/allurl/:host", ginHelper.Handle(handler.WebsiteAllUrl))
+	data.GET("/all/website", ginHelper.Handle(handler.AllWebsite))
 }
 
 func Test() {

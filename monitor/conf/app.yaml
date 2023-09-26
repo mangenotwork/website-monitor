@@ -1,1 +1,4 @@
+# 与master通讯的udp地址
 master: 127.0.0.1:18889
+# master接口地址，获取相关数据
+masterHTTP: http://127.0.0.1:18888

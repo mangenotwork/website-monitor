@@ -111,6 +111,7 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 }
 
 func WebsiteList(c *ginHelper.GinCtx) {
+	// TODO 获取监测结果数据
 	data, _, err := dao.NewWebsite().SelectList()
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -177,6 +178,27 @@ func WebsiteInfoRefresh(c *ginHelper.GinCtx) {
 func WebsiteUrls(c *ginHelper.GinCtx) {
 	hostId := c.Param("host")
 	data, err := dao.NewWebsite().GetWebSiteUrl(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut(data, "")
+	return
+}
+
+func WebsiteAllUrl(c *ginHelper.GinCtx) {
+	hostId := c.Param("host")
+	data, err := dao.NewWebsite().GetWebSiteUrl(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut(data.AllUri, "")
+	return
+}
+
+func AllWebsite(c *ginHelper.GinCtx) {
+	data, _, err := dao.NewWebsite().SelectList()
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return

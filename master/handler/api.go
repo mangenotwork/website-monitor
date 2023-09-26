@@ -169,6 +169,7 @@ func GetSSLCertificate(c *ginHelper.GinCtx) {
 		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
 		return
 	}
+	log.Info("GetSSLCertificate ... ")
 	data, _ := dao.GetCertificateInfo(caseUrl)
 	c.APIOutPut(data, "")
 	return
