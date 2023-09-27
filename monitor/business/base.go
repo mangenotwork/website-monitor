@@ -1,35 +1,86 @@
 package business
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/ginHelper"
 	"github.com/mangenotwork/common/log"
+	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
 	"time"
+)
+
+const (
+	URIHealth    = "Health"
+	URIRandom    = "Random"
+	URIPoint     = "Point"
+	LogTypeInfo  = "Info"
+	LogTypeAlert = "Alert"
+	LogTypeError = "Error"
 )
 
 func Initialize(client *udp.Client) {
 	go func() {
 		GetWebsite()
+
+		// 启动监测
+		go func() {
+			timer := time.NewTimer(time.Second * 1) //初始化定时器
+			for {
+				select {
+				case <-timer.C:
+					AllWebsiteData.Range(func(key, value any) bool {
+						website := value.(*WebsiteItem)
+						website.Conn = client
+						Business(website)
+						return true
+					})
+					timer.Reset(time.Second * 1)
+				}
+			}
+		}()
 	}()
 }
 
-func Business(client *udp.Client) {
-	log.Info("业务...")
-	go func() {
-		for {
-			time.Sleep(10 * time.Second)
-			rse, err := client.Get("conn/test", []byte("test"))
-			if err != nil {
-				udp.Error(err)
-				return
-			}
-			udp.Info("get 请求返回 = ", string(rse))
+func Business(item *WebsiteItem) {
+	item.RateItem--
+	if item.RateItem <= 0 {
+		// 计算频率复位
+		item.RateItem = item.MonitorRate
+		log.Info("执行 " + item.Host)
+		// 报警数据初始化
+		// 日志数据
+		mLog := &MonitorLog{
+			MonitorId:   "1", // TODO 获取监测器id和昵称
+			MonitorName: "1", // TODO 获取监测器id和昵称
+			LogType:     "Info",
+			Time:        utils.NowDate(),
+			HostId:      item.HostID,
+			Host:        item.Host,
+			ContrastUri: item.ContrastUrl,
+			Ping:        item.Ping,
 		}
-	}()
+		// ping一下，检查当前网络环境
+		_, pingRse := item.PingActive(mLog)
+		if !pingRse {
+			// 网络环境异常不执行监测
+			return
+		}
+		// 请求对照组，对照组有问题不执行监测
+		if item.ContrastActive(mLog) {
+			return
+		}
+		// 监测生命URI
+		item.MonitorHealthUri(mLog)
+		// TODO 随机URI监测  需要获取所有网站Url
+		// isAlert2 := item.MonitorRandomUri(masterConf, mLog, alert)
+		// TODO 循环监测点监测  需要获取监测点数据 并且每个请求要求有延时
+		// isAlert3 := item.MonitorPointUri(masterConf, mLog, alert)
+	}
 }
 
 var (
@@ -53,6 +104,8 @@ func GetWebsite() {
 	}
 	for _, v := range list {
 		log.Info("v = ", v)
+		item := &WebsiteItem{v, 0, nil}
+		item.Add()
 	}
 }
 
@@ -89,4 +142,46 @@ func AnalysisData(jsonStr string, data any) error {
 		return err
 	}
 	return nil
+}
+
+// MonitorLog 监测日志
+type MonitorLog struct {
+	LogType         string // Info  Alert Error
+	Time            string
+	HostId          string
+	Host            string
+	UriType         string // 监测的URI类型 Health:根URI,健康URI  Random:随机URI  Point:监测点URI
+	Uri             string // URI
+	UriCode         int    // URI响应码
+	UriMs           int64  // URI响应时间
+	ContrastUri     string // 对照组URI
+	ContrastUriCode int    // 对照组URI响应码
+	ContrastUriMs   int64  // 对照组URI响应时间
+	Ping            string
+	PingMs          int64
+	Msg             string
+	MonitorId       string // 监测器ID
+	MonitorName     string // 监测器名称
+	// TODO 监测器 ip地域信息
+}
+
+func Struct2Buf(any2 any) []byte {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.LittleEndian, any2)
+	if err != nil {
+		log.Error(err)
+	}
+	return buf.Bytes()
+}
+
+func request(url string) (int, int64, error) {
+	ctx, err := gt.Get(url, gt.Header{
+		"Accept-Encoding": "gzip, deflate, br",
+		"Referer":         url,
+	})
+	if err != nil {
+		log.Error(err)
+		return 0, 0, err
+	}
+	return ctx.StateCode, ctx.Ms.Milliseconds(), nil
 }

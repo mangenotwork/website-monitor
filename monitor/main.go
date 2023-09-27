@@ -22,10 +22,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	// 初始化
 	business.Initialize(client)
-	// 业务
-	business.Business(client)
 	// 运行客户端
 	client.Run()
 }

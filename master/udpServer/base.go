@@ -1,7 +1,6 @@
 package udpServer
 
 import (
-	"fmt"
 	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/utils"
@@ -17,14 +16,13 @@ func RunUDPServer() {
 		panic(err)
 	}
 
-	// 定义get方法
-	Servers.GetHandleFunc("conn/test", ConnTest)
+	// 定义put方法
+	Servers.PutHandleFunc("monitor", MonitorRse)
 
 	// 启动servers
 	Servers.Run()
 }
 
-func ConnTest(s *udp.Servers, param []byte) (int, []byte) {
-	udp.Info("获取到的请求参数  param = ", string(param))
-	return 0, []byte(fmt.Sprintf("服务器名称 %s.", s.GetServersName()))
+func MonitorRse(s *udp.Servers, param []byte) {
+	udp.Info("接收到监测结果  param = ", string(param))
 }

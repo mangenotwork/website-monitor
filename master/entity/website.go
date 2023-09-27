@@ -104,9 +104,6 @@ type WebSiteAlert struct {
 	List   []*AlertData `json:"list"`
 }
 
-// TODO 请求的时候要设置 Accept-Encoding ： gzip, deflate, br
-// TODO 请求的时候要设置 Referer : host url
-
 type IPAddr struct {
 	IP      string `json:"ip"`
 	Address string `json:"address"` // ip的地址信息
