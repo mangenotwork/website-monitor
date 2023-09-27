@@ -40,10 +40,10 @@ func (item *WebsiteItem) Put(data []byte) {
 
 func (item *WebsiteItem) mLogSerialize(mLog *MonitorLog) []byte {
 	buf := new(bytes.Buffer)
-	buf.WriteString(fmt.Sprintf("%s|%s|%s|%s|%s|%s|%d|%d|%s|%d|%d|%s|%d|%s|%s|%s|",
+	buf.WriteString(fmt.Sprintf("%s|%s|%s|%s|%s|%s|%d|%d|%s|%d|%d|%s|%d|%s|%s|%s|%s|",
 		mLog.LogType, mLog.Time, mLog.HostId, mLog.Host, mLog.UriType, mLog.Uri, mLog.UriCode, mLog.UriMs,
 		mLog.ContrastUri, mLog.ContrastUriCode, mLog.ContrastUriMs, mLog.Ping, mLog.PingMs, mLog.Msg,
-		mLog.MonitorId, mLog.MonitorName))
+		mLog.MonitorName, mLog.MonitorIP, mLog.MonitorAddr))
 	return buf.Bytes()
 }
 

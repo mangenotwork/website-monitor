@@ -11,6 +11,7 @@ import (
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
+	"sync"
 	"time"
 )
 
@@ -23,27 +24,33 @@ const (
 	LogTypeError = "Error"
 )
 
-func Initialize(client *udp.Client) {
-	go func() {
-		GetWebsite()
+var GlobalName = "监视器"
 
-		// 启动监测
-		go func() {
-			timer := time.NewTimer(time.Second * 1) //初始化定时器
-			for {
-				select {
-				case <-timer.C:
-					AllWebsiteData.Range(func(key, value any) bool {
-						website := value.(*WebsiteItem)
-						website.Conn = client
-						Business(website)
-						return true
-					})
-					timer.Reset(time.Second * 1)
-				}
+func Initialize(client *udp.Client) {
+
+	// 监测器获取ip地址信息
+	GetMyIP()
+
+	// 拉取website列表
+	GetWebsite()
+
+	// 启动监测
+	go func() {
+		timer := time.NewTimer(time.Second * 1) //初始化定时器
+		for {
+			select {
+			case <-timer.C:
+				AllWebsiteData.Range(func(key, value any) bool {
+					website := value.(*WebsiteItem)
+					website.Conn = client
+					Business(website)
+					return true
+				})
+				timer.Reset(time.Second * 1)
 			}
-		}()
+		}
 	}()
+
 }
 
 func Business(item *WebsiteItem) {
@@ -55,14 +62,15 @@ func Business(item *WebsiteItem) {
 		// 报警数据初始化
 		// 日志数据
 		mLog := &MonitorLog{
-			MonitorId:   "1", // TODO 获取监测器id和昵称
-			MonitorName: "1", // TODO 获取监测器id和昵称
+			MonitorName: GlobalName, // TODO 获取监测器id和昵称
 			LogType:     "Info",
 			Time:        utils.NowDate(),
 			HostId:      item.HostID,
 			Host:        item.Host,
 			ContrastUri: item.ContrastUrl,
 			Ping:        item.Ping,
+			MonitorIP:   MyIP.IP,
+			MonitorAddr: MyIP.Address,
 		}
 		// ping一下，检查当前网络环境
 		_, pingRse := item.PingActive(mLog)
@@ -106,6 +114,33 @@ func GetWebsite() {
 		log.Info("v = ", v)
 		item := &WebsiteItem{v, 0, nil}
 		item.Add()
+	}
+}
+
+type IPInfo struct {
+	IP      string
+	Address string
+}
+
+const GetMyIPInfoUrl = "https://www.ip.cn/api/index?ip=&type=0"
+
+var MyIP *IPInfo
+var MyIPOnce sync.Once
+
+func GetMyIP() *IPInfo {
+	MyIPOnce.Do(func() {
+		MyIP = getIPAddr()
+	})
+	return MyIP
+}
+
+func getIPAddr() *IPInfo {
+	ctx, _ := gt.Get(GetMyIPInfoUrl)
+	ip, _ := gt.JsonFind2Str(ctx.Json, "/ip")
+	address, _ := gt.JsonFind2Str(ctx.Json, "/address")
+	return &IPInfo{
+		IP:      ip,
+		Address: address,
 	}
 }
 
@@ -160,9 +195,9 @@ type MonitorLog struct {
 	Ping            string
 	PingMs          int64
 	Msg             string
-	MonitorId       string // 监测器ID
 	MonitorName     string // 监测器名称
-	// TODO 监测器 ip地域信息
+	MonitorIP       string // 监测器 ip地域信息
+	MonitorAddr     string
 }
 
 func Struct2Buf(any2 any) []byte {

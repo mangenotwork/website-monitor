@@ -3,7 +3,7 @@ module website-monitor/monitor
 go 1.19
 
 require (
-	github.com/mangenotwork/beacon-tower/udp v0.0.0-20230912092106-8d6f12d60067
+	github.com/mangenotwork/beacon-tower/udp v0.0.0-20230927071244-09e888114b10
 	github.com/mangenotwork/common v0.1.3
 	github.com/mangenotwork/gathertool v0.4.5
 )
