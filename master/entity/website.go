@@ -180,3 +180,9 @@ type ICPInfo struct {
 	AuditDate      string `json:"auditDate"`      // 审核日期
 	RestrictAccess string `json:"restrictAccess"` // 是否限制接入
 }
+
+// WebSitePoint 指定监测点(URL)
+type WebSitePoint struct {
+	HostID string   `json:"hostID"`
+	URL    []string `json:"url"`
+}

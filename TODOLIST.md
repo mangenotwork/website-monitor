@@ -19,12 +19,14 @@
 - master 扫描网站 css, js url  ok
 - master 扫描网站 其他静态资源 url ok
 - master 定期扫描网站  ok
-- monitor 每次启动拉一次监测任务表
-- monitor 监测网站
+- monitor 每次启动拉一次监测任务表 ok
+- monitor 监测网站-Host基础 ok
+- master 监测日志存储和读取 ok
+- master 监测点设置
+- monitor 通知拉取网站监测点
+- monitor 定时拉取网站的url
 - master 监测设置
 - master 网站Url信息
-- master 监测点设置
-- master 监测日志
 - master 监测图表
 - master 报警信息
 - master 报警信息

@@ -32,12 +32,6 @@ type WebsiteEr interface {
 	// GetWebSiteUrl 获取采集的网站Url
 	GetWebSiteUrl(hostId string) (*entity.WebSiteUrl, error)
 
-	// SetUrlPoint 设置指定监测Url点
-	SetUrlPoint()
-
-	// GetUrlPoint 获取监测Url点
-	GetUrlPoint()
-
 	// Collect 采集网站信息
 	Collect(host string) *entity.WebsiteInfo
 	SaveCollectInfo(host, hostID string) error
@@ -62,6 +56,18 @@ type WebsiteEr interface {
 
 	// CollectICP 采集网站ipc信息 - 刷新功能
 	CollectICP(host string) error
+
+	// SetPoint  设置网站监测点url
+	SetPoint(hostID, url string) error
+
+	// GetPoint  获取网站监测点url
+	GetPoint(hostID string) ([]*entity.WebSitePoint, error)
+
+	// DelPoint  删除指定网站监测点url
+	DelPoint(hostID, url string) error
+
+	// ClearPoint 清空指定网站监测点url
+	ClearPoint(hostID string) error
 }
 
 func NewWebsite() WebsiteEr {
@@ -337,10 +343,18 @@ func (w *websiteDao) GetWebSiteUrl(hostId string) (*entity.WebSiteUrl, error) {
 	return urlData, err
 }
 
-func (w *websiteDao) SetUrlPoint() {
-
+func (w *websiteDao) SetPoint(hostID, url string) error {
+	return nil
 }
 
-func (w *websiteDao) GetUrlPoint() {
+func (w *websiteDao) GetPoint(hostID string) ([]*entity.WebSitePoint, error) {
+	return nil, nil
+}
 
+func (w *websiteDao) DelPoint(hostID, url string) error {
+	return nil
+}
+
+func (w *websiteDao) ClearPoint(hostID string) error {
+	return nil
 }

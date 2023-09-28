@@ -222,3 +222,10 @@ func WebsiteAlertList(c *ginHelper.GinCtx) {
 func WebsiteAlertDel(c *ginHelper.GinCtx) {
 
 }
+
+func MonitorLog(c *ginHelper.GinCtx) {
+	hostId := c.Param("host")
+	data := dao.NewMonitorLogDao().ReadLog(hostId)
+	c.APIOutPut(data, "")
+	return
+}

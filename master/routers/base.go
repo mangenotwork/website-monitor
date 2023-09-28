@@ -72,6 +72,7 @@ func API() {
 	api.GET("/website/chart/:host", ginHelper.Handle(handler.WebsiteChart))        // TODO 图表
 	api.GET("/website/alert/:host", ginHelper.Handle(handler.WebsiteAlertList))    // TODO 报警信息
 	api.GET("/website/alert/del/:host", ginHelper.Handle(handler.WebsiteAlertDel)) // TODO 报警信息
+	api.GET("/website/log/:host", ginHelper.Handle(handler.MonitorLog))            // 获取监测日志
 
 	// mail
 	api.GET("/mail/init", ginHelper.Handle(handler.MailInit))          // 是否设置邮件
