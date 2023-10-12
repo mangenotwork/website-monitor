@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"fmt"
+	gt "github.com/mangenotwork/gathertool"
 	"time"
+	"website-monitor/master/business"
 
 	"website-monitor/master/constname"
 	"website-monitor/master/dao"
@@ -187,7 +190,7 @@ func WebsiteUrls(c *ginHelper.GinCtx) {
 }
 
 func WebsiteAllUrl(c *ginHelper.GinCtx) {
-	hostId := c.Param("host")
+	hostId := c.Param("hostId")
 	data, err := dao.NewWebsite().GetWebSiteUrl(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -227,5 +230,72 @@ func MonitorLog(c *ginHelper.GinCtx) {
 	hostId := c.Param("host")
 	data := dao.NewMonitorLogDao().ReadLog(hostId)
 	c.APIOutPut(data, "")
+	return
+}
+
+type WebsitePointParam struct {
+	Uri string `json:"uri"`
+}
+
+func WebsitePointAdd(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	log.Info("hostId = ", hostId)
+	param := &WebsitePointParam{}
+	err := c.GetPostArgs(param)
+	if err != nil {
+		c.APIOutPutError(err, "参数或参数类型错误")
+		return
+	}
+	ctx, _ := gt.Get(param.Uri)
+	if business.AlertRuleCode(ctx.StateCode) {
+		c.APIOutPutError(nil, fmt.Sprintf("%s请求失败，状态码:%d", param.Uri, ctx.StateCode))
+		return
+	}
+	err = dao.NewWebsite().SetPoint(hostId, param.Uri)
+	if err != nil {
+		c.APIOutPutError(err, "添加监测点失败:"+err.Error())
+		return
+	}
+	c.APIOutPut("", "添加成功")
+	return
+}
+
+func WebsitePointList(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	data, err := dao.NewWebsite().GetPoint(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut(data, "成功")
+	return
+}
+
+func WebsitePointDel(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	log.Info("hostId = ", hostId)
+	param := &WebsitePointParam{}
+	err := c.GetPostArgs(param)
+	if err != nil {
+		c.APIOutPutError(err, "参数或参数类型错误")
+		return
+	}
+	err = dao.NewWebsite().DelPoint(hostId, param.Uri)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut("", "成功")
+	return
+}
+
+func WebsitePointClear(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	err := dao.NewWebsite().ClearPoint(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut("", "成功")
 	return
 }

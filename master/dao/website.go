@@ -2,6 +2,7 @@ package dao
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -61,7 +62,7 @@ type WebsiteEr interface {
 	SetPoint(hostID, url string) error
 
 	// GetPoint  获取网站监测点url
-	GetPoint(hostID string) ([]*entity.WebSitePoint, error)
+	GetPoint(hostID string) (*entity.WebSitePoint, error)
 
 	// DelPoint  删除指定网站监测点url
 	DelPoint(hostID, url string) error
@@ -344,17 +345,40 @@ func (w *websiteDao) GetWebSiteUrl(hostId string) (*entity.WebSiteUrl, error) {
 }
 
 func (w *websiteDao) SetPoint(hostID, url string) error {
-	return nil
+	data, err := w.GetPoint(hostID)
+	if err != nil && !errors.Is(err, ISNULL) {
+		return err
+	}
+	for _, v := range data.URL {
+		if v == url {
+			return fmt.Errorf("监测点存在")
+		}
+	}
+	data.URL = append(data.URL, url)
+	return DB.Set(WebSiteUrlPointTable, hostID, data)
 }
 
-func (w *websiteDao) GetPoint(hostID string) ([]*entity.WebSitePoint, error) {
-	return nil, nil
+func (w *websiteDao) GetPoint(hostID string) (*entity.WebSitePoint, error) {
+	data := &entity.WebSitePoint{}
+	err := DB.Get(WebSiteUrlPointTable, hostID, &data)
+	return data, err
 }
 
 func (w *websiteDao) DelPoint(hostID, url string) error {
-	return nil
+	data, err := w.GetPoint(hostID)
+	if err != nil && !errors.Is(err, ISNULL) {
+		return err
+	}
+	for n, v := range data.URL {
+		if v == url {
+			log.Info("n = ", n)
+			data.URL = append(data.URL[:n], data.URL[n+1:]...)
+			break
+		}
+	}
+	return DB.Set(WebSiteUrlPointTable, hostID, data)
 }
 
 func (w *websiteDao) ClearPoint(hostID string) error {
-	return nil
+	return DB.Delete(WebSiteUrlPointTable, hostID)
 }

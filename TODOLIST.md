@@ -22,7 +22,7 @@
 - monitor 每次启动拉一次监测任务表 ok
 - monitor 监测网站-Host基础 ok
 - master 监测日志存储和读取 ok
-- master 监测点设置
+- master 监测点设置  ok
 - monitor 通知拉取网站监测点
 - monitor 定时拉取网站的url
 - master 监测设置
@@ -32,4 +32,7 @@
 - master 报警信息
 - master 任务表
 - master 获取monitor在线情况
-- 
+- master 监测器列表
+- master 未部署监测器提示
+- monitor 监测器信息获取
+- master 监测器信息展示

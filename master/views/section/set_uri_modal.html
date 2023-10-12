@@ -8,6 +8,9 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
+                    说明: 添加指定url后会根据监测周期轮询监测url
+                    <br>
+                    <br>
                     <div class="input-group">
                         <span class="input-group-text" id="basic-addon3">{{ point.hostUri }}</span>
                         <input type="text" class="form-control" v-model="point.nowUri" aria-describedby="basic-addon3">
@@ -16,6 +19,7 @@
                 <button type="button" class="btn btn-light" @click="addUriPoint">确认添加监测点</button>
                 <br>
                 <hr>
+                监测点列表:
                 <ul class="list-group list-group-flush" style="height: 360px; overflow: auto;">
                     <template v-for="item in point.uriList">
                         <li class="list-group-item list-group-item-action">

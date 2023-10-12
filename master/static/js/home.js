@@ -18,9 +18,10 @@ const app = createApp({
             point: {
                 hostId: "",
                 hostUri: "",
-                apiAdd: function (){ return "/api/point/add/"+this.hostId; },
-                apiList: function () { return "/api/point/list/"+this.hostId; },
-                apiDel: function () { return "/api/point/del/"+this.hostId; },
+                apiAdd: function (){ return "/api/website/point/add/"+this.hostId; },
+                apiList: function () { return "/api/website/point/list/"+this.hostId; },
+                apiDel: function () { return "/api/website/point/del/"+this.hostId; },
+                apiClear: function () { return "/api/website/point/clear/"+this.hostId; },
                 param: {
                     uri:"",
                 },
@@ -225,8 +226,10 @@ const app = createApp({
 
         setUriPoint: function (item) {
             let t = this;
-            t.point.hostUri = item.HealthUri + "/";
-            t.point.hostId = item.ID;
+            console.log("setUriPoint item... ")
+            console.log(item)
+            t.point.hostUri = item.host + "/";
+            t.point.hostId = item.hostID;
             t.getUriPoint();
             $("#setUriModal").modal('show');
         },
@@ -235,7 +238,7 @@ const app = createApp({
             common.AjaxGet(t.point.apiList(), function (data){
                 t.point.uriList = []
                 if (data.code === 0) {
-                    t.point.uriList = data.data;
+                    t.point.uriList = data.data.url;
                 }
             });
         },
