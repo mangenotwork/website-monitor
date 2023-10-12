@@ -1,31 +1,40 @@
-- master 登录  ok
-- master 邮件 ok
-- master 设计"网站" 实体 ok
-- 证书信息获取，dns扫描  ok
-- IP属地获取，ipc查询 ok
-- tool : 获取网站的T, D, K, 图标  ok
-- tool : ip信息查询 ok
-- tool : 查询dns  ok
-- tool : Whois查询  ok
-- tool : 查询备案  ok
-- tool : 在线ping ok
-- tool : 获取证书  ok
-- tool : 网站信息获取  ok
-- master 添加网站 ok
-- master 监测网站列表 ok
-- master 获取网站基础信息 ok
-- master 删除网站监测 ok
-- master 扫描网站Url ok
-- master 扫描网站 css, js url  ok
-- master 扫描网站 其他静态资源 url ok
-- master 定期扫描网站  ok
-- monitor 每次启动拉一次监测任务表 ok
-- monitor 监测网站-Host基础 ok
-- master 监测日志存储和读取 ok
-- master 监测点设置  ok
-- monitor 通知拉取网站监测点
+- [ok] master 登录 
+- [ok] master 邮件 
+- [ok] master 设计"网站" 实体 
+- [ok] 证书信息获取，dns扫描  
+- [ok] IP属地获取，ipc查询 
+- [ok] tool : 获取网站的T, D, K, 图标  
+- [ok] tool : ip信息查询 
+- [ok] tool : 查询dns  
+- [ok] tool : Whois查询  
+- [ok] tool : 查询备案  
+- [ok] tool : 在线ping 
+- [ok] tool : 获取证书  
+- [ok] tool : 网站信息获取  
+- [ok] master 添加网站 
+- [ok] master 监测网站列表 
+- [ok] master 获取网站基础信息 
+- [ok] master 删除网站监测 
+- [ok] master 扫描网站Url 
+- [ok] master 扫描网站 css, js url  
+- [ok] master 扫描网站 其他静态资源 url 
+- [ok] master 定期扫描网站  
+- [ok] monitor 每次启动拉一次监测任务表 
+- [ok] monitor 监测网站-Host基础 
+- [ok] master 监测日志存储和读取 
+- [ok] master 监测点设置  
+- [ok] master 通知拉取网站监测点
+- [ok] master 删除网站监测
+- master 增加网站监测 改为指定增加网站监测
+- master 删除网站监测 改为指定网站删除
+- bug master删除网站监测应该停止扫描
+- master 修改网站监测配置 指定修改
 - monitor 定时拉取网站的url
-- master 监测设置
+- monitor 执行网站监测点监测
+- monitor 执行网站随机url监测
+- master 存储所有网站监测日志
+- master 分析监测日志并产生报警
+- master 统计报警并发送邮件通知
 - master 网站Url信息
 - master 监测图表
 - master 报警信息

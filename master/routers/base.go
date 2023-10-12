@@ -113,8 +113,10 @@ func Data() {
 }
 
 func Test() {
-	// test := Router.Group("/test")
-	// test.GET("/css", ginHelper.Handle(handler.GetCss)) // 获取css js
+	test := Router.Group("/test")
+	test.GET("/NoticeUpdateWebsite", ginHelper.Handle(handler.NoticeUpdateWebsiteTest))
+	test.GET("/NoticeUpdateWebsiteAllUrl", ginHelper.Handle(handler.NoticeUpdateWebsiteAllUrlTest))
+	test.GET("/NoticeUpdateWebsitePoint", ginHelper.Handle(handler.NoticeUpdateWebsitePointTest))
 }
 
 // AuthPG 权限验证中间件

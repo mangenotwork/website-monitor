@@ -121,6 +121,11 @@ func (w *websiteDao) Add(data *entity.Website, rule *entity.WebsiteAlarmRule, sc
 		Scan(data.Host, hostKey, scan.ScanDepth)
 	}()
 
+	// 异步通知监测器更新监测网站
+	go func() {
+		NoticeUpdateWebsite()
+	}()
+
 	return err
 }
 
@@ -155,7 +160,6 @@ func (w *websiteDao) addWebsiteScanCheckUp(scan *entity.WebsiteScanCheckUp) erro
 }
 
 func (w *websiteDao) Del(hostID string) error {
-	// TODO... 通知停止监测
 	// 删除 Website
 	err := DB.Delete(WebSiteTable, hostID)
 	// 删除 WebsiteAlarmRule
@@ -164,6 +168,12 @@ func (w *websiteDao) Del(hostID string) error {
 	err = DB.Delete(WebsiteScanCheckUpTable, hostID)
 	// 删除 WebsiteInfo
 	err = DB.Delete(WebSiteInfoTable, hostID)
+	// 删除监测点 Website
+	err = DB.Delete(WebSiteUrlPointTable, hostID)
+	// 通知更新监测网站
+	go func() {
+		NoticeUpdateWebsite()
+	}()
 	return err
 }
 
@@ -355,11 +365,20 @@ func (w *websiteDao) SetPoint(hostID, url string) error {
 		}
 	}
 	data.URL = append(data.URL, url)
-	return DB.Set(WebSiteUrlPointTable, hostID, data)
+	data.HostID = hostID
+	err = DB.Set(WebSiteUrlPointTable, hostID, data)
+	if err == nil {
+		go func() {
+			NoticeUpdateWebsitePoint(hostID)
+		}()
+	}
+	return err
 }
 
 func (w *websiteDao) GetPoint(hostID string) (*entity.WebSitePoint, error) {
-	data := &entity.WebSitePoint{}
+	data := &entity.WebSitePoint{
+		HostID: hostID,
+	}
 	err := DB.Get(WebSiteUrlPointTable, hostID, &data)
 	return data, err
 }
@@ -371,14 +390,25 @@ func (w *websiteDao) DelPoint(hostID, url string) error {
 	}
 	for n, v := range data.URL {
 		if v == url {
-			log.Info("n = ", n)
 			data.URL = append(data.URL[:n], data.URL[n+1:]...)
 			break
 		}
 	}
-	return DB.Set(WebSiteUrlPointTable, hostID, data)
+	err = DB.Set(WebSiteUrlPointTable, hostID, data)
+	if err == nil {
+		go func() {
+			NoticeUpdateWebsitePoint(hostID)
+		}()
+	}
+	return err
 }
 
 func (w *websiteDao) ClearPoint(hostID string) error {
-	return DB.Delete(WebSiteUrlPointTable, hostID)
+	err := DB.Delete(WebSiteUrlPointTable, hostID)
+	if err == nil {
+		go func() {
+			NoticeUpdateWebsitePoint(hostID)
+		}()
+	}
+	return err
 }

@@ -130,7 +130,7 @@ let AddWebSite = {
         monitorRate: 15,
         contrastUrl: "https://www.baidu.com",
         contrastTime: 1000,
-        ping: "8.8.8.8",
+        ping: "223.5.5.5",
         pingTime: 1000,
     },
     next2Param: {

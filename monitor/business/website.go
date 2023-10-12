@@ -11,10 +11,15 @@ import (
 
 var AllWebsiteData sync.Map
 
+func EmptyAllWebsiteData() {
+	AllWebsiteData = sync.Map{}
+}
+
 type WebsiteItem struct {
 	*Website
-	RateItem int64 // 用于计算
-	Conn     *udp.Client
+	RateItem  int64 // 用于计算
+	Conn      *udp.Client
+	LoopPoint int64
 }
 
 // Website 监测网站

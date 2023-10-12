@@ -31,7 +31,7 @@ func Initialize(client *udp.Client) {
 	// 监测器获取ip地址信息
 	GetMyIP()
 
-	// 拉取website列表
+	// 拉取website列表和监测点数据
 	GetWebsite()
 
 	// 启动监测
@@ -53,6 +53,21 @@ func Initialize(client *udp.Client) {
 
 }
 
+/*
+Business
+
+	每一轮监测会先进行确认当前网络，再执行三次请求监测
+
+	确认网络
+	1. ping设置的ip,响应时间大于 1000ms 视为网络不好本轮不执行监测
+	2. 请求对照组，响应时间大于设置的时间 视为网络不好本轮不执行监测
+
+	三次请求监测
+	1. 监测host确认网站是否存活
+	2. 监测网站采集到的url随机选择一个进行监测，如果是新添加的网站采集url会延后
+	3. 监测设置的网站监测点依次进行监测
+*/
+
 func Business(item *WebsiteItem) {
 	item.RateItem--
 	if item.RateItem <= 0 {
@@ -72,29 +87,46 @@ func Business(item *WebsiteItem) {
 			MonitorIP:   MyIP.IP,
 			MonitorAddr: MyIP.Address,
 		}
+
 		// ping一下，检查当前网络环境
 		_, pingRse := item.PingActive(mLog)
 		if !pingRse {
 			// 网络环境异常不执行监测
 			return
 		}
+
 		// 请求对照组，对照组有问题不执行监测
 		if item.ContrastActive(mLog) {
 			return
 		}
+
 		// 监测生命URI
 		item.MonitorHealthUri(mLog)
+
 		// TODO 随机URI监测  需要获取所有网站Url
 		// isAlert2 := item.MonitorRandomUri(masterConf, mLog, alert)
-		// TODO 循环监测点监测  需要获取监测点数据 并且每个请求要求有延时
-		// isAlert3 := item.MonitorPointUri(masterConf, mLog, alert)
+
+		// 判断是否执行监测点监测
+		point, pointLen := GetWebSitePoint(item.HostID)
+		log.Info("监测点个数 ==> ", pointLen)
+		if pointLen > 0 {
+			log.Info("执行监测点监测")
+			if item.LoopPoint >= pointLen {
+				item.LoopPoint = 0
+			}
+			pointUrl := point[item.LoopPoint]
+			item.LoopPoint++
+			log.Info("本次监测的监测点是 = ", pointUrl)
+			// TODO... 执行监测点监测
+		}
+
 	}
 }
 
 var (
-	MasterHTTP          = ""
-	GetAllWebsiteAPI    = "/data/all/website"
-	GetWebsiteAllUrlAPI = func(id string) string { return fmt.Sprintf("/data/allurl/%s", id) }
+	MasterHTTP         = ""
+	GetAllWebsiteAPI   = "/data/all/website"
+	GetWebsitePointAPI = func(id string) string { return fmt.Sprintf("/data/website/point/%s", id) }
 )
 
 func GetWebsite() {
@@ -110,11 +142,31 @@ func GetWebsite() {
 		log.Error(err)
 		return
 	}
+	// 清空 websiteItem
+	EmptyAllWebsiteData()
 	for _, v := range list {
 		log.Info("v = ", v)
-		item := &WebsiteItem{v, 0, nil}
+		item := &WebsiteItem{v, 0, nil, 0}
 		item.Add()
+		// 获取监测点
+		GetWebsitePoint(v.HostID)
 	}
+}
+
+func GetWebsitePoint(hostID string) {
+	ctx, err := gt.Get(MasterHTTP + GetWebsitePointAPI(hostID))
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	data := &WebSitePoint{}
+	err = AnalysisData(ctx.Json, &data)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	log.Info(data)
+	WebsitePointDataMap.Store(hostID, data)
 }
 
 type IPInfo struct {

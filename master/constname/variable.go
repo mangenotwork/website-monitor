@@ -1,6 +1,8 @@
 package constname
 
-import "time"
+import (
+	"time"
+)
 
 var (
 	UserToken    string = "sign"
@@ -25,4 +27,10 @@ var (
 	DefaultScanRate                 int64 = 24
 	DefaultWebsiteSlowResponseCount int64 = 3
 	DefaultSSLCertificateExpire     int64 = 14
+)
+
+const (
+	NoticeUpdateWebsiteLabel       = "website" // 通知更新网站监测
+	NoticeUpdateWebsiteAllUrlLabel = "allUrl"  // 通知更新网站url
+	NoticeUpdateWebsitePointLabel  = "point"   // 通知更新网站监测点
 )
