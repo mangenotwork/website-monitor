@@ -32,7 +32,7 @@ func Initialize(client *udp.Client) {
 	GetMyIP()
 
 	// 拉取website列表和监测点数据
-	GetWebsite()
+	GetWebsiteAll()
 
 	// 启动监测
 	go func() {
@@ -127,9 +127,10 @@ var (
 	MasterHTTP         = ""
 	GetAllWebsiteAPI   = "/data/all/website"
 	GetWebsitePointAPI = func(id string) string { return fmt.Sprintf("/data/website/point/%s", id) }
+	GetWebsiteAPI      = func(id string) string { return fmt.Sprintf("/data/website/%s", id) }
 )
 
-func GetWebsite() {
+func GetWebsiteAll() {
 	log.Info("启动获取 website ")
 	ctx, err := gt.Get(MasterHTTP + GetAllWebsiteAPI)
 	if err != nil {
@@ -151,6 +152,30 @@ func GetWebsite() {
 		// 获取监测点
 		GetWebsitePoint(v.HostID)
 	}
+}
+
+func GetWebsite(hostID string) {
+	ctx, err := gt.Get(MasterHTTP + GetWebsiteAPI(hostID))
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	data := &Website{}
+	log.Info(ctx.Json)
+	err = AnalysisData(ctx.Json, &data)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	log.Info(data)
+	item := &WebsiteItem{data, 0, nil, 0}
+	item.Add()
+	// 获取监测点
+	GetWebsitePoint(data.HostID)
+}
+
+func DelWebsite(hostID string) {
+	AllWebsiteData.Delete(hostID)
 }
 
 func GetWebsitePoint(hostID string) {

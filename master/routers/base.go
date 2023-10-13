@@ -64,15 +64,16 @@ func API() {
 	// website
 	api.POST("/website/add", ginHelper.Handle(handler.WebsiteAdd))                       // 创建网站监测
 	api.GET("/website/list", ginHelper.Handle(handler.WebsiteList))                      // 监测网站列表
-	api.GET("/website/info/:host", ginHelper.Handle(handler.WebsiteInfo))                // 监测网站详情
+	api.GET("/website/conf/:hostId", ginHelper.Handle(handler.WebsiteConf))              // 监测网站的监测配置信息
+	api.GET("/website/info/:hostId", ginHelper.Handle(handler.WebsiteInfo))              // 监测网站详情
 	api.GET("/website/info/refresh", ginHelper.Handle(handler.WebsiteInfoRefresh))       // 监测网站详情刷新
-	api.GET("/website/delete/:host", ginHelper.Handle(handler.WebsiteDelete))            // 删除网站监测
-	api.GET("/website/urls/:host", ginHelper.Handle(handler.WebsiteUrls))                // 监测网站采集到url
+	api.GET("/website/delete/:hostId", ginHelper.Handle(handler.WebsiteDelete))          // 删除网站监测
+	api.GET("/website/urls/:hostId", ginHelper.Handle(handler.WebsiteUrls))              // 监测网站采集到url
 	api.POST("/website/edit", ginHelper.Handle(handler.WebsiteEdit))                     // TODO 监测设置
-	api.GET("/website/chart/:host", ginHelper.Handle(handler.WebsiteChart))              // TODO 图表
-	api.GET("/website/alert/:host", ginHelper.Handle(handler.WebsiteAlertList))          // TODO 报警信息
-	api.GET("/website/alert/del/:host", ginHelper.Handle(handler.WebsiteAlertDel))       // TODO 报警信息
-	api.GET("/website/log/:host", ginHelper.Handle(handler.MonitorLog))                  // 获取监测日志
+	api.GET("/website/chart/:hostId", ginHelper.Handle(handler.WebsiteChart))            // TODO 图表
+	api.GET("/website/alert/:hostId", ginHelper.Handle(handler.WebsiteAlertList))        // TODO 报警信息
+	api.GET("/website/alert/del/:hostId", ginHelper.Handle(handler.WebsiteAlertDel))     // TODO 报警信息
+	api.GET("/website/log/:hostId", ginHelper.Handle(handler.MonitorLog))                // 获取监测日志
 	api.POST("/website/point/add/:hostId", ginHelper.Handle(handler.WebsitePointAdd))    // 添加监测点
 	api.GET("/website/point/list/:hostId", ginHelper.Handle(handler.WebsitePointList))   // 获取监测点
 	api.POST("/website/point/del/:hostId", ginHelper.Handle(handler.WebsitePointDel))    // 删除监测点
@@ -110,6 +111,7 @@ func Data() {
 	data.GET("/allurl/:hostId", ginHelper.Handle(handler.WebsiteAllUrl))           // 获取网站下的所有url
 	data.GET("/all/website", ginHelper.Handle(handler.AllWebsite))                 // 获取所有需要监测的网站
 	data.GET("/website/point/:hostId", ginHelper.Handle(handler.WebsitePointList)) // 获取网站监测点
+	data.GET("/website/:hostId", ginHelper.Handle(handler.GetWebsiteData))         // 获取指定网站信息
 }
 
 func Test() {

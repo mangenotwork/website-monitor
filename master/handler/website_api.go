@@ -124,9 +124,14 @@ func WebsiteList(c *ginHelper.GinCtx) {
 	return
 }
 
+// TODO...
+func WebsiteConf(c *ginHelper.GinCtx) {
+
+}
+
 func WebsiteDelete(c *ginHelper.GinCtx) {
-	host := c.Param("host")
-	err := dao.NewWebsite().Del(host)
+	hostId := c.Param("hostId")
+	err := dao.NewWebsite().Del(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
@@ -148,15 +153,15 @@ type WebsiteOutPut struct {
 }
 
 func WebsiteInfo(c *ginHelper.GinCtx) {
-	host := c.Param("host")
+	hostId := c.Param("hostId")
 	website := dao.NewWebsite()
 	output := &WebsiteInfoOutPut{}
 	var err error
-	base, err := website.Select(host)
+	base, err := website.Select(hostId)
 	output.Base = WebsiteOutPut{base, utils.Timestamp2Date(base.Created)}
-	output.Info, err = website.GetInfo(host)
-	output.AlarmRule, err = website.GetAlarmRule(host)
-	output.ScanCheckUp, err = website.GetScanCheckUp(host)
+	output.Info, err = website.GetInfo(hostId)
+	output.AlarmRule, err = website.GetAlarmRule(hostId)
+	output.ScanCheckUp, err = website.GetScanCheckUp(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
@@ -179,7 +184,7 @@ func WebsiteInfoRefresh(c *ginHelper.GinCtx) {
 }
 
 func WebsiteUrls(c *ginHelper.GinCtx) {
-	hostId := c.Param("host")
+	hostId := c.Param("hostId")
 	data, err := dao.NewWebsite().GetWebSiteUrl(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -210,6 +215,17 @@ func AllWebsite(c *ginHelper.GinCtx) {
 	return
 }
 
+func GetWebsiteData(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	data, err := dao.NewWebsite().Select(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut(data, "")
+	return
+}
+
 func WebsiteEdit(c *ginHelper.GinCtx) {
 
 }
@@ -227,7 +243,7 @@ func WebsiteAlertDel(c *ginHelper.GinCtx) {
 }
 
 func MonitorLog(c *ginHelper.GinCtx) {
-	hostId := c.Param("host")
+	hostId := c.Param("hostId")
 	data := dao.NewMonitorLogDao().ReadLog(hostId)
 	c.APIOutPut(data, "")
 	return

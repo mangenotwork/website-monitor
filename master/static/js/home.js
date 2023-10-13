@@ -127,6 +127,8 @@ const app = createApp({
                 log: "",
             },
             editWebsiteConf: {
+                hostId: "",
+                confApi : function () { return "/api/website/conf/" + this.hostId; },
                 api: "/api/website/edit",
                 param: {
                     hostId: "",
@@ -134,7 +136,6 @@ const app = createApp({
                     alarmResTime: 3000,
                     uriDepth: 2,
                 },
-                host: "",
             },
             chartData: {
                 hostId: "",

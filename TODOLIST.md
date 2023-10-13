@@ -25,9 +25,8 @@
 - [ok] master 监测点设置  
 - [ok] master 通知拉取网站监测点
 - [ok] master 删除网站监测
-- master 增加网站监测 改为指定增加网站监测
-- master 删除网站监测 改为指定网站删除
-- bug master删除网站监测应该停止扫描
+- [ok] master 增加网站监测 改为指定增加网站监测
+- [ok] master 删除网站监测 改为指定网站删除
 - master 修改网站监测配置 指定修改
 - monitor 定时拉取网站的url
 - monitor 执行网站监测点监测
@@ -45,3 +44,5 @@
 - master 未部署监测器提示
 - monitor 监测器信息获取
 - master 监测器信息展示
+- master 测试
+- master 压力测试

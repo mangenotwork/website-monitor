@@ -123,7 +123,7 @@ func (w *websiteDao) Add(data *entity.Website, rule *entity.WebsiteAlarmRule, sc
 
 	// 异步通知监测器更新监测网站
 	go func() {
-		NoticeUpdateWebsite()
+		NoticeUpdateWebsite(data.HostID)
 	}()
 
 	return err
@@ -172,7 +172,7 @@ func (w *websiteDao) Del(hostID string) error {
 	err = DB.Delete(WebSiteUrlPointTable, hostID)
 	// 通知更新监测网站
 	go func() {
-		NoticeUpdateWebsite()
+		NoticeDelWebsite(hostID)
 	}()
 	return err
 }

@@ -6,10 +6,24 @@ import (
 	"website-monitor/monitor/business"
 )
 
-func NoticeUpdateWebsite(c *udp.Client, data []byte) {
+func NoticeUpdateWebsiteAll(c *udp.Client, data []byte) {
 	log.Info("更新监测网站")
 	log.Info("获取参数: ", string(data))
-	business.GetWebsite()
+	business.GetWebsiteAll()
+}
+
+func NoticeUpdateWebsite(c *udp.Client, data []byte) {
+	log.Info("更新监测网站指定")
+	log.Info("获取参数: ", string(data))
+	hostID := string(data)
+	business.GetWebsite(hostID)
+}
+
+func NoticeDelWebsite(c *udp.Client, data []byte) {
+	log.Info("删除监测网站指定")
+	log.Info("获取参数: ", string(data))
+	hostID := string(data)
+	business.DelWebsite(hostID)
 }
 
 func NoticeUpdateWebsiteAllUrl(c *udp.Client, data []byte) {

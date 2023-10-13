@@ -8,8 +8,12 @@ import (
 var Servers *udp.Servers
 
 // NoticeUpdateWebsite 有新的监测网站，通知拉取并更新监测网站列表
-func NoticeUpdateWebsite() {
-	Servers.NoticeAll(constname.NoticeUpdateWebsiteLabel, []byte(""), Servers.SetNoticeRetry(2, 3000))
+func NoticeUpdateWebsite(hostID string) {
+	Servers.NoticeAll(constname.NoticeUpdateWebsiteLabel, []byte(hostID), Servers.SetNoticeRetry(2, 3000))
+}
+
+func NoticeDelWebsite(hostID string) {
+	Servers.NoticeAll(constname.NoticeDelWebsiteLabel, []byte(hostID), Servers.SetNoticeRetry(2, 3000))
 }
 
 // NoticeUpdateWebsitePoint 有网站监测点更改，通知拉取并更新该网站监测点

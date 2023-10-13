@@ -4,7 +4,7 @@ const app = createApp({
     data() {
         return {
             mail: Mail,
-            addWebSite: AddWebSite,
+            webSite: AddWebSite,
         }
     },
     created:function(){

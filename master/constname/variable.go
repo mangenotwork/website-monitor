@@ -30,7 +30,9 @@ var (
 )
 
 const (
-	NoticeUpdateWebsiteLabel       = "website" // 通知更新网站监测
-	NoticeUpdateWebsiteAllUrlLabel = "allUrl"  // 通知更新网站url
-	NoticeUpdateWebsitePointLabel  = "point"   // 通知更新网站监测点
+	NoticeUpdateWebsiteAllLabel    = "websiteAll" // 通知更新网站监测所有
+	NoticeUpdateWebsiteLabel       = "website"    // 通知更新网站监测
+	NoticeDelWebsiteLabel          = "websiteDel" // 通知删除网站监测
+	NoticeUpdateWebsiteAllUrlLabel = "allUrl"     // 通知更新网站url
+	NoticeUpdateWebsitePointLabel  = "point"      // 通知更新网站监测点
 )

@@ -28,9 +28,11 @@ func main() {
 	business.Initialize(client)
 
 	// 通知方法
-	client.NoticeHandleFunc("website", handler.NoticeUpdateWebsite)      // 通知更新网站监测
-	client.NoticeHandleFunc("allUrl", handler.NoticeUpdateWebsiteAllUrl) // 通知更新网站url
-	client.NoticeHandleFunc("point", handler.NoticeUpdateWebsitePoint)   // 通知更新网站监测点
+	client.NoticeHandleFunc("websiteAll", handler.NoticeUpdateWebsiteAll) // 通知更新网站监测-所有
+	client.NoticeHandleFunc("website", handler.NoticeUpdateWebsite)       // 通知更新网站监测-指定
+	client.NoticeHandleFunc("websiteDel", handler.NoticeDelWebsite)       // 通知删除网站监测-指定
+	client.NoticeHandleFunc("allUrl", handler.NoticeUpdateWebsiteAllUrl)  // 通知更新网站url
+	client.NoticeHandleFunc("point", handler.NoticeUpdateWebsitePoint)    // 通知更新网站监测点
 	// TODO 通知执行并发请求
 
 	// 运行客户端
