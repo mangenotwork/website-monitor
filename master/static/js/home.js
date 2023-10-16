@@ -128,14 +128,11 @@ const app = createApp({
             },
             editWebsiteConf: {
                 hostId: "",
-                confApi : function () { return "/api/website/conf/" + this.hostId; },
-                api: "/api/website/edit",
-                param: {
-                    hostId: "",
-                    rate: 10,
-                    alarmResTime: 3000,
-                    uriDepth: 2,
-                },
+                confApi: function () { return "/api/website/conf/" + this.hostId; },
+                editApi: function () { return "/api/website/edit/" + this.hostId; },
+                base: {},
+                alarmRule: {},
+                scanCheckUp: {},
             },
             chartData: {
                 hostId: "",
@@ -338,21 +335,41 @@ const app = createApp({
         },
         openEditWebsiteConf: function (item) {
             let t = this;
-            t.editWebsiteConf.host = item.Host;
-            t.editWebsiteConf.param.hostId = item.ID;
-            t.editWebsiteConf.param.rate = item.Rate;
-            t.editWebsiteConf.param.alarmResTime = item.AlarmResTime;
-            t.editWebsiteConf.param.uriDepth = item.UriDepth;
-            console.log(item)
-            console.log(t.editWebsiteConf)
-            $("#setAlertModal").modal("show");
+            t.editWebsiteConf.hostId = item.hostID;
+            // t.editWebsiteConf.param.hostId = item.ID;
+            // t.editWebsiteConf.param.rate = item.Rate;
+            // t.editWebsiteConf.param.alarmResTime = item.AlarmResTime;
+            // t.editWebsiteConf.param.uriDepth = item.UriDepth;
+
+            common.AjaxGetNotAsync(t.editWebsiteConf.confApi(), function (data) {
+                t.editWebsiteConf.base = data.data.base;
+                t.editWebsiteConf.alarmRule = data.data.alarmRule;
+                t.editWebsiteConf.scanCheckUp = data.data.scanCheckUp;
+                console.log(t.editWebsiteConf.param)
+                $("#setAlertModal").modal("show");
+            })
+
         },
         editWebsiteConfSubmit: function () {
             let t = this;
-            t.editWebsiteConf.param.rate = Number(t.editWebsiteConf.param.rate);
-            t.editWebsiteConf.param.alarmResTime = Number(t.editWebsiteConf.param.alarmResTime);
-            t.editWebsiteConf.param.uriDepth = Number(t.editWebsiteConf.param.uriDepth);
-            common.AjaxPost(t.editWebsiteConf.api, t.editWebsiteConf.param, function (data){
+            let param = {
+                "host": t.editWebsiteConf.base.host,
+                "notes": t.editWebsiteConf.base.notes,
+                "monitorRate": Number(t.editWebsiteConf.base.monitorRate),
+                "contrastUrl": t.editWebsiteConf.base.contrastUrl,
+                "contrastTime": Number(t.editWebsiteConf.base.contrastTime),
+                "ping": t.editWebsiteConf.base.ping,
+                "pingTime": Number(t.editWebsiteConf.base.pingTime),
+                "uriDepth": Number(t.editWebsiteConf.scanCheckUp.uriDepth),
+                "scanRate": Number(t.editWebsiteConf.scanCheckUp.scanRate),
+                "scanBadLink": t.editWebsiteConf.scanCheckUp.scanBadLink,
+                "scanTDK": t.editWebsiteConf.scanCheckUp.scanTDK,
+                "scanExtLinks": t.editWebsiteConf.scanCheckUp.scanExtLinks,
+                "websiteSlowResponseTime": Number(t.editWebsiteConf.alarmRule.websiteSlowResponseTime),
+                "websiteSlowResponseCount": Number(t.editWebsiteConf.alarmRule.websiteSlowResponseCount),
+                "SSLCertificateExpire": Number(t.editWebsiteConf.alarmRule.SSLCertificateExpire),
+            }
+            common.AjaxPost(t.editWebsiteConf.editApi(), param, function (data){
                 common.ToastShow(data.msg);
                 $("#setAlertModal").modal('toggle');
             })

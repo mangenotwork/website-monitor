@@ -7,71 +7,76 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" v-model="editWebsiteConf.base.host" placeholder="name@example.com" disabled>
+                    <label>监测网站</label>
+                </div>
                 <div class="mb-3">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next1Param.notes" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.base.notes" placeholder="name@example.com">
                         <label>备注</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next1Param.monitorRate" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.base.monitorRate" placeholder="name@example.com">
                         <label>监测频率(单位s)</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next1Param.contrastUrl" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.base.contrastUrl" placeholder="name@example.com">
                         <label>对照组URL(保证监测的有效性:每次监测前先过对照组+ping来确认当前监测器网络的情况)</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next1Param.contrastTime" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.base.contrastTime" placeholder="name@example.com">
                         <label>对照组响应超时(单位ms;超过这个时间判定为当前网络不稳定不执行本次监测请求)</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next1Param.ping" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.base.ping" placeholder="name@example.com">
                         <label>Ping(保证监测的有效性:每次监测前先过对照组+ping来确认当前监测器网络的情况)</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next1Param.pingTime" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.base.pingTime" placeholder="name@example.com">
                         <label>Ping响应超时(单位ms;超过这个时间判定为当前网络不稳定不执行本次监测请求)</label>
                     </div>
                 </div>
+                <hr>
+                扫描设置:
 
                 <div class="mb-3">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next2Param.uriDepth" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.scanCheckUp.uriDepth" placeholder="name@example.com">
                         <label>扫描网站深度</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next2Param.scanRate" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.scanCheckUp.scanRate" placeholder="name@example.com">
                         <label>扫描网站频率(单位小时)</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="webSite.next2Param.scanBadLink" role="switch" checked>
+                        <input class="form-check-input" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanBadLink" role="switch" checked>
                         <label class="form-check-label">死链检查</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="webSite.next2Param.scanTDK" role="switch">
+                        <input class="form-check-input" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanTDK" role="switch">
                         <label class="form-check-label">TDK为空检查</label>
                     </div>
                 </div>
                 <div class="mb-3">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="webSite.next2Param.scanExtLinks" role="switch">
+                        <input class="form-check-input" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanExtLinks" role="switch">
                         <label class="form-check-label">外链变化检查</label>
                     </div>
                 </div>
@@ -93,6 +98,8 @@
                         <label class="form-check-label">[TODO...] 开启服务器端口扫描</label>
                     </div>
                 </div>
+                <hr>
+                报警设置:
 
                 <div class="mb-3">
                     <div class="form-check form-switch">
@@ -100,33 +107,20 @@
                         <label class="form-check-label">响应状态码错误报警；例如 404,500...</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next3Param.websiteSlowResponseTime" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.alarmRule.websiteSlowResponseTime" placeholder="name@example.com">
                         <label>网站响应多慢记录报警(单位ms)</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next3Param.websiteSlowResponseCount" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.alarmRule.websiteSlowResponseCount" placeholder="name@example.com">
                         <label>连续几次慢就发送邮件通知</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="webSite.next3Param.SSLCertificateExpire" placeholder="name@example.com">
+                        <input type="text" class="form-control" v-model="editWebsiteConf.alarmRule.SSLCertificateExpire" placeholder="name@example.com">
                         <label>证书到期预警邮件通知(单位天)</label>
                     </div>
                     其他: 开启了扫描检查，检查到问题就会有对应的报警通知;例如开启了死链扫描检查检查到死链就会发送报警通知邮件；
                 </div>
 
-
-<!--                <div class="form-floating mb-3">-->
-<!--                    <input type="text" class="form-control" v-model="editWebsiteConf.param.rate" placeholder="smtp.qq.com">-->
-<!--                    <label>监测频率</label>-->
-<!--                </div>-->
-<!--                <div class="form-floating mb-3">-->
-<!--                    <input type="text" class="form-control" v-model="editWebsiteConf.param.alarmResTime" placeholder="smtp.qq.com">-->
-<!--                    <label>超时报警</label>-->
-<!--                </div>-->
-<!--                <div class="form-floating mb-3">-->
-<!--                    <input type="text" class="form-control" v-model="editWebsiteConf.param.uriDepth" placeholder="smtp.qq.com">-->
-<!--                    <label>采集站点深度</label>-->
-<!--                </div>-->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>

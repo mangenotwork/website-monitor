@@ -33,16 +33,14 @@ type WebsiteAddParam struct {
 	SSLCertificateExpire     int64  `json:"SSLCertificateExpire"`
 }
 
-func WebsiteAdd(c *ginHelper.GinCtx) {
+func analysisWebsiteAddParam(c *ginHelper.GinCtx) (*WebsiteAddParam, error) {
 	param := &WebsiteAddParam{}
 	err := c.GetPostArgs(param)
 	if err != nil {
-		c.APIOutPutError(err, "参数或参数类型错误")
-		return
+		return param, err
 	}
 	if len(param.Host) < 1 {
-		c.APIOutPutError(nil, "参数错误: host不能为空")
-		return
+		return param, fmt.Errorf("参数错误: host不能为空")
 	}
 	if param.MonitorRate < 1 {
 		param.MonitorRate = constname.DefaultMonitorRate
@@ -66,8 +64,7 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 		param.ScanRate = constname.DefaultScanRate
 	}
 	if param.WebsiteSlowResponseTime < 100 {
-		c.APIOutPutError(nil, "网站响应慢不能小于100ms")
-		return
+		return param, fmt.Errorf("网站响应慢不能小于100ms")
 	}
 	if param.WebsiteSlowResponseCount < 1 {
 		param.WebsiteSlowResponseCount = constname.DefaultWebsiteSlowResponseCount
@@ -75,7 +72,15 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 	if param.SSLCertificateExpire < 1 {
 		param.SSLCertificateExpire = constname.DefaultSSLCertificateExpire
 	}
+	return param, nil
+}
 
+func WebsiteAdd(c *ginHelper.GinCtx) {
+	param, err := analysisWebsiteAddParam(c)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
 	log.Info("param = ", param)
 	website := &entity.Website{
 		Host:         param.Host,
@@ -124,9 +129,26 @@ func WebsiteList(c *ginHelper.GinCtx) {
 	return
 }
 
-// TODO...
-func WebsiteConf(c *ginHelper.GinCtx) {
+type WebsiteConfOut struct {
+	Base        *entity.Website            `json:"base"`
+	AlarmRule   *entity.WebsiteAlarmRule   `json:"alarmRule"`
+	ScanCheckUp *entity.WebsiteScanCheckUp `json:"scanCheckUp"`
+}
 
+func WebsiteConf(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	website := dao.NewWebsite()
+	base, err := website.Select(hostId)
+	log.Info("base = ", base)
+	alertRule, err := website.GetConfAlarmRule(hostId)
+	checkUp, err := website.GetConfScanCheckUp(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	out := &WebsiteConfOut{base, alertRule, checkUp}
+	c.APIOutPut(out, "")
+	return
 }
 
 func WebsiteDelete(c *ginHelper.GinCtx) {
@@ -227,7 +249,50 @@ func GetWebsiteData(c *ginHelper.GinCtx) {
 }
 
 func WebsiteEdit(c *ginHelper.GinCtx) {
-
+	hostId := c.Param("hostId")
+	param, err := analysisWebsiteAddParam(c)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	log.Info("param = ", param)
+	website := &entity.Website{
+		Host:         param.Host,
+		HostID:       hostId,
+		MonitorRate:  param.MonitorRate,
+		ContrastUrl:  param.ContrastUrl,
+		ContrastTime: param.ContrastTime,
+		Ping:         param.Ping,
+		PingTime:     param.PingTime,
+		Notes:        param.Notes,
+		Created:      time.Now().Unix(),
+	}
+	alarmRule := &entity.WebsiteAlarmRule{
+		Host:                     param.Host,
+		HostID:                   hostId,
+		WebsiteSlowResponseTime:  param.WebsiteSlowResponseTime,
+		WebsiteSlowResponseCount: param.WebsiteSlowResponseCount,
+		SSLCertificateExpire:     param.SSLCertificateExpire,
+		NotTDK:                   param.ScanTDK,
+		BadLink:                  param.ScanBadLink,
+		ExtLinkChange:            param.ScanExtLinks,
+	}
+	scan := &entity.WebsiteScanCheckUp{
+		Host:         param.Host,
+		HostID:       hostId,
+		ScanDepth:    param.UriDepth,
+		ScanRate:     param.ScanRate,
+		ScanTDK:      param.ScanTDK,
+		ScanBadLink:  param.ScanBadLink,
+		ScanExtLinks: param.ScanExtLinks,
+	}
+	err = dao.NewWebsite().Edit(website, alarmRule, scan)
+	if err != nil {
+		c.APIOutPutError(err, "修改监测配置失败, err = "+err.Error())
+		return
+	}
+	c.APIOutPut("修改监测配置成功", "修改监测配置成功")
+	return
 }
 
 func WebsiteChart(c *ginHelper.GinCtx) {

@@ -17,9 +17,13 @@ import (
 type WebsiteEr interface {
 	Add(data *entity.Website, alarmRule *entity.WebsiteAlarmRule, scan *entity.WebsiteScanCheckUp) error
 	Del(hostID string) error
-	Update()
+	Edit(base *entity.Website, alarmRule *entity.WebsiteAlarmRule, scan *entity.WebsiteScanCheckUp) error
 	SelectList() ([]*entity.Website, int, error)
 	Select(hostID string) (*entity.Website, error)
+
+	// GetConfAlarmRule GetConfScanCheckUp 获取网站的监测配置
+	GetConfAlarmRule(hostID string) (*entity.WebsiteAlarmRule, error)
+	GetConfScanCheckUp(hostID string) (*entity.WebsiteScanCheckUp, error)
 
 	// GetAlarmRule 获取监测报警规则
 	GetAlarmRule(hostID string) (*entity.WebsiteAlarmRule, error)
@@ -177,8 +181,11 @@ func (w *websiteDao) Del(hostID string) error {
 	return err
 }
 
-func (w *websiteDao) Update() {
-
+func (w *websiteDao) Edit(base *entity.Website, alarmRule *entity.WebsiteAlarmRule, scan *entity.WebsiteScanCheckUp) error {
+	err := w.addWebsite(base)
+	err = w.addWebsiteAlarmRule(alarmRule)
+	err = w.addWebsiteScanCheckUp(scan)
+	return err
 }
 
 func (w *websiteDao) SelectList() ([]*entity.Website, int, error) {
@@ -411,4 +418,16 @@ func (w *websiteDao) ClearPoint(hostID string) error {
 		}()
 	}
 	return err
+}
+
+func (w *websiteDao) GetConfAlarmRule(hostID string) (*entity.WebsiteAlarmRule, error) {
+	data := &entity.WebsiteAlarmRule{}
+	err := DB.Get(WebsiteAlarmRuleTable, hostID, data)
+	return data, err
+}
+
+func (w *websiteDao) GetConfScanCheckUp(hostID string) (*entity.WebsiteScanCheckUp, error) {
+	data := &entity.WebsiteScanCheckUp{}
+	err := DB.Get(WebsiteScanCheckUpTable, hostID, data)
+	return data, err
 }
