@@ -1,0 +1,110 @@
+<!-- 设置监测点 -->
+<div class="modal modal-xl fade" id="urlInfoModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setUriModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="setUriModalLabel">网站Url信息</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Url:
+                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
+                    <template v-if="websiteUrl.data.allUri === null">
+                        <p>采集中...</p>
+                    </template>
+                    <template v-else>
+                        <template v-for="item in websiteUrl.data.allUri">
+                            <li class="list-group-item list-group-item-action">
+                                <span>{{ item }}</span>
+                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank">{[ SVG "window" 18 18 ]}</a>
+                                <a class="copy" style="float: right; margin-right: 12px;" :data-clipboard-text="item" @click="copy">{[ SVG "link-45deg" 18 18 ]}</a>
+                            </li>
+                        </template>
+                    </template>
+                </ul>
+                <hr>
+                外链:
+                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
+                    <template v-if="websiteUrl.data.extLink === null">
+                        <p>采集中...</p>
+                    </template>
+                    <template v-else>
+                        <template v-for="item in websiteUrl.data.extLink">
+                            <li class="list-group-item list-group-item-action">
+                                <span>{{ item }}</span>
+                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank">{[ SVG "window" 18 18 ]}</a>
+                                <a style="float: right; margin-right: 12px;" @click="copy">{[ SVG "link-45deg" 18 18 ]}</a>
+                            </li>
+                        </template>
+                    </template>
+                </ul>
+                <hr>
+                死链:
+                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
+                    <template v-if="websiteUrl.data.badLink == false">
+                        <p>暂无扫描到死链接...</p>
+                    </template>
+                    <template v-else>
+                        <template v-for="item in websiteUrl.data.badLink">
+                            <li class="list-group-item list-group-item-action">
+                                <span>{{ item }}</span>
+                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank">{[ SVG "window" 18 18 ]}</a>
+                                <a style="float: right; margin-right: 12px;" @click="copy">{[ SVG "link-45deg" 18 18 ]}</a>
+                            </li>
+                        </template>
+                    </template>
+                </ul>
+                <hr>
+                JS静态文件:
+                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
+                    <template v-if="websiteUrl.data.jsLink === null">
+                        <p>采集中...</p>
+                    </template>
+                    <template v-else>
+                        <template v-for="item in websiteUrl.data.jsLink">
+                            <li class="list-group-item list-group-item-action">
+                                <span>{{ item }}</span>
+                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank">{[ SVG "window" 18 18 ]}</a>
+                                <a style="float: right; margin-right: 12px;" @click="copy">{[ SVG "link-45deg" 18 18 ]}</a>
+                            </li>
+                        </template>
+                    </template>
+                </ul>
+                <hr>
+                CSS静态文件:
+                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
+                    <template v-if="websiteUrl.data.cssLink === null">
+                        <p>采集中...</p>
+                    </template>
+                    <template v-else>
+                        <template v-for="item in websiteUrl.data.cssLink">
+                            <li class="list-group-item list-group-item-action">
+                                <span>{{ item }}</span>
+                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank">{[ SVG "window" 18 18 ]}</a>
+                                <a style="float: right; margin-right: 12px;" @click="copy">{[ SVG "link-45deg" 18 18 ]}</a>
+                            </li>
+                        </template>
+                    </template>
+                </ul>
+                <hr>
+                图片静态文件:
+                <ul class="list-group list-group-flush" style="height: 120px; overflow: auto;">
+                    <template v-if="websiteUrl.data.imgLink === null">
+                        <p>采集中...</p>
+                    </template>
+                    <template v-else>
+                        <template v-for="item in websiteUrl.data.imgLink">
+                            <li class="list-group-item list-group-item-action">
+                                <span>{{ item }}</span>
+                                <a style="float: right; margin-right: 12px;" :href="item" target="_blank">{[ SVG "window" 18 18 ]}</a>
+                                <a style="float: right; margin-right: 12px;" @click="copy">{[ SVG "link-45deg" 18 18 ]}</a>
+                            </li>
+                        </template>
+                    </template>
+                </ul>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>

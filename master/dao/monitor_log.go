@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"website-monitor/master/constname"
 	"website-monitor/master/entity"
@@ -16,12 +17,13 @@ import (
 
 type MonitorLogEr interface {
 	Write(hostId, mLog string)
-	ReadLog(hostId string) []*entity.MonitorLog
+	ReadLog(hostId, day string) []*entity.MonitorLog
 	ToMonitorLogObj(str string) *entity.MonitorLog
 	DataFormat(mLog *entity.MonitorLog) string
 	DeleteLog(hostId string) error
 	ReadAll(hostId, day string) ([]*entity.MonitorLog, error)
 	LogList(hostId string) ([]string, error)
+	LogListDay(hostId string) ([]string, error)
 	Upload(hostId, day string) (string, error)
 }
 
@@ -64,12 +66,22 @@ func (m *monitorLogDao) DataFormat(mLog *entity.MonitorLog) string {
 		mLog.MonitorName, mLog.MonitorIP, mLog.MonitorAddr, mLog.ClientIP)
 }
 
-func (m *monitorLogDao) ReadLog(hostId string) []*entity.MonitorLog {
+func (m *monitorLogDao) ReadLog(hostId, day string) []*entity.MonitorLog {
 	logPath, err := conf.YamlGetString("logPath")
 	if err != nil {
 		logPath = "./log/"
 	}
-	fileName := logPath + hostId + "_" + utils.NowDateLayout(constname.DayLayout) + ".log"
+
+	if day == "" {
+		list, err := m.LogListDay(hostId)
+		if err != nil || len(list) < 1 {
+			log.Info(err)
+			return make([]*entity.MonitorLog, 0)
+		}
+		day = list[0]
+	}
+
+	fileName := logPath + hostId + "_" + day + ".log"
 	log.Info("fileName = ", fileName)
 	f, err := os.Open(fileName)
 	if err != nil {
@@ -225,6 +237,29 @@ func (m *monitorLogDao) LogList(hostId string) ([]string, error) {
 			list = append(list, fileName)
 		}
 		return err
+	})
+	return list, err
+}
+
+func (m *monitorLogDao) LogListDay(hostId string) ([]string, error) {
+	logPath, err := conf.YamlGetString("logPath")
+	if err != nil {
+		logPath = "./log/"
+	}
+	list := make([]string, 0)
+	err = filepath.Walk(logPath, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return err
+		}
+		fileName := info.Name()
+		fid := strings.Split(fileName, "_")
+		if len(fid) > 1 && fid[0] == hostId {
+			list = append(list, strings.Replace(fid[1], ".log", "", -1))
+		}
+		return err
+	})
+	sort.Slice(list, func(i, j int) bool {
+		return i > j
 	})
 	return list, err
 }

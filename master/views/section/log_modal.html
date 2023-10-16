@@ -13,6 +13,7 @@
                             <option v-bind:value="item">{{ item }}</option>
                         </template>
                     </select>
+                    <label class="input-group-text" @click="loadLog()">载入日志</label>
                     <label class="input-group-text" @click="uploadLog()">下载日志</label>
                 </div>
                 <hr>
@@ -31,6 +32,7 @@
                             <th scope="col">Ping时间</th>
                             <th scope="col">对照组响应时间</th>
                             <th scope="col">监测结果</th>
+                            <th scope="col">监测器</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -46,6 +48,7 @@
                                 <td>{{ item.PingMs }} ms</td>
                                 <td>{{ item.ContrastUriMs }} ms</td>
                                 <td>{{ item.Msg }}</td>
+                                <td>{{ item.MonitorName }} | {{ item.MonitorIP }} | {{ item.MonitorAddr }} | {{ item.ClientIP }}</td>
                             </tr>
                         </template>
                         </tbody>

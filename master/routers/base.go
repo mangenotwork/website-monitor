@@ -70,10 +70,12 @@ func API() {
 	api.GET("/website/delete/:hostId", ginHelper.Handle(handler.WebsiteDelete))          // 删除网站监测
 	api.GET("/website/urls/:hostId", ginHelper.Handle(handler.WebsiteUrls))              // 监测网站采集到url
 	api.POST("/website/edit/:hostId", ginHelper.Handle(handler.WebsiteEdit))             // 监测设置
-	api.GET("/website/chart/:hostId", ginHelper.Handle(handler.WebsiteChart))            // TODO 图表
+	api.GET("/website/chart/:hostId", ginHelper.Handle(handler.WebsiteChart))            // 图表
 	api.GET("/website/alert/:hostId", ginHelper.Handle(handler.WebsiteAlertList))        // TODO 报警信息
 	api.GET("/website/alert/del/:hostId", ginHelper.Handle(handler.WebsiteAlertDel))     // TODO 报警信息
 	api.GET("/website/log/:hostId", ginHelper.Handle(handler.MonitorLog))                // 获取监测日志
+	api.GET("/website/log/list/:hostId", ginHelper.Handle(handler.MonitorLogList))       // 获取监测日志列表
+	api.GET("/website/log/upload/:hostId", ginHelper.Handle(handler.MonitorLogUpload))   // 日志文件下载
 	api.POST("/website/point/add/:hostId", ginHelper.Handle(handler.WebsitePointAdd))    // 添加监测点
 	api.GET("/website/point/list/:hostId", ginHelper.Handle(handler.WebsitePointList))   // 获取监测点
 	api.POST("/website/point/del/:hostId", ginHelper.Handle(handler.WebsitePointDel))    // 删除监测点

@@ -119,9 +119,10 @@ const app = createApp({
             isOk: "",
             monitorLog: {
                 hostId: "",
-                api: function (){ return "/api/monitor/log/" + this.hostId; },
-                logListApi: function () { return "/api/log/list/" + this.hostId; },
-                logUpload: function () { return "/api/log/upload/" + this.hostId + "?day=" + this.log; },
+                logApi: function (){ return "/api/website/log/" + this.hostId; },
+                loadApi: function (){ return "/api/website/log/" + this.hostId + "?day=" + this.log; },
+                logListApi: function () { return "/api/website/log/list/" + this.hostId; },
+                logUpload: function () { return "/api/website/log/upload/" + this.hostId + "?day=" + this.log; },
                 data: {},
                 logList: [],
                 log: "",
@@ -139,7 +140,7 @@ const app = createApp({
                 api: function () {
                   return "/api/website/chart/" + this.hostId + "?day=" + this.selectDay + "&uri=" + this.selectUriType;
                 },
-                dayApi: function () { return "/api/log/list/" + this.hostId; },
+                dayApi: function () { return "/api/website/log/list/" + this.hostId; },
                 list: [],
                 host: "",
                 selectDay: "",
@@ -155,7 +156,11 @@ const app = createApp({
                 len: 0,
                 del: function (date) { return "/api/website/alert/del/" + this.hostId + "?date="+date; }
             },
-
+            websiteUrl: {
+                hostId: "",
+                api: function () { return "/api/website/urls/" + this.hostId; },
+                data: {},
+            },
         }
     },
     created:function(){
@@ -297,14 +302,25 @@ const app = createApp({
         gotoWebsite: function (item) {
             window.open(item.host, '_blank');
         },
-        logShow: function (id) {
+        logShow: function (item) {
             let t = this;
-            t.monitorLog.hostId = id;
+            t.monitorLog.hostId = item.hostID;
             common.AjaxGetNotAsync(t.monitorLog.logListApi(), function (data){
-                t.monitorLog.logList = data.data.DayList;
+                t.monitorLog.logList = data.data;
                 t.monitorLog.log = t.monitorLog.logList[0];
             })
-            common.AjaxGet(t.monitorLog.api(), function (data){
+            common.AjaxGet(t.monitorLog.logApi(), function (data){
+                if (data.code === 0) {
+                    t.monitorLog.data = data.data;
+                    $("#logModal").modal('show');
+                } else {
+                    common.ToastShow(data.msg);
+                }
+            });
+        },
+        loadLog: function () {
+            let t = this;
+            common.AjaxGet(t.monitorLog.loadApi(), function (data){
                 if (data.code === 0) {
                     t.monitorLog.data = data.data;
                     $("#logModal").modal('show');
@@ -336,11 +352,6 @@ const app = createApp({
         openEditWebsiteConf: function (item) {
             let t = this;
             t.editWebsiteConf.hostId = item.hostID;
-            // t.editWebsiteConf.param.hostId = item.ID;
-            // t.editWebsiteConf.param.rate = item.Rate;
-            // t.editWebsiteConf.param.alarmResTime = item.AlarmResTime;
-            // t.editWebsiteConf.param.uriDepth = item.UriDepth;
-
             common.AjaxGetNotAsync(t.editWebsiteConf.confApi(), function (data) {
                 t.editWebsiteConf.base = data.data.base;
                 t.editWebsiteConf.alarmRule = data.data.alarmRule;
@@ -374,6 +385,14 @@ const app = createApp({
                 $("#setAlertModal").modal('toggle');
             })
         },
+        openWebsiteUrl: function (item) {
+            let t =this;
+            t.websiteUrl.hostId = item.hostID;
+            common.AjaxGet(t.websiteUrl.api(), function (data){
+                t.websiteUrl.data = data.data;
+                $("#urlInfoModal").modal("show");
+            });
+        },
         copy: function () {
             let t = this;
             let clipboard = new ClipboardJS('.copy');
@@ -387,11 +406,11 @@ const app = createApp({
         },
         openChart: function (item){
             let t = this;
-            t.chartData.hostId = item.ID;
-            t.chartData.host = item.Host;
+            t.chartData.hostId = item.hostID;
+            t.chartData.host = item.host;
             t.chartData.selectUriType = t.chartData.uriType[0].value;
             common.AjaxGetNotAsync(t.chartData.dayApi(), function (data) {
-                t.chartData.dayList = data.data.DayList;
+                t.chartData.dayList = data.data;
                 t.chartData.selectDay = t.chartData.dayList[0];
             });
             t.$nextTick(() => {

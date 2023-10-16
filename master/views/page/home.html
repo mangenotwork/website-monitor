@@ -82,7 +82,7 @@
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="查看网站信息" @click="openWebsiteInfo(item.hostID)">{[ SVG "house-fill" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="gotoWebsite(item)">{[ SVG "browser-chrome" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="修改网站监测配置" @click="openEditWebsiteConf(item)">{[ SVG "gear-fill" 18 18]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="网站扫描的Url" @click="">{[ SVG "window-stack" 18 18]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="网站扫描的Url" @click="openWebsiteUrl(item)">{[ SVG "window-stack" 18 18]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="设置网站监测点(Url)" @click="setUriPoint(item)">{[ SVG "broadcast" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测日志" @click="logShow(item)">{[ SVG "file-text-fill" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测图" @click="openChart(item)">{[ SVG "graph-up" 18 18 ]}</a>
@@ -97,14 +97,15 @@
                     </div>
                     {[ template "add_host_modal.html" . ]}
                     {[ template "mail_set_modal.html" . ]}
-                    {[ template "toast.html" ]}
+                    {[ template "toast.html" . ]}
                     {[ template "set_alert_modal.html" . ]}
                     {[ template "set_uri_modal.html" . ]}
                     {[ template "website_info_modal.html" . ]}
-                    {[ template "log_modal.html" ]}
-                    {[ template "isok_modal.html" ]}
-                    {[ template "chart_modal.html" ]}
-                    {[ template "alert_modal.html" ]}
+                    {[ template "log_modal.html" . ]}
+                    {[ template "isok_modal.html" . ]}
+                    {[ template "chart_modal.html" . ]}
+                    {[ template "alert_modal.html" . ]}
+                    {[ template "url_info_modal.html" . ]}
                 </main>
             </div>
         </div>

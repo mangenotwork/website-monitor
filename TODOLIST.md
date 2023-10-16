@@ -28,8 +28,9 @@
 - [ok] master 增加网站监测 改为指定增加网站监测
 - [ok] master 删除网站监测 改为指定网站删除
 - [ok] master 修改网站监测配置 指定修改
-- master 网站扫描的Url
-- master 监测图表
+- [ok] master 网站扫描的Url
+- [ok] master 查看日志列表
+- [ok] master 监测图表
 - monitor 定时拉取网站的url
 - monitor 执行网站监测点监测
 - monitor 执行网站随机url监测
@@ -70,7 +71,10 @@
 Database Scanner（如图1-54所示）、NGSSQuirreL，以及SQL空口令扫描器等。另外，许多入侵者或渗透测试人员也有自己的专用扫描器，其使用更加个性化。
 
 
-3.
+3. 相关软件工具（如扫描工具X-Scan等）来收集网络系统中各个主机系统的相关信息
+
+
+4. 
 
 
 

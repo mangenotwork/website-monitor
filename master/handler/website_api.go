@@ -296,7 +296,35 @@ func WebsiteEdit(c *ginHelper.GinCtx) {
 }
 
 func WebsiteChart(c *ginHelper.GinCtx) {
-
+	hostId := c.Param("hostId")
+	day := c.GetQuery("day")
+	if len(day) < 1 {
+		day = utils.NowDateLayout(constname.DayLayout)
+	}
+	uri := c.GetQuery("uri") // Health:根URI,健康URI  Random:随机URI  Point:监测点URI
+	data, err := dao.NewMonitorLogDao().ReadAll(hostId, day)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	out := make([][]int64, 0)
+	for _, v := range data {
+		if len(uri) > 0 { // 指定类型
+			if v.UriType == uri {
+				item := make([]int64, 0)
+				item = append(item, utils.Date2Timestamp(v.Time)*1000)
+				item = append(item, v.UriMs)
+				out = append(out, item)
+			}
+		} else {
+			item := make([]int64, 0)
+			item = append(item, utils.Date2Timestamp(v.Time)*1000)
+			item = append(item, v.UriMs)
+			out = append(out, item)
+		}
+	}
+	c.APIOutPut(out, "")
+	return
 }
 
 func WebsiteAlertList(c *ginHelper.GinCtx) {
@@ -309,8 +337,35 @@ func WebsiteAlertDel(c *ginHelper.GinCtx) {
 
 func MonitorLog(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
-	data := dao.NewMonitorLogDao().ReadLog(hostId)
+	day := c.GetQuery("day")
+	data := dao.NewMonitorLogDao().ReadLog(hostId, day)
 	c.APIOutPut(data, "")
+	return
+}
+
+func MonitorLogList(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	data, err := dao.NewMonitorLogDao().LogListDay(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.APIOutPut(data, "")
+	return
+}
+
+func MonitorLogUpload(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	day := c.GetQuery("day")
+	logPath, err := dao.NewMonitorLogDao().Upload(hostId, day)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+	c.Writer.Header().Add("Content-Disposition",
+		fmt.Sprintf("attachment; filename=%s", fmt.Sprintf("%s.log", day)))
+	c.Writer.Header().Add("Content-Type", "application/text/plain")
+	c.File(logPath)
 	return
 }
 
