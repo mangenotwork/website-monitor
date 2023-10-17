@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/log"
+	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
 	"sync"
+	"time"
 )
 
 var AllWebsiteData sync.Map
@@ -115,10 +117,7 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 	mLog.UriType = URIHealth
 	mLog.LogType = LogTypeInfo
 	mLog.Msg = ""
-	// =================================  监测生命URI
 	log.Info("=================================  监测生命URI... ", item.Host)
-	times := 0
-R:
 	healthCode, healthMs, err := request(item.Host)
 	if err != nil {
 		mLog.LogType = LogTypeAlert
@@ -136,15 +135,80 @@ R:
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}
-	// TODO 请求超时报警业务
+	// 请求超时报警
 	if item.AlertRuleMs(healthMs) {
-		// 如果是超时再来一次,确保监测是连续超时并非单个网络波动
-		if times == 0 {
-			times++
-			goto R
-		}
 		mLog.LogType = LogTypeAlert
 		mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms;", healthMs)
+		item.Put(item.mLogSerialize(mLog))
+		return
+	}
+	mLog.Msg = "passed"
+	item.Put(item.mLogSerialize(mLog))
+	return
+}
+
+func (item *WebsiteItem) MonitorRandomUri(mLog *MonitorLog) {
+	uri := GetWebsiteUrlDataMap(item.HostID)
+	if len(uri) > 0 {
+		time.Sleep(1 * time.Second) // 强行休息1s
+		mLog.UriType = URIRandom
+		mLog.LogType = LogTypeInfo // 复位
+		mLog.Msg = ""              // 复位
+		randomUri := utils.RandomString(uri)
+		log.Info("=================================  随机取一个URI监测... ", randomUri)
+		randomCode, randomMs, err := request(randomUri)
+		if err != nil {
+			mLog.LogType = LogTypeAlert
+			mLog.Msg = "请求失败，err=" + err.Error()
+			item.Put(item.mLogSerialize(mLog))
+			return
+		}
+		mLog.Uri = randomUri
+		mLog.UriCode = randomCode
+		mLog.UriMs = randomMs
+		if item.AlertRuleCode(randomCode) {
+			mLog.LogType = LogTypeAlert
+			mLog.Msg = fmt.Sprintf("请求失败，状态码:%d", randomCode)
+			item.Put(item.mLogSerialize(mLog))
+			return
+		}
+		if item.AlertRuleMs(randomMs) {
+			mLog.LogType = LogTypeAlert
+			mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms", randomMs)
+			item.Put(item.mLogSerialize(mLog))
+			return
+		}
+		mLog.Msg = "passed"
+		item.Put(item.mLogSerialize(mLog))
+	}
+}
+
+func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
+	log.Info("=================================  执行监测点监测... ", pointUrl)
+	time.Sleep(1 * time.Second) // 强行休息1s
+	mLog.UriType = URIPoint
+	mLog.LogType = LogTypeInfo // 复位
+	mLog.Msg = ""              // 复位
+	pointCode, pointMs, err := request(pointUrl)
+	if err != nil {
+		mLog.LogType = LogTypeAlert
+		mLog.Msg = "请求失败，err=" + err.Error()
+		item.Put(item.mLogSerialize(mLog))
+		return
+	}
+	mLog.Uri = pointUrl
+	mLog.UriCode = pointCode
+	mLog.UriMs = pointMs
+	// 监测规则
+	if item.AlertRuleCode(pointCode) {
+		mLog.LogType = LogTypeAlert
+		mLog.Msg = fmt.Sprintf("请求失败，状态码:%d", pointCode)
+		item.Put(item.mLogSerialize(mLog))
+		return
+	}
+	if item.AlertRuleMs(pointMs) {
+		mLog.LogType = LogTypeAlert
+		mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms", pointMs)
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}

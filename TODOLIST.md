@@ -31,21 +31,20 @@
 - [ok] master 网站扫描的Url
 - [ok] master 查看日志列表
 - [ok] master 监测图表
-- monitor 定时拉取网站的url
-- monitor 执行网站监测点监测
-- monitor 执行网站随机url监测
-- master 存储所有网站监测日志
-- master 分析监测日志并产生报警
-- master 统计报警并发送邮件通知
-- master 网站Url信息
-- master 报警信息
-- master 报警信息
-- master 任务表
+- [ok] monitor 定时拉取网站的url
+- [ok] monitor 执行网站监测点监测
+- [ok] monitor 执行网站随机url监测
 - master 获取monitor在线情况
 - master 监测器列表
 - master 未部署监测器提示
 - monitor 监测器信息获取
 - master 监测器信息展示
+- master 存储所有网站监测日志
+- master 分析监测日志并产生报警
+- master 统计报警并发送邮件通知
+- master 网站Url信息
+- master 报警信息
+- master 任务表
 - master 测试
 - master 压力测试
 
@@ -74,9 +73,16 @@ Database Scanner（如图1-54所示）、NGSSQuirreL，以及SQL空口令扫描�
 3. 相关软件工具（如扫描工具X-Scan等）来收集网络系统中各个主机系统的相关信息
 
 
-4. 
+4. 上传漏洞扫描
+例如：正常的上传路径是“http://www.xxx.com/net op/upload/01.jpg”，但黑客可使用“\0”来构造filepath为“http://www.xxx.com.cn/netop.asp \0/01.jpg”，
+这样当服务器接收filepath数据时，就会简单地看到“netop.asp”后面的“\0”后，认为filepath数据到此就结束了，此时上传文件就被保存为www.xxx.com.cn/netop.asp。
+利用这个上传漏洞就可以上传ASP木马，再连接上传的网页，进而控制整个网站系统了。
 
 
+5. SYN攻击利器HGod；  SYN-Killer是由国人编写的一款基于SYN攻击程序的代表作品； 
+
+
+6. 
 
 ```
 

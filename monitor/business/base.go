@@ -51,6 +51,22 @@ func Initialize(client *udp.Client) {
 		}
 	}()
 
+	// 启动定时器 15分钟一次，定时拉取监测网站url
+	go func() {
+		timer := time.NewTimer(time.Minute * 15) //初始化定时器
+		for {
+			select {
+			case <-timer.C:
+				log.Info("执行定期器，定时拉取监测网站url")
+				AllWebsiteData.Range(func(key, value any) bool {
+					website := value.(*WebsiteItem)
+					SetWebsiteUrlData(website.HostID)
+					return true
+				})
+				timer.Reset(time.Second * 1)
+			}
+		}
+	}()
 }
 
 /*
@@ -64,8 +80,8 @@ Business
 
 	三次请求监测
 	1. 监测host确认网站是否存活
-	2. 监测网站采集到的url随机选择一个进行监测，如果是新添加的网站采集url会延后
-	3. 监测设置的网站监测点依次进行监测
+	2. 监测网站采集到的url随机选择一个进行监测，如果是新添加的网站采集url会延后; 如果存在强行休息1s再执行
+	3. 监测设置的网站监测点依次进行监测; 如果存在强行休息1s再执行
 */
 
 func Business(item *WebsiteItem) {
@@ -103,8 +119,8 @@ func Business(item *WebsiteItem) {
 		// 监测生命URI
 		item.MonitorHealthUri(mLog)
 
-		// TODO 随机URI监测  需要获取所有网站Url
-		// isAlert2 := item.MonitorRandomUri(masterConf, mLog, alert)
+		// 随机URI监测  需要获取所有网站Url
+		item.MonitorRandomUri(mLog)
 
 		// 判断是否执行监测点监测
 		point, pointLen := GetWebSitePoint(item.HostID)
@@ -118,16 +134,18 @@ func Business(item *WebsiteItem) {
 			item.LoopPoint++
 			log.Info("本次监测的监测点是 = ", pointUrl)
 			// TODO... 执行监测点监测
+			item.MonitorPointUri(mLog, pointUrl)
 		}
 
 	}
 }
 
 var (
-	MasterHTTP         = ""
-	GetAllWebsiteAPI   = "/data/all/website"
-	GetWebsitePointAPI = func(id string) string { return fmt.Sprintf("/data/website/point/%s", id) }
-	GetWebsiteAPI      = func(id string) string { return fmt.Sprintf("/data/website/%s", id) }
+	MasterHTTP          = ""
+	GetAllWebsiteAPI    = "/data/all/website"
+	GetWebsitePointAPI  = func(id string) string { return fmt.Sprintf("/data/website/point/%s", id) }
+	GetWebsiteAPI       = func(id string) string { return fmt.Sprintf("/data/website/%s", id) }
+	GetWebsiteAllUrlAPI = func(id string) string { return fmt.Sprintf("/data/allurl/%s", id) }
 )
 
 func GetWebsiteAll() {
@@ -151,6 +169,8 @@ func GetWebsiteAll() {
 		item.Add()
 		// 获取监测点
 		GetWebsitePoint(v.HostID)
+		// 获取所有url
+		SetWebsiteUrlData(v.HostID)
 	}
 }
 
