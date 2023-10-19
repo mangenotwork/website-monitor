@@ -6,7 +6,38 @@
         <div class="row">
             {[ template "__menu__.html" . ]}
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                Monitor TODO...
+                Monitor List Info
+
+                <div style="margin-top: 24px;padding: 0px;">
+                    <div class="box" style="height: calc(100vh - 320px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
+                        <table class="table table-hover">
+                            <thead style="z-index: 99;">
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">状态</th>
+                                <th scope="col">地址</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <template v-for="item in monitor.list">
+                                <tr>
+                                    <td><span style="font-size: 14px;"><b>{{ item.name }}</b></span></td>
+                                    <td>
+                                        <template v-if="item.online===true">
+                                            <span class="badge text-bg-success">执行监测中...</span>
+                                        </template>
+                                        <template v-if="item.online===false">
+                                            <span class="badge text-bg-danger">已掉线 </span>
+                                        </template>
+                                    </td>
+                                    <td><span style="font-size: 14px;">{{ item.addr }}</span></td>
+                                </tr>
+                            </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 {[ template "add_host_modal.html" . ]}
                 {[ template "mail_set_modal.html" . ]}
                 {[ template "toast.html" . ]}

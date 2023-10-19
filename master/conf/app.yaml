@@ -26,3 +26,6 @@ jwt:
 
 # 存放监测日志的路径
 logPath: "./log/"
+
+connCode: qwert
+connSecret: abc123!@

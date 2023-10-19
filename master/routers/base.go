@@ -103,7 +103,8 @@ func API() {
 	api.GET("/tool/ping", ginHelper.Handle(handler.Ping))                          // TODO ping
 	// TODO 端口搜索
 
-	//
+	// monitor
+	api.GET("/monitor/list", ginHelper.Handle(handler.MonitorList)) // 监测器列表，在线情况
 
 }
 

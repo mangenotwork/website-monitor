@@ -9,8 +9,18 @@ import (
 
 func RunUDPServer() {
 	var err error
+	connCode, err := conf.YamlGetString("connCode")
+	if err != nil {
+		connCode = udp.DefaultConnectCode
+	}
+	connSecret, err := conf.YamlGetString("connSecret")
+	if err != nil {
+		connSecret = udp.DefaultSecretKey
+	}
 	// 初始化 s端
-	dao.Servers, err = udp.NewServers("0.0.0.0", utils.AnyToInt(conf.Conf.Default.UdpServer.Prod))
+	dao.Servers, err = udp.NewServers("0.0.0.0",
+		utils.AnyToInt(conf.Conf.Default.UdpServer.Prod),
+		udp.SetServersConf("s", connCode, connSecret))
 	if err != nil {
 		panic(err)
 	}

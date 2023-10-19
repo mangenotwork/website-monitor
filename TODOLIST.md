@@ -34,8 +34,10 @@
 - [ok] monitor 定时拉取网站的url
 - [ok] monitor 执行网站监测点监测
 - [ok] monitor 执行网站随机url监测
-- master 获取monitor在线情况
-- master 监测器列表
+- [ok] master 获取monitor在线情况
+- [ok] master 监测器列表
+- monitor 获取ip环境地址
+- monitor 获取系统信息
 - master 未部署监测器提示
 - monitor 监测器信息获取
 - master 监测器信息展示
@@ -82,7 +84,35 @@ Database Scanner（如图1-54所示）、NGSSQuirreL，以及SQL空口令扫描�
 5. SYN攻击利器HGod；  SYN-Killer是由国人编写的一款基于SYN攻击程序的代表作品； 
 
 
-6. 
+6.  网络协议与活跃主机发现技术。▯ 基于ARP协议的活跃主机发现技术。▯ 基于ICMP协议的活跃主机发现技术。▯ 基于TCP协议的活跃主机发现技术。
+▯ 基于UDP协议的活跃主机发现技术。▯ 基于SCTP协议的活跃主机发现技术。
+
+
+7. http 报文攻击方式
+这里有个有意思的事情，我在查询http报文资料的时候，发现有一种攻击方法，称之为slow header和 slow post，这里来解释下是什么意思。
+slow header：表示客户端连接到服务器后，通过慢速度发送数据，但是一直不发送\r\n\r\n，服务器一直在接收，所以始终占着服务器连接，当该种连接过多时，会导致服务器连接数满，从而不能接收新的请求。
+slow post: 这里指的是，通过post发送数据，但是将Content-Length设置的很大，还是每次只发送很小的数据，和上述一样，当该种连接过多时候，会导致服务器连接数满，从而不能接收新的请求。
+
+参考: https://www.cnblogs.com/NoneID/p/17513530.html
+
+
+8. 信息搜索工具: Whois   nslookup命令工具  OneForAll子域名搜集工具
+扫描探测工具:  Nmap  Nessus   AWVS   Dirsearch    Nikto
+漏洞扫描工具：  sqlmap注入工具   
+Webshell管理工具：   冰蝎    中国蚁剑    哥斯拉   
+网络抓包分析工具：   Wireshark   Fiddler    tcpdump   
+
+
+9. 地址扫描探测。主要利用ARP、ICMP请求目标IP或网段，通过回应消息获取目标网段中存活机器的IP地址和MAC地址，进而掌握拓扑结构。
+
+
+10. 设备指纹探测。根据扫描返回的数据包匹配TCP/IP协议栈指纹来识别不同的操作系统和设备
+
+
+11. 
+
+
+
 
 ```
 

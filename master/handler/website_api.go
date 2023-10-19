@@ -435,3 +435,9 @@ func WebsitePointClear(c *ginHelper.GinCtx) {
 	c.APIOutPut("", "成功")
 	return
 }
+
+func MonitorList(c *ginHelper.GinCtx) {
+	data := dao.GetClientList()
+	c.APIOutPut(data, "成功")
+	return
+}

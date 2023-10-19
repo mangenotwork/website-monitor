@@ -4,9 +4,17 @@ import (
 	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/log"
+	"math/rand"
+	"time"
 	"website-monitor/monitor/business"
 	"website-monitor/monitor/handler"
 )
+
+const maxNameLen = 7
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func main() {
 	conf.InitConf("./conf/")
@@ -19,7 +27,23 @@ func main() {
 		panic(err)
 	}
 	log.Info(master)
-	client, err := udp.NewClient(master)
+	clientName, err := conf.YamlGetString("clientName")
+	if err != nil {
+		clientName = randStringBytes(maxNameLen)
+	}
+	connectCode, err := conf.YamlGetString("connCode")
+	if err != nil {
+		connectCode = udp.DefaultConnectCode
+	}
+	secretKey, err := conf.YamlGetString("connSecret")
+	if err != nil {
+		secretKey = udp.DefaultSecretKey
+	}
+	client, err := udp.NewClient(master, udp.ClientConf{
+		Name:        clientName,
+		ConnectCode: connectCode,
+		SecretKey:   secretKey,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -37,4 +61,14 @@ func main() {
 
 	// 运行客户端
 	client.Run()
+}
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func randStringBytes(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }
