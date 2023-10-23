@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/log"
+	udp "github.com/mangenotwork/udp_comm"
 	"math/rand"
 	"time"
 	"website-monitor/monitor/business"
@@ -50,6 +50,10 @@ func main() {
 
 	// 初始化监测
 	business.Initialize(client)
+
+	// 获取方法
+	client.GetHandleFunc("ipAddr", handler.GetIPAddr) // 获取监测器ip属地
+	client.GetHandleFunc("osInfo", handler.GetOSInfo) // 获取监测器宿主系统信息
 
 	// 通知方法
 	client.NoticeHandleFunc("websiteAll", handler.NoticeUpdateWebsiteAll) // 通知更新网站监测-所有

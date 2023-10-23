@@ -2,15 +2,13 @@ module website-monitor/monitor
 
 go 1.19
 
-replace github.com/mangenotwork/beacon-tower/udp => /media/ManGe/fe3b15b2-5de5-42d6-98ce-ed93b8af992b9/mygo/src/github.com/mangenotwork/beacon-tower/udp
-
 require (
-	//github.com/mangenotwork/beacon-tower/udp v0.0.0-20230927071244-09e888114b10
+	//github.com/mangenotwork/udp_comm v0.0.1
 	github.com/mangenotwork/common v0.1.3
 	github.com/mangenotwork/gathertool v0.4.5
 )
 
-require github.com/mangenotwork/beacon-tower/udp v0.0.0-00010101000000-000000000000
+require github.com/mangenotwork/udp_comm v0.0.1
 
 require (
 	github.com/Shopify/sarama v1.38.1 // indirect

@@ -36,15 +36,13 @@
 - [ok] monitor 执行网站随机url监测
 - [ok] master 获取monitor在线情况
 - [ok] master 监测器列表
-- monitor 获取ip环境地址
-- monitor 获取系统信息
-- master 未部署监测器提示
-- monitor 监测器信息获取
-- master 监测器信息展示
+- [ok] monitor 获取ip环境地址
+- [ok] monitor 获取系统信息
+- [ok] master 首页未部署监测器提示
+- [ok] master 监测器信息展示
 - master 存储所有网站监测日志
 - master 分析监测日志并产生报警
 - master 统计报警并发送邮件通知
-- master 网站Url信息
 - master 报警信息
 - master 任务表
 - master 测试

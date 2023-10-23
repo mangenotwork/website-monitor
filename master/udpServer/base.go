@@ -1,9 +1,9 @@
 package udpServer
 
 import (
-	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/utils"
+	udp "github.com/mangenotwork/udp_comm"
 	"website-monitor/master/dao"
 )
 

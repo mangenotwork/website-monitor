@@ -104,8 +104,8 @@ func API() {
 	// TODO 端口搜索
 
 	// monitor
-	api.GET("/monitor/list", ginHelper.Handle(handler.MonitorList)) // 监测器列表，在线情况
-
+	api.GET("/monitor/list", ginHelper.Handle(handler.MonitorList))     // 监测器列表，在线情况
+	api.GET("/monitor/ipaddr", ginHelper.Handle(handler.MonitorIPAddr)) // 测试获取ip地址属地信息
 }
 
 func Data() {

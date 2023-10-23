@@ -5,12 +5,12 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/ginHelper"
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
+	udp "github.com/mangenotwork/udp_comm"
 	"sync"
 	"time"
 )
@@ -235,6 +235,7 @@ func getIPAddr() *IPInfo {
 	ctx, _ := gt.Get(GetMyIPInfoUrl)
 	ip, _ := gt.JsonFind2Str(ctx.Json, "/ip")
 	address, _ := gt.JsonFind2Str(ctx.Json, "/address")
+	log.Info("获取到ip属地= ", address)
 	return &IPInfo{
 		IP:      ip,
 		Address: address,

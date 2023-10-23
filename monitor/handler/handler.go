@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/mangenotwork/beacon-tower/udp"
+	"encoding/json"
 	"github.com/mangenotwork/common/log"
+	udp "github.com/mangenotwork/udp_comm"
 	"website-monitor/monitor/business"
 )
 
@@ -36,4 +37,31 @@ func NoticeUpdateWebsitePoint(c *udp.Client, data []byte) {
 	log.Info("获取参数: ", string(data))
 	hostID := string(data)
 	business.GetWebsitePoint(hostID)
+}
+
+func GetIPAddr(c *udp.Client, param []byte) (int, []byte) {
+	log.Info("获取ip地址与属地")
+	data := business.GetMyIP()
+	log.Info("data = ", data)
+	b, err := json.Marshal(data)
+	if err != nil {
+		log.Error(err)
+	}
+	return 0, b
+}
+
+func GetOSInfo(c *udp.Client, param []byte) (int, []byte) {
+	log.Info("获取监测器宿主系统信息")
+	data := &OSInfo{
+		HostName:      GetHostName(),
+		OSType:        GetSysType(),
+		OSArch:        GetSysArch(),
+		CpuCoreNumber: GetCpuCoreNumber(),
+		InterfaceInfo: GetInterfaceInfo(),
+	}
+	b, err := json.Marshal(data)
+	if err != nil {
+		log.Error(err)
+	}
+	return 0, b
 }

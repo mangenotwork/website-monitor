@@ -161,6 +161,11 @@ const app = createApp({
                 api: function () { return "/api/website/urls/" + this.hostId; },
                 data: {},
             },
+            monitor: {
+                api: "/api/monitor/list",
+                list: [],
+            },
+
         }
     },
     created:function(){
@@ -168,6 +173,7 @@ const app = createApp({
         t.webSite.getList();
         t.mail.hasSet();
         t.mail.getInfo();
+        t.getMonitorList();
         //t.getAlertList();
         // t.getMonitorErrList();
 
@@ -187,6 +193,16 @@ const app = createApp({
                 t.alertList.list = data.data;
                 t.alertList.len = t.alertList.list.length;
             });
+        },
+        getMonitorList: function () {
+            let t = this;
+            common.AjaxGet(t.monitor.api, function (data) {
+                t.monitor.list = data.data;
+            });
+        },
+        refreshMonitorList: function () {
+            let t = this;
+            t.getMonitorList();
         },
         alertClear: function () {
             let t = this;

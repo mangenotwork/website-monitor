@@ -3,10 +3,10 @@ package business
 import (
 	"bytes"
 	"fmt"
-	"github.com/mangenotwork/beacon-tower/udp"
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
+	udp "github.com/mangenotwork/udp_comm"
 	"sync"
 	"time"
 )

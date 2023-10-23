@@ -274,6 +274,8 @@ github.com/mangenotwork/common v0.1.3 h1:71SeWtm06XYobI1RN32rawO1+tLZDlt4vazR5vh
 github.com/mangenotwork/common v0.1.3/go.mod h1:Pi3ZjC4e+gOJYp9P17/gYbcERor+iUhqK2iZffueqHY=
 github.com/mangenotwork/gathertool v0.4.5 h1:L12WX7o8M1he+zul4yFpYEsE8wfHkq/YeDeOSUlQrfg=
 github.com/mangenotwork/gathertool v0.4.5/go.mod h1:1hDEjLLIfxsNhjqwGnygrfr4RBQpERWWF/p6c4vO+1U=
+github.com/mangenotwork/udp_comm v0.0.1 h1:69WobNT/GrHHtnG+lh3xn98Ah1xkQSlJgHLP5JBjSF4=
+github.com/mangenotwork/udp_comm v0.0.1/go.mod h1:kBVY5cVqo0e/XZ54oRaP4TF3ZzFqsAuaxDWOKZpKleQ=
 github.com/markbates/oncer v0.0.0-20181203154359-bf2de49a0be2/go.mod h1:Ld9puTsIW75CHf65OeIOkyKbteujpZVXDpWK6YGZbxE=
 github.com/markbates/safe v1.0.1/go.mod h1:nAqgmRi7cY2nqMc92/bSEeQA+R4OheNU2T1kNSCBdG0=
 github.com/mattn/go-colorable v0.1.12/go.mod h1:u5H1YNBxpqRaxsYJYSkiCWKzEfiAb1Gb520KVy5xxl4=

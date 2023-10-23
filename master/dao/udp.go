@@ -1,7 +1,9 @@
 package dao
 
 import (
-	"github.com/mangenotwork/beacon-tower/udp"
+	"encoding/json"
+	"github.com/mangenotwork/common/log"
+	udp "github.com/mangenotwork/udp_comm"
 	"website-monitor/master/constname"
 )
 
@@ -26,14 +28,16 @@ func NoticeUpdateWebsitePoint(hostID string) {
 // TODO... 通知执行压力并发请求任务
 
 type MonitorInfo struct {
-	Key         string `json:"key"`
-	Name        string `json:"name"`
-	Online      bool   `json:"online"`
-	Addr        string `json:"addr"`
-	LastTime    int64  `json:"lastTime"`
-	DiscardTime int64  `json:"discardTime"`
-	// TODO 获取ip环境地址
-	// TODO 获取系统信息
+	Key          string  `json:"key"`
+	Name         string  `json:"name"`
+	Online       bool    `json:"online"`
+	IP           string  `json:"IP"`
+	Addr         string  `json:"addr"`
+	LastTime     int64   `json:"lastTime"`
+	DiscardTime  int64   `json:"discardTime"`
+	PublicIP     string  `json:"publicIP"`     // 公网ip环境地址
+	PublicIPAddr string  `json:"publicIPAddr"` // 公网ip属地
+	OSInfo       *OSInfo `json:"osInfo"`       // TODO 获取系统信息
 }
 
 // GetClientList 获取监测器列表信息
@@ -41,14 +45,72 @@ func GetClientList() []*MonitorInfo {
 	data := make([]*MonitorInfo, 0)
 	table := Servers.OnLineTable()
 	for k, v := range table {
-		data = append(data, &MonitorInfo{
+		info := &MonitorInfo{
 			Key:         k,
 			Name:        v.Name,
 			Online:      v.Online,
+			IP:          v.IP,
 			Addr:        v.Addr,
 			LastTime:    v.LastTime,
 			DiscardTime: v.DiscardTime,
-		})
+		}
+		info.PublicIP, info.PublicIPAddr = getIPAddr(v.Name, v.IP)
+		info.OSInfo = getOSInfo(v.Name, v.IP)
+		data = append(data, info)
 	}
 	return data
+}
+
+func getIPAddr(name, ip string) (string, string) {
+	data, err := Servers.GetAtIP("ipAddr", name, ip, []byte(""))
+	if err != nil {
+		log.Error(err)
+	}
+	ipInfo := &IPInfo{}
+	err = json.Unmarshal(data, &ipInfo)
+	if err != nil {
+		log.Error(err)
+	}
+	log.Info("ipInfo = ", ipInfo)
+	return ipInfo.IP, ipInfo.Address
+}
+
+type OSInfo struct {
+	HostName      string `json:"hostName"`
+	OSType        string `json:"osType"`
+	OSArch        string `json:"osArch"`
+	CpuCoreNumber string `json:"cpuCoreNumber"`
+	InterfaceInfo string `json:"interfaceInfo"`
+}
+
+func getOSInfo(name, ip string) *OSInfo {
+	data, err := Servers.GetAtIP("osInfo", name, ip, []byte(""))
+	if err != nil {
+		log.Error(err)
+	}
+	osInfo := &OSInfo{}
+	err = json.Unmarshal(data, &osInfo)
+	if err != nil {
+		log.Error(err)
+	}
+	log.Info("osInfo = ", osInfo)
+	return osInfo
+}
+
+func GetClientList2() {
+	table := Servers.OnLineTable()
+	for k, v := range table {
+		log.Info(k, v)
+		data, err := Servers.GetAtIP("ipAddr", v.Name, v.IP, []byte(""))
+		if err != nil {
+			log.Error(err)
+		}
+		inInfo := &IPInfo{}
+		err = json.Unmarshal(data, &inInfo)
+		if err != nil {
+			log.Error(err)
+		}
+		log.Info("inInfo = ", inInfo)
+	}
+
 }

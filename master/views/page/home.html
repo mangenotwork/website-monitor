@@ -31,16 +31,25 @@
                         <div class="col">
                             <div class="card box">
                                 <div class="card-header">监测器列表
-                                    <template v-if="monitorErrList.len !== 0">
-                                        <span class="badge text-bg-warning">{{ monitorErrList.len }}</span>
-                                    </template>
+                                    <a @click="refreshMonitorList" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="刷新监视器列表" >{[ SVG "arrow-repeat" 18 18 ]}</a>
+
                                 </div>
                                 <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
                                     <ul class="list-group list-group-flush">
-                                        <template v-if="monitorErrList.len === 0"><p style="text-align: center;color: red;">没有连接监测器,请部署监测器!!!</p></template>
+                                        <template v-if="monitor.list.length<=0"><p style="text-align: center;color: red;">没有连接监测器,请部署监测器!!!</p></template>
                                         <template v-else>
-                                            <template v-for="item in monitorErrList.list">
-                                                <li class="list-group-item list-group-item-action"><span>{{item}}</span></li>
+                                            <template v-for="item in monitor.list">
+                                                <li class="list-group-item list-group-item-action">
+                                                    <span>{{item.key}} |
+                                                        <template v-if="item.online===true">
+                                                            <span class="badge text-bg-success">执行监测中...</span>
+                                                        </template>
+                                                        <template v-if="item.online===false">
+                                                             <span class="badge text-bg-danger">离线! </span>
+                                                        </template> |
+                                                        公网: {{item.publicIP}} {{item.publicIPAddr}} |
+                                                    </span>
+                                                </li>
                                             </template>
                                         </template>
                                     </ul>

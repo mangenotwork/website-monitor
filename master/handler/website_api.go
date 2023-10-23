@@ -441,3 +441,9 @@ func MonitorList(c *ginHelper.GinCtx) {
 	c.APIOutPut(data, "成功")
 	return
 }
+
+func MonitorIPAddr(c *ginHelper.GinCtx) {
+	dao.GetClientList2()
+	c.APIOutPut("ok", "成功")
+	return
+}

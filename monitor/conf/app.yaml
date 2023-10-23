@@ -1,7 +1,7 @@
 # 与master通讯的udp地址
-master: 127.0.0.1:18889
+master: 192.168.3.86:18889
 # master接口地址，获取相关数据
-masterHTTP: http://127.0.0.1:18888
+masterHTTP: http://192.168.3.86:18888
 # client name 最多7个字符
 clientName: node2
 connCode: qwert
