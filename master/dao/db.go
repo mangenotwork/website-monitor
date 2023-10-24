@@ -29,6 +29,7 @@ const (
 	HistoryPingTable        = "History_Ping_table"
 	HistorySSLTable         = "History_SSL_table"
 	HistoryWebsiteInfoTable = "History_WebsiteInfo_table"
+	AlertTable              = "alert_table"
 )
 
 // KeyName
@@ -53,7 +54,7 @@ var (
 		MailTable, WebSiteTable, WebSiteInfoTable, WebsiteAlarmRuleTable, WebsiteScanCheckUpTable,
 		WebSiteURITable, WebSiteUrlPointTable, WebSiteAlertTable, IPTable, MasterConfTable,
 		HistoryWebsiteTDKITable, HistoryIpTable, HistoryNsLookUpTable, HistoryWhoisTable, HistoryICPTable,
-		HistoryPingTable, HistorySSLTable, HistoryWebsiteInfoTable,
+		HistoryPingTable, HistorySSLTable, HistoryWebsiteInfoTable, AlertTable,
 	}
 	DB     = NewLocalDB(DBPath, Tables)
 	ISNULL = fmt.Errorf("ISNULL")

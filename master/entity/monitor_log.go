@@ -16,6 +16,7 @@ type MonitorLog struct {
 	Ping            string
 	PingMs          int64
 	Msg             string
+	AlertType       string
 	MonitorName     string // 监测器名称
 	MonitorIP       string // 监测器 ip地域信息
 	MonitorAddr     string

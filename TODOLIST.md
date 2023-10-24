@@ -40,10 +40,18 @@
 - [ok] monitor 获取系统信息
 - [ok] master 首页未部署监测器提示
 - [ok] master 监测器信息展示
-- master 存储所有网站监测日志
-- master 分析监测日志并产生报警
-- master 统计报警并发送邮件通知
-- master 报警信息
+- [ok] master 存储所有网站监测日志
+- [ok] master 分析监测日志并产生报警
+- master 发送报警邮件通知
+- master 报警信息列表，新增导航
+- master 首页报警信息
+- master 监测列表报警信息
+
+
+---
+
+未安排
+
 - master 任务表
 - master 测试
 - master 压力测试

@@ -4,6 +4,7 @@ import (
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/utils"
 	udp "github.com/mangenotwork/udp_comm"
+	"website-monitor/master/constname"
 	"website-monitor/master/dao"
 )
 
@@ -41,7 +42,10 @@ func MonitorRse(s *udp.Servers, c *udp.ClientInfo, param []byte) {
 	mLog := mLogDao.ToMonitorLogObj(mLogStr)
 	// 写日志
 	mLogDao.Write(mLog.HostId, mLogStr)
-	// TODO 报警统计
+	if mLog.LogType == constname.LogTypeAlert {
+		// 监测到报警
+		dao.AddAlert(mLog)
+	}
 }
 
 func StressRse(s *udp.Servers, c *udp.ClientInfo, param []byte) {

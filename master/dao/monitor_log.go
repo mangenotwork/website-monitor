@@ -62,8 +62,8 @@ func (m *monitorLogDao) Write(hostId, mLog string) {
 func (m *monitorLogDao) DataFormat(mLog *entity.MonitorLog) string {
 	return fmt.Sprintf("%s|%s|%s|%s|%s|%s|%d|%d|%s|%d|%d|%s|%d|%s|%s|%s|%s|%s|",
 		mLog.LogType, mLog.Time, mLog.HostId, mLog.Host, mLog.UriType, mLog.Uri, mLog.UriCode, mLog.UriMs,
-		mLog.ContrastUri, mLog.ContrastUriCode, mLog.ContrastUriMs, mLog.Ping, mLog.PingMs, mLog.Msg,
-		mLog.MonitorName, mLog.MonitorIP, mLog.MonitorAddr, mLog.ClientIP)
+		mLog.ContrastUri, mLog.ContrastUriCode, mLog.ContrastUriMs, mLog.Ping, mLog.PingMs, mLog.Msg, mLog.AlertType,
+		mLog.MonitorName, mLog.MonitorIP, mLog.MonitorAddr)
 }
 
 func (m *monitorLogDao) ReadLog(hostId, day string) []*entity.MonitorLog {
@@ -137,7 +137,7 @@ func revers(s []byte) {
 
 func (m *monitorLogDao) ToMonitorLogObj(str string) *entity.MonitorLog {
 	strList := strings.Split(str, "|")
-	if len(strList) < 17 {
+	if len(strList) < 18 {
 		return nil
 	}
 	return &entity.MonitorLog{
@@ -155,10 +155,11 @@ func (m *monitorLogDao) ToMonitorLogObj(str string) *entity.MonitorLog {
 		Ping:            strList[11],
 		PingMs:          utils.AnyToInt64(strList[12]),
 		Msg:             strList[13],
-		MonitorName:     strList[14],
-		MonitorIP:       strList[15],
-		MonitorAddr:     strList[16],
-		ClientIP:        strList[17],
+		AlertType:       strList[14],
+		MonitorName:     strList[15],
+		MonitorIP:       strList[16],
+		MonitorAddr:     strList[17],
+		ClientIP:        strList[18],
 	}
 }
 

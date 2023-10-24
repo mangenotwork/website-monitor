@@ -218,9 +218,15 @@ func WebsiteUrls(c *ginHelper.GinCtx) {
 
 func WebsiteAllUrl(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
-	data, err := dao.NewWebsite().GetWebSiteUrl(hostId)
+	obj := dao.NewWebsite()
+	data, err := obj.GetWebSiteUrl(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
+		return
+	}
+	website, _ := obj.Select(hostId)
+	if len(data.AllUri) == 1 && data.AllUri[0] == website.Host {
+		c.APIOutPut([]string{}, "")
 		return
 	}
 	c.APIOutPut(data.AllUri, "")
@@ -228,21 +234,41 @@ func WebsiteAllUrl(c *ginHelper.GinCtx) {
 }
 
 func AllWebsite(c *ginHelper.GinCtx) {
-	data, _, err := dao.NewWebsite().SelectList()
+	data := make([]*WebsiteDataOut, 0)
+	obj := dao.NewWebsite()
+	websiteList, _, err := obj.SelectList()
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
+	}
+	for _, v := range websiteList {
+		rule, rErr := obj.GetAlarmRule(v.HostID)
+		if rErr != nil {
+			continue
+		}
+		data = append(data, &WebsiteDataOut{v, rule.WebsiteSlowResponseTime})
 	}
 	c.APIOutPut(data, "")
 	return
 }
 
+type WebsiteDataOut struct {
+	*entity.Website
+	WebsiteSlowResponseTime int64
+}
+
 func GetWebsiteData(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
-	data, err := dao.NewWebsite().Select(hostId)
+	obj := dao.NewWebsite()
+	website, err := obj.Select(hostId)
+	rule, err := obj.GetAlarmRule(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
+	}
+	data := &WebsiteDataOut{
+		website,
+		rule.WebsiteSlowResponseTime,
 	}
 	c.APIOutPut(data, "")
 	return

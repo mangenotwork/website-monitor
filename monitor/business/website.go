@@ -26,15 +26,16 @@ type WebsiteItem struct {
 
 // Website 监测网站
 type Website struct {
-	Host         string `json:"host"`
-	HostID       string `json:"hostID"`
-	MonitorRate  int64  `json:"monitorRate"`
-	ContrastUrl  string `json:"contrastUrl"`
-	ContrastTime int64  `json:"contrastTime"`
-	Ping         string `json:"ping"`
-	PingTime     int64  `json:"pingTime"`
-	Notes        string `json:"notes"`
-	Created      int64  `json:"created"`
+	Host                    string `json:"host"`
+	HostID                  string `json:"hostID"`
+	MonitorRate             int64  `json:"monitorRate"`
+	ContrastUrl             string `json:"contrastUrl"`
+	ContrastTime            int64  `json:"contrastTime"`
+	Ping                    string `json:"ping"`
+	PingTime                int64  `json:"pingTime"`
+	Notes                   string `json:"notes"`
+	Created                 int64  `json:"created"`
+	WebsiteSlowResponseTime int    `json:"websiteSlowResponseTime"`
 }
 
 func (item *WebsiteItem) Add() {
@@ -47,9 +48,9 @@ func (item *WebsiteItem) Put(data []byte) {
 
 func (item *WebsiteItem) mLogSerialize(mLog *MonitorLog) []byte {
 	buf := new(bytes.Buffer)
-	buf.WriteString(fmt.Sprintf("%s|%s|%s|%s|%s|%s|%d|%d|%s|%d|%d|%s|%d|%s|%s|%s|%s|",
+	buf.WriteString(fmt.Sprintf("%s|%s|%s|%s|%s|%s|%d|%d|%s|%d|%d|%s|%d|%s|%s|%s|%s|%s|",
 		mLog.LogType, mLog.Time, mLog.HostId, mLog.Host, mLog.UriType, mLog.Uri, mLog.UriCode, mLog.UriMs,
-		mLog.ContrastUri, mLog.ContrastUriCode, mLog.ContrastUriMs, mLog.Ping, mLog.PingMs, mLog.Msg,
+		mLog.ContrastUri, mLog.ContrastUriCode, mLog.ContrastUriMs, mLog.Ping, mLog.PingMs, mLog.Msg, mLog.AlertType,
 		mLog.MonitorName, mLog.MonitorIP, mLog.MonitorAddr))
 	return buf.Bytes()
 }
@@ -108,8 +109,10 @@ func (item *WebsiteItem) AlertRuleCode(code int) bool {
 }
 
 // AlertRuleMs 响应时间超过设置的响应时间视为出现问题
-// TODO 获取报警规则
-func (item *WebsiteItem) AlertRuleMs(nowMs int64) bool {
+func (item *WebsiteItem) AlertRuleMs(resMs int64) bool {
+	if resMs > int64(item.WebsiteSlowResponseTime) {
+		return true
+	}
 	return false
 }
 
@@ -117,11 +120,13 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 	mLog.UriType = URIHealth
 	mLog.LogType = LogTypeInfo
 	mLog.Msg = ""
+	mLog.AlertType = AlertTypeNone
 	log.Info("=================================  监测生命URI... ", item.Host)
 	healthCode, healthMs, err := request(item.Host)
 	if err != nil {
 		mLog.LogType = LogTypeAlert
 		mLog.Msg = "请求失败，err=" + err.Error()
+		mLog.AlertType = AlertTypeErr
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}
@@ -132,6 +137,7 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 	if item.AlertRuleCode(healthCode) {
 		mLog.LogType = LogTypeAlert
 		mLog.Msg = fmt.Sprintf("请求失败，状态码:%d;", healthCode)
+		mLog.AlertType = AlertTypeCode
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}
@@ -139,6 +145,7 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 	if item.AlertRuleMs(healthMs) {
 		mLog.LogType = LogTypeAlert
 		mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms;", healthMs)
+		mLog.AlertType = AlertTypeTimeout
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}
@@ -152,14 +159,16 @@ func (item *WebsiteItem) MonitorRandomUri(mLog *MonitorLog) {
 	if len(uri) > 0 {
 		time.Sleep(1 * time.Second) // 强行休息1s
 		mLog.UriType = URIRandom
-		mLog.LogType = LogTypeInfo // 复位
-		mLog.Msg = ""              // 复位
+		mLog.LogType = LogTypeInfo     // 复位
+		mLog.Msg = ""                  // 复位
+		mLog.AlertType = AlertTypeNone // 复位
 		randomUri := utils.RandomString(uri)
 		log.Info("=================================  随机取一个URI监测... ", randomUri)
 		randomCode, randomMs, err := request(randomUri)
 		if err != nil {
 			mLog.LogType = LogTypeAlert
 			mLog.Msg = "请求失败，err=" + err.Error()
+			mLog.AlertType = AlertTypeErr
 			item.Put(item.mLogSerialize(mLog))
 			return
 		}
@@ -169,12 +178,14 @@ func (item *WebsiteItem) MonitorRandomUri(mLog *MonitorLog) {
 		if item.AlertRuleCode(randomCode) {
 			mLog.LogType = LogTypeAlert
 			mLog.Msg = fmt.Sprintf("请求失败，状态码:%d", randomCode)
+			mLog.AlertType = AlertTypeCode
 			item.Put(item.mLogSerialize(mLog))
 			return
 		}
 		if item.AlertRuleMs(randomMs) {
 			mLog.LogType = LogTypeAlert
 			mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms", randomMs)
+			mLog.AlertType = AlertTypeTimeout
 			item.Put(item.mLogSerialize(mLog))
 			return
 		}
@@ -187,12 +198,14 @@ func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
 	log.Info("=================================  执行监测点监测... ", pointUrl)
 	time.Sleep(1 * time.Second) // 强行休息1s
 	mLog.UriType = URIPoint
-	mLog.LogType = LogTypeInfo // 复位
-	mLog.Msg = ""              // 复位
+	mLog.LogType = LogTypeInfo     // 复位
+	mLog.Msg = ""                  // 复位
+	mLog.AlertType = AlertTypeNone // 复位
 	pointCode, pointMs, err := request(pointUrl)
 	if err != nil {
 		mLog.LogType = LogTypeAlert
 		mLog.Msg = "请求失败，err=" + err.Error()
+		mLog.AlertType = AlertTypeErr
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}
@@ -203,12 +216,14 @@ func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
 	if item.AlertRuleCode(pointCode) {
 		mLog.LogType = LogTypeAlert
 		mLog.Msg = fmt.Sprintf("请求失败，状态码:%d", pointCode)
+		mLog.AlertType = AlertTypeCode
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}
 	if item.AlertRuleMs(pointMs) {
 		mLog.LogType = LogTypeAlert
 		mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms", pointMs)
+		mLog.AlertType = AlertTypeTimeout
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}

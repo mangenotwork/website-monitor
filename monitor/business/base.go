@@ -16,12 +16,16 @@ import (
 )
 
 const (
-	URIHealth    = "Health"
-	URIRandom    = "Random"
-	URIPoint     = "Point"
-	LogTypeInfo  = "Info"
-	LogTypeAlert = "Alert"
-	LogTypeError = "Error"
+	URIHealth        = "Health"
+	URIRandom        = "Random"
+	URIPoint         = "Point"
+	LogTypeInfo      = "Info"
+	LogTypeAlert     = "Alert"
+	LogTypeError     = "Error"
+	AlertTypeNone    = ""
+	AlertTypeErr     = "err"
+	AlertTypeCode    = "code"
+	AlertTypeTimeout = "timeout"
 )
 
 var GlobalName = "监视器"
@@ -133,7 +137,7 @@ func Business(item *WebsiteItem) {
 			pointUrl := point[item.LoopPoint]
 			item.LoopPoint++
 			log.Info("本次监测的监测点是 = ", pointUrl)
-			// TODO... 执行监测点监测
+			// 执行监测点监测
 			item.MonitorPointUri(mLog, pointUrl)
 		}
 
@@ -293,6 +297,7 @@ type MonitorLog struct {
 	Ping            string
 	PingMs          int64
 	Msg             string
+	AlertType       string // code  timeout
 	MonitorName     string // 监测器名称
 	MonitorIP       string // 监测器 ip地域信息
 	MonitorAddr     string

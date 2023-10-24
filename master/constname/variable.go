@@ -36,3 +36,16 @@ const (
 	NoticeUpdateWebsiteAllUrlLabel = "allUrl"     // 通知更新网站url
 	NoticeUpdateWebsitePointLabel  = "point"      // 通知更新网站监测点
 )
+
+const (
+	URIHealth        = "Health"
+	URIRandom        = "Random"
+	URIPoint         = "Point"
+	LogTypeInfo      = "Info"
+	LogTypeAlert     = "Alert"
+	LogTypeError     = "Error"
+	AlertTypeNone    = ""
+	AlertTypeErr     = "err"
+	AlertTypeCode    = "code"
+	AlertTypeTimeout = "timeout"
+)
