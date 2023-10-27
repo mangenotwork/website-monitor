@@ -42,7 +42,9 @@
 - [ok] master 监测器信息展示
 - [ok] master 存储所有网站监测日志
 - [ok] master 分析监测日志并产生报警
-- master 发送报警邮件通知
+- [ok] master 发送报警邮件通知
+- [ok] master 报警信息列表接口 
+- master 报警信息列表数量接口 指定网站获取接口
 - master 报警信息列表，新增导航
 - master 首页报警信息
 - master 监测列表报警信息

@@ -2,6 +2,7 @@ package entity
 
 // AlertData 报警信息
 type AlertData struct {
+	AlertId         int64  `json:"alertId"`
 	HostId          string `json:"hostId"`
 	Host            string `json:"host"`
 	Date            string `json:"date"`            // 监测的时间

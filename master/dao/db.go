@@ -30,6 +30,7 @@ const (
 	HistorySSLTable         = "History_SSL_table"
 	HistoryWebsiteInfoTable = "History_WebsiteInfo_table"
 	AlertTable              = "alert_table"
+	AlertWebsiteTable       = "alert_website_table"
 )
 
 // KeyName
@@ -54,7 +55,7 @@ var (
 		MailTable, WebSiteTable, WebSiteInfoTable, WebsiteAlarmRuleTable, WebsiteScanCheckUpTable,
 		WebSiteURITable, WebSiteUrlPointTable, WebSiteAlertTable, IPTable, MasterConfTable,
 		HistoryWebsiteTDKITable, HistoryIpTable, HistoryNsLookUpTable, HistoryWhoisTable, HistoryICPTable,
-		HistoryPingTable, HistorySSLTable, HistoryWebsiteInfoTable, AlertTable,
+		HistoryPingTable, HistorySSLTable, HistoryWebsiteInfoTable, AlertTable, AlertWebsiteTable,
 	}
 	DB     = NewLocalDB(DBPath, Tables)
 	ISNULL = fmt.Errorf("ISNULL")
@@ -71,6 +72,13 @@ func NewLocalDB(path string, tables []string) *LocalDB {
 		Path:   path,
 		Tables: tables,
 	}
+}
+
+func GetDBConn() *bolt.DB {
+	if DB.Conn == nil {
+		DB.Open()
+	}
+	return DB.Conn
 }
 
 func (ldb *LocalDB) Init() {

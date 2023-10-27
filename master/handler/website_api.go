@@ -353,14 +353,6 @@ func WebsiteChart(c *ginHelper.GinCtx) {
 	return
 }
 
-func WebsiteAlertList(c *ginHelper.GinCtx) {
-
-}
-
-func WebsiteAlertDel(c *ginHelper.GinCtx) {
-
-}
-
 func MonitorLog(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
 	day := c.GetQuery("day")

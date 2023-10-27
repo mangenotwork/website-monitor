@@ -67,7 +67,7 @@ func Initialize(client *udp.Client) {
 					SetWebsiteUrlData(website.HostID)
 					return true
 				})
-				timer.Reset(time.Second * 1)
+				timer.Reset(time.Minute * 15)
 			}
 		}
 	}()

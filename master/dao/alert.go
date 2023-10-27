@@ -1,6 +1,9 @@
 package dao
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/boltdb/bolt"
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
 	"sync"
@@ -10,15 +13,75 @@ import (
 )
 
 type AlertEr interface {
-	Get()     // 指定获取网站监测的报警信息
-	GetList() // 获取报警信息列表
+	Get(alertId string) (*entity.AlertData, error) // 指定获取报警信息
+	GetList() ([]*entity.AlertData, error)         // 获取所有报警信息列表
+	GetAtWebsite()                                 // 获取指定网站的报警信息
+}
+
+func NewAlert() AlertEr {
+	return new(alertDao)
 }
 
 type alertDao struct {
 }
 
 func (a *alertDao) set(data *entity.AlertData) error {
-	return DB.Set(AlertTable, data.HostId, data)
+	id := utils.AnyToString(data.AlertId)
+	err := DB.Set(AlertTable, id, data)
+	if err != nil {
+		return err
+	}
+	list, err := a.getAtHostID(data.HostId)
+	if err != nil && err != ISNULL {
+		return err
+	}
+	list = append(list, id)
+	err = DB.Set(AlertWebsiteTable, data.HostId, list)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *alertDao) getAtHostID(hostId string) ([]string, error) {
+	data := make([]string, 0)
+	err := DB.Get(AlertWebsiteTable, hostId, data)
+	return data, err
+}
+
+func (a *alertDao) Get(alertId string) (*entity.AlertData, error) {
+	data := &entity.AlertData{}
+	err := DB.Get(AlertTable, alertId, &data)
+	return data, err
+}
+
+func (a *alertDao) GetList() ([]*entity.AlertData, error) {
+	log.Error("GetList...")
+	conn := GetDBConn()
+	defer func() {
+		conn.Close()
+	}()
+	list := make([]*entity.AlertData, 0)
+	err := conn.View(func(tx *bolt.Tx) error {
+		// Assume bucket exists and has keys
+		b := tx.Bucket([]byte(AlertTable))
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			fmt.Printf("key=%s, value=%v\n", k, v)
+			data := &entity.AlertData{}
+			err := json.Unmarshal(v, &data)
+			if err != nil {
+				return err
+			}
+			list = append(list, data)
+		}
+		return nil
+	})
+	return list, err
+}
+
+func (a *alertDao) GetAtWebsite() {
+
 }
 
 // AlertTimeInfoMap 记录报警超时次数
@@ -39,6 +102,7 @@ func setAlertTimeInfoData(key string, data []*entity.MonitorLog) {
 func AddAlert(mLog *entity.MonitorLog) {
 	// 记录报警
 	alert := &entity.AlertData{
+		AlertId:         utils.ID(),
 		HostId:          mLog.HostId,
 		Host:            mLog.Host,
 		Date:            mLog.Time,
@@ -64,8 +128,10 @@ func AddAlert(mLog *entity.MonitorLog) {
 	}
 
 	if mLog.AlertType == constname.AlertTypeErr || mLog.AlertType == constname.AlertTypeCode {
-		// TODO...
 		log.Info("发送报警邮件...")
+		alertBody := NewAlertBody(mLog)
+		NewMail().Send("监测报警通知!", alertBody)
+
 	} else if mLog.AlertType == constname.AlertTypeTimeout {
 		log.Error("报警信息为超时...")
 		key := mLog.HostId + mLog.MonitorIP // hostID +  MonitorIP
@@ -102,8 +168,10 @@ func AddAlert(mLog *entity.MonitorLog) {
 		}
 		// 判断连续次数是否触发报警发送邮件
 		if len(data) >= int(rule.WebsiteSlowResponseCount) {
-			// TODO...
 			log.Info("发送报警邮件...")
+			if alertBody, err := NewAlertBodyAtList(data); err == nil {
+				NewMail().Send("监测报警通知!", alertBody)
+			}
 			data = make([]*entity.MonitorLog, 0)
 		}
 
@@ -111,4 +179,82 @@ func AddAlert(mLog *entity.MonitorLog) {
 
 	}
 
+}
+
+// AlertBody 报警通知
+type AlertBody struct {
+	Synopsis string
+	Tr       []*AlertTd
+}
+
+type AlertTd struct {
+	Date       string
+	Host       string
+	Uri        string
+	Code       int
+	Ms         int64
+	NetworkEnv string
+	Msg        string
+	Monitor    string
+}
+
+func (a *AlertBody) Html() string {
+	body := ""
+	synopsis := fmt.Sprintf("<h3>%s</h3>", a.Synopsis)
+	tr := ""
+	for _, v := range a.Tr {
+		tr += fmt.Sprintf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%dms</td><td>%s</td><td>%s</td><td>%s</td></tr>",
+			v.Date, v.Host, v.Uri, v.Code, v.Ms, v.NetworkEnv, v.Msg, v.Monitor)
+	}
+	thead := `<thead><tr>
+		<th width="auto">监测时间</th>
+		<th width="auto">站点</th>
+		<th width="auto">链接</th>
+		<th width="auto">请求状态码</th>
+		<th width="auto">响应时间</th>
+		<th width="auto">网络环境</th>
+		<th width="auto">报警信息</th>
+		<th width="auto">监测器</th>
+	</tr></thead>`
+	table := fmt.Sprintf(`<table border="1" cellspacing="0">%s<tbody>%s</tbody></table>`, thead, tr)
+	body = synopsis + table
+	return body
+}
+
+func createAlertBody(mLog *entity.MonitorLog) *AlertTd {
+	td := &AlertTd{
+		Date: mLog.Time,
+		Host: mLog.Host,
+		Uri:  mLog.Uri,
+		Code: mLog.UriCode,
+		Ms:   mLog.UriMs,
+		Msg:  mLog.Msg,
+	}
+	td.NetworkEnv = fmt.Sprintf("对照组=> %s ms:%d | Ping=> %s ms:%d ",
+		mLog.ContrastUri, mLog.ContrastUriMs, mLog.Ping, mLog.PingMs)
+	td.Monitor = fmt.Sprintf("%s| %s| %s", mLog.MonitorName, mLog.MonitorIP, mLog.MonitorAddr)
+	return td
+}
+
+func NewAlertBody(mLog *entity.MonitorLog) string {
+	alert := &AlertBody{
+		Synopsis: "监测到" + mLog.Host + "网站出现问题，请快速前往检查并处理!",
+		Tr:       make([]*AlertTd, 0),
+	}
+	alert.Tr = append(alert.Tr, createAlertBody(mLog))
+	return alert.Html()
+}
+
+func NewAlertBodyAtList(mLogs []*entity.MonitorLog) (string, error) {
+	if len(mLogs) < 1 {
+		return "", fmt.Errorf("报警日志为空")
+	}
+	alert := &AlertBody{
+		Synopsis: "监测到" + mLogs[0].Host + "等网站出现问题，请快速前往检查并处理!",
+		Tr:       make([]*AlertTd, 0),
+	}
+	for _, v := range mLogs {
+		alert.Tr = append(alert.Tr, createAlertBody(v))
+	}
+	return alert.Html(), nil
 }

@@ -64,14 +64,19 @@ let Mail= {
     },
     conf: {
         api: "/api/mail/conf",
-        param: {
-            host: "smtp.qq.com",
-            port: 25,
-            from: "",
-            authCode: "",
-            toList: "",
-        },
     },
+    param: {
+        host: "smtp.qq.com",
+        port: 25,
+        from: "",
+        authCode: "",
+        toList: "",
+    },
+    paramHost: "smtp.qq.com",
+    paramPort: 25,
+    paramFrom: "",
+    paramAuthCode: "",
+    paramToList: "",
     infoApi: "/api/mail/info",
     sendApi: "/api/mail/sendTest",
     common: new Utils(),
@@ -84,33 +89,35 @@ let Mail= {
     hasSet: function () {
         let t = this;
         console.log("getMail...")
-        t.common.AjaxGet(t.init.api, function (data){
-            t.init.data = data.data;
+        Mail.common.AjaxGet(Mail.init.api, function (data){
+            Mail.init.data = data.data;
         })
     },
     setConf: function () {
         let t = this;
-        t.conf.param.toList = t.toListJoin(t.conf.param.toList);
-        t.conf.param.port = Number(t.conf.param.port)
-        t.common.AjaxPost(t.conf.api, t.conf.param, function (data){
+        Mail.param.toList = Mail.toListJoin(Mail.param.toList);
+        Mail.param.port = Number(Mail.param.port);
+        Mail.common.AjaxPost(Mail.api, Mail.param, function (data){
             if (data.code === 0) {
                 $("#mailSetModal").modal('toggle');
-                t.getMail();
+                Mail.getMail();
             }
             common.ToastShow(data.msg);
         });
     },
     getInfo: function () {
         let t = this;
-        t.common.AjaxGet(t.infoApi, function (data){
-            t.conf.param = data.data;
+        Mail.common.AjaxGet(Mail.infoApi, function (data){
+            if (data.code === 0 ){
+                Mail.param = data.data;
+            }
         });
     },
     send: function () {
         let t = this;
-        t.conf.param.toList = t.toListJoin(t.conf.param.toList);
-        t.conf.param.port = Number(t.conf.param.port)
-        t.common.AjaxPost(t.sendApi, t.conf.param, function (data){
+        Mail.param.toList = Mail.toListJoin(Mail.param.toList);
+        Mail.param.port = Number(Mail.param.port);
+        Mail.common.AjaxPost(Mail.sendApi, Mail.param, function (data){
             common.ToastShow(data.msg);
         });
     },

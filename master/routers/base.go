@@ -71,8 +71,6 @@ func API() {
 	api.GET("/website/urls/:hostId", ginHelper.Handle(handler.WebsiteUrls))              // 监测网站采集到url
 	api.POST("/website/edit/:hostId", ginHelper.Handle(handler.WebsiteEdit))             // 监测设置
 	api.GET("/website/chart/:hostId", ginHelper.Handle(handler.WebsiteChart))            // 图表
-	api.GET("/website/alert/:hostId", ginHelper.Handle(handler.WebsiteAlertList))        // TODO 报警信息
-	api.GET("/website/alert/del/:hostId", ginHelper.Handle(handler.WebsiteAlertDel))     // TODO 报警信息
 	api.GET("/website/log/:hostId", ginHelper.Handle(handler.MonitorLog))                // 获取监测日志
 	api.GET("/website/log/list/:hostId", ginHelper.Handle(handler.MonitorLogList))       // 获取监测日志列表
 	api.GET("/website/log/upload/:hostId", ginHelper.Handle(handler.MonitorLogUpload))   // 日志文件下载
@@ -86,6 +84,11 @@ func API() {
 	api.POST("/mail/conf", ginHelper.Handle(handler.MailConf))         // 设置邮件配置
 	api.GET("/mail/info", ginHelper.Handle(handler.MailInfo))          // 获取邮件配置信息
 	api.POST("/mail/sendTest", ginHelper.Handle(handler.MailSendTest)) // 测试发生邮件
+
+	// alert
+	api.GET("/alert/list", ginHelper.Handle(handler.AlertList))               // 报警列表
+	api.GET("/alert/wbesite/:hostId", ginHelper.Handle(handler.AlertWebsite)) // 指定网站的报警信息
+	api.GET("/alert/red", ginHelper.Handle(handler.AlertRed))                 // 报警信息已读
 
 	// tool
 	api.POST("/tool/history", ginHelper.Handle(handler.ToolHistorySet))            // 记录历史记录
