@@ -74,6 +74,16 @@ func MonitorPage(c *gin.Context) {
 	)
 }
 
+func AlertPage(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"alert.html",
+		ginH(gin.H{
+			"nav": "alert",
+		}),
+	)
+}
+
 func ToolPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,

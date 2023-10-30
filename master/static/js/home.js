@@ -165,7 +165,6 @@ const app = createApp({
                 api: "/api/monitor/list",
                 list: [],
             },
-
         }
     },
     created:function(){
@@ -174,7 +173,7 @@ const app = createApp({
         t.mail.hasSet();
         t.mail.getInfo();
         t.getMonitorList();
-        //t.getAlertList();
+        t.getAlertList();
         // t.getMonitorErrList();
 
 
@@ -190,7 +189,7 @@ const app = createApp({
         getAlertList: function () {
             let t = this;
             common.AjaxGet(t.alertList.api, function (data) {
-                t.alertList.list = data.data;
+                t.alertList.list = data.data.list;
                 t.alertList.len = t.alertList.list.length;
             });
         },
@@ -204,6 +203,7 @@ const app = createApp({
             let t = this;
             t.getMonitorList();
         },
+
         alertClear: function () {
             let t = this;
             t.isOk = "alertClear";

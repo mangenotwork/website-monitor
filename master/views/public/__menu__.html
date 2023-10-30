@@ -16,6 +16,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="/alert">
+                    <div class='{[ if eq .nav "alert" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "bell" 16 16 ]} <span>监测报警</span>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/tool">
                     <div class='{[ if eq .nav "tool" ]}active{[ else ]}not-active{[ end ]}'>
                         {[ SVG "tools" 16 16 ]} <span>工具</span>

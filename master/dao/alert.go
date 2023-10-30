@@ -13,9 +13,10 @@ import (
 )
 
 type AlertEr interface {
-	Get(alertId string) (*entity.AlertData, error) // 指定获取报警信息
-	GetList() ([]*entity.AlertData, error)         // 获取所有报警信息列表
-	GetAtWebsite()                                 // 获取指定网站的报警信息
+	Get(alertId string) (*entity.AlertData, error)           // 指定获取报警信息
+	GetList() ([]*entity.AlertData, error)                   // 获取所有报警信息列表
+	GetAtWebsite(hostId string) ([]*entity.AlertData, error) // 获取指定网站的报警信息
+	GetWebsiteAlertIDList(hostId string) ([]string, error)   // 获取指定网站报警信息的id
 }
 
 func NewAlert() AlertEr {
@@ -33,6 +34,7 @@ func (a *alertDao) set(data *entity.AlertData) error {
 	}
 	list, err := a.getAtHostID(data.HostId)
 	if err != nil && err != ISNULL {
+		log.Error("getAtHostID err = ", err)
 		return err
 	}
 	list = append(list, id)
@@ -45,7 +47,8 @@ func (a *alertDao) set(data *entity.AlertData) error {
 
 func (a *alertDao) getAtHostID(hostId string) ([]string, error) {
 	data := make([]string, 0)
-	err := DB.Get(AlertWebsiteTable, hostId, data)
+	log.Info(hostId)
+	err := DB.Get(AlertWebsiteTable, hostId, &data)
 	return data, err
 }
 
@@ -56,10 +59,9 @@ func (a *alertDao) Get(alertId string) (*entity.AlertData, error) {
 }
 
 func (a *alertDao) GetList() ([]*entity.AlertData, error) {
-	log.Error("GetList...")
 	conn := GetDBConn()
 	defer func() {
-		conn.Close()
+		_ = conn.Close()
 	}()
 	list := make([]*entity.AlertData, 0)
 	err := conn.View(func(tx *bolt.Tx) error {
@@ -67,7 +69,6 @@ func (a *alertDao) GetList() ([]*entity.AlertData, error) {
 		b := tx.Bucket([]byte(AlertTable))
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
-			fmt.Printf("key=%s, value=%v\n", k, v)
 			data := &entity.AlertData{}
 			err := json.Unmarshal(v, &data)
 			if err != nil {
@@ -80,8 +81,29 @@ func (a *alertDao) GetList() ([]*entity.AlertData, error) {
 	return list, err
 }
 
-func (a *alertDao) GetAtWebsite() {
+func (a *alertDao) GetAtWebsite(hostId string) ([]*entity.AlertData, error) {
+	data := make([]*entity.AlertData, 0)
+	alertIDList, err := a.getAtHostID(hostId)
+	if err != nil {
+		return data, err
+	}
+	alertList, err := a.GetList()
+	if err != nil {
+		return data, err
+	}
+	log.Error("alertIDList = ", alertIDList)
+	for _, id := range alertIDList {
+		for _, v := range alertList {
+			if id == utils.AnyToString(v.AlertId) {
+				data = append(data, v)
+			}
+		}
+	}
+	return data, nil
+}
 
+func (a *alertDao) GetWebsiteAlertIDList(hostId string) ([]string, error) {
+	return a.getAtHostID(hostId)
 }
 
 // AlertTimeInfoMap 记录报警超时次数

@@ -118,12 +118,41 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 	return
 }
 
+type WebsiteListOutItem struct {
+	*entity.Website
+	AlertCount int `json:"alertCount"`
+	State      int `json:"state"` // 0:未执行(没有监测器连接)  1:监测中  2:有报警
+}
+
 func WebsiteList(c *ginHelper.GinCtx) {
-	// TODO 获取监测结果数据
-	data, _, err := dao.NewWebsite().SelectList()
+	data := make([]*WebsiteListOutItem, 0)
+	websiteList, _, err := dao.NewWebsite().SelectList()
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
+	}
+	// 监测器状态
+	isMonitor := false
+	monitor := dao.GetClientList()
+	if len(monitor) > 0 {
+		isMonitor = true
+	}
+	// 报警数量获取
+	for _, v := range websiteList {
+		alertList, _ := dao.NewAlert().GetWebsiteAlertIDList(v.HostID)
+		alertLen := len(alertList)
+		state := 0
+		if isMonitor {
+			state = 1
+		}
+		if alertLen > 0 {
+			state = 2
+		}
+		data = append(data, &WebsiteListOutItem{
+			v,
+			alertLen,
+			state,
+		})
 	}
 	c.APIOutPut(data, "")
 	return
@@ -464,4 +493,43 @@ func MonitorIPAddr(c *ginHelper.GinCtx) {
 	dao.GetClientList2()
 	c.APIOutPut("ok", "成功")
 	return
+}
+
+type AlertListOut struct {
+	List  []*entity.AlertData `json:"list"`
+	Count int                 `json:"count"`
+}
+
+func AlertList(c *ginHelper.GinCtx) {
+	list, err := dao.NewAlert().GetList()
+	if err != nil {
+		log.Error(err)
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	data := &AlertListOut{
+		List:  list,
+		Count: len(list),
+	}
+	c.APIOutPut(data, "")
+	return
+}
+
+func AlertWebsite(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	list, err := dao.NewAlert().GetAtWebsite(hostId)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	data := &AlertListOut{
+		List:  list,
+		Count: len(list),
+	}
+	c.APIOutPut(data, "")
+	return
+}
+
+func AlertRed(c *ginHelper.GinCtx) {
+
 }

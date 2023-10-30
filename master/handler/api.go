@@ -276,21 +276,3 @@ func Ping(c *ginHelper.GinCtx) {
 	c.APIOutPut(data, "")
 	return
 }
-
-func AlertList(c *ginHelper.GinCtx) {
-	data, err := dao.NewAlert().GetList()
-	if err != nil {
-		c.APIOutPutError(nil, err.Error())
-		return
-	}
-	c.APIOutPut(data, "")
-	return
-}
-
-func AlertWebsite(c *ginHelper.GinCtx) {
-
-}
-
-func AlertRed(c *ginHelper.GinCtx) {
-
-}

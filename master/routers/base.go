@@ -49,6 +49,7 @@ func Page() {
 	pg.Use(AuthPG())
 	pg.GET("/home", handler.HomePage)
 	pg.GET("/monitor", handler.MonitorPage)
+	pg.GET("/alert", handler.AlertPage)
 	pg.GET("/tool", handler.ToolPage)
 	pg.GET("/test/api", handler.TestAPI)
 	pg.GET("/test/stress", handler.TestStress)

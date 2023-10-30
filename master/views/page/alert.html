@@ -1,0 +1,61 @@
+{[ template "__start__.html" . ]}
+<body>
+<div id="app">
+    {[ template "__header__.html" . ]}
+    <div class="container-fluid">
+        <div class="row">
+            {[ template "__menu__.html" . ]}
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                Alert List Info
+                <div style="margin-top: 24px;padding: 0px;">
+                    <div class="box" style="height: calc(100vh - 320px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
+                        <table class="table table-hover">
+                            <thead style="z-index: 99;">
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Host</th>
+                                <th scope="col">Url</th>
+                                <th scope="col">Url Code</th>
+                                <th scope="col">Url Ms</th>
+                                <th scope="col">Url Type</th>
+                                <th scope="col">Msg</th>
+                                <th scope="col">网络环境</th>
+                                <th scope="col">监测器</th>
+                                <th scope="col">未读:0|已读1</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <template v-for="item in alert.list">
+                                <tr>
+                                    <td>{{ item.date }}</td>
+                                    <td>{{ item.host }}</td>
+                                    <td>{{ item.uri }}</td>
+                                    <td>{{ item.uriCode }}</td>
+                                    <td>{{ item.uriMs }}</td>
+                                    <td>{{ item.uriType }}</td>
+                                    <td>{{ item.msg }}</td>
+                                    <td>对照组:{{ item.contrastUri }}, code:{{ item.contrastUriCode }}, ms:{{ item.contrastUriMs }}|
+                                        Ping:{{ item.ping }}, ms:{{ item.pingMs }}
+                                    </td>
+                                    <td>{{ item.monitorName }}| {{ item.monitorIP }}| {{ item.monitorAddr }}|{{ item.clientIP }}
+                                    </td>
+                                    <td>{{ item.read }}</td>
+                                </tr>
+                            </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {[ template "add_host_modal.html" . ]}
+                {[ template "mail_set_modal.html" . ]}
+                {[ template "toast.html" . ]}
+            </main>
+        </div>
+    </div>
+</div>
+</body>
+{[ template "__js__.html" . ]}
+<script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
+<script src="/static/js/alert.js?v={[ .TimeStamp ]}"></script>
+{[ template "__end__.html" . ]}

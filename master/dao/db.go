@@ -75,9 +75,7 @@ func NewLocalDB(path string, tables []string) *LocalDB {
 }
 
 func GetDBConn() *bolt.DB {
-	if DB.Conn == nil {
-		DB.Open()
-	}
+	DB.Open()
 	return DB.Conn
 }
 
@@ -109,6 +107,10 @@ func (ldb *LocalDB) Init() {
 
 func (ldb *LocalDB) Open() {
 	ldb.Conn, _ = bolt.Open(ldb.Path, 0600, nil)
+}
+
+func (ldb *LocalDB) Close() {
+	_ = ldb.Conn.Close()
 }
 
 func (ldb *LocalDB) Get(table, key string, data interface{}) error {

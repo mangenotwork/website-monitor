@@ -1,3 +1,7 @@
+#### v0.0.1
+
+监测功能，基础页面，监测器，基础工具等
+
 - [ok] master 登录 
 - [ok] master 邮件 
 - [ok] master 设计"网站" 实体 
@@ -44,20 +48,51 @@
 - [ok] master 分析监测日志并产生报警
 - [ok] master 发送报警邮件通知
 - [ok] master 报警信息列表接口 
-- master 报警信息列表数量接口 指定网站获取接口
-- master 报警信息列表，新增导航
-- master 首页报警信息
-- master 监测列表报警信息
+- [ok] master 报警信息列表数量接口 指定网站获取接口
+- [ok] master 报警信息列表，新增导航
+- [ok] master 首页报警信息
+- [ok] master 监测列表报警信息
+- v0.0.1 测试
+- v0.0.1 git发布
+
+#### v0.0.2
+
+主要开发请求器功能，参考postman  apiPost
+
+- master 请求器 导航和页面
+- master 指定 monitor 请求，未指定默认 master请求
+- master 请求器 请求记录
+- master 请求器 保存请求 增删改查
+
+
+#### v0.0.3
+
+接口测试开发
+
+- master 接口测试 页面
+- master 接口测试 脚本编写
+- master 接口测试 管理 与 增删改查
+- master 接口测试 执行，未指定 monitor 默认 master执行
+- monitor 执行接口测试
+- master 可视化操作新增或编辑接口测试
+
+
+#### v0.0.4
+
+压力测试开发
+
+
+#### v0.0.5
+
+渗透测试开发
+
+
+#### v0.0.6
+
+扫描等工具的开发
 
 
 ---
-
-未安排
-
-- master 任务表
-- master 测试
-- master 压力测试
-
 
 其他工具
 - tcp|udp端口扫描 
