@@ -106,7 +106,6 @@ const app = createApp({
             },
             alertList: {
                 api: "/api/alert/list",
-                clear: "/api/alert/clear",
                 list: [],
                 len: 0,
             },
@@ -193,6 +192,10 @@ const app = createApp({
                 t.alertList.len = t.alertList.list.length;
             });
         },
+        refreshAlertList: function () {
+            let t = this;
+            t.getAlertList();
+        },
         getMonitorList: function () {
             let t = this;
             common.AjaxGet(t.monitor.api, function (data) {
@@ -202,20 +205,6 @@ const app = createApp({
         refreshMonitorList: function () {
             let t = this;
             t.getMonitorList();
-        },
-
-        alertClear: function () {
-            let t = this;
-            t.isOk = "alertClear";
-            $("#isOkModal").modal("show");
-        },
-        alertClearSubmit: function () {
-            let t = this;
-            common.AjaxGet(t.alertList.clear, function (data){
-                common.ToastShow(data.msg);
-                t.getAlertList();
-                $("#isOkModal").modal('toggle');
-            });
         },
         getMonitorErrList: function () {
             let t = this;

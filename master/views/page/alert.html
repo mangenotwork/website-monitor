@@ -21,7 +21,8 @@
                                 <th scope="col">Msg</th>
                                 <th scope="col">网络环境</th>
                                 <th scope="col">监测器</th>
-                                <th scope="col">未读:0|已读1</th>
+                                <th scope="col">状态</th>
+                                <th scope="col">操作</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -39,7 +40,15 @@
                                     </td>
                                     <td>{{ item.monitorName }}| {{ item.monitorIP }}| {{ item.monitorAddr }}|{{ item.clientIP }}
                                     </td>
-                                    <td>{{ item.read }}</td>
+                                    <td> <template v-if="item.read==0">未读</template><template v-else>已读</template>
+                                    </td>
+                                    <td style="width: 500px;">
+                                        <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+                                            <a type="button" class="btn btn-outline-dark btn-sm" @click="delAlert(item.alertId)">删除</a>
+                                            <a type="button" class="btn btn-outline-dark btn-sm" @click="readMark(item.alertId)">标记已读</a>
+                                            <a type="button" class="btn btn-outline-dark btn-sm" @click="">打开链接</a>
+                                        </div>
+                                    </td>
                                 </tr>
                             </template>
                             </tbody>

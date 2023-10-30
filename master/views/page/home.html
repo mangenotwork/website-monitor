@@ -19,14 +19,16 @@
                                             {{ alertList.len }}<span class="visually-hidden">unread messages</span>
                                         </span>
                                     </template>
-                                    <a @click="alertClear" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="确认所有报警信息" >{[ SVG "record-circle-fill" 18 18 ]}</a>
+                                    <a @click="refreshAlertList" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="刷新报警信息" >{[ SVG "arrow-repeat" 18 18 ]}</a>
                                 </div>
                                 <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
                                     <ul class="list-group list-group-flush">
                                         <template v-if="alertList.len === 0"><p style="text-align: center;">占无报警通知</p></template>
                                         <template v-else>
                                             <template v-for="item in alertList.list">
-                                                <li class="list-group-item list-group-item-action"><span>{{item.date}}|{{item.uri}}|{{item.msg}} </span></li>
+                                                <li class="list-group-item list-group-item-action">
+                                                    <a href="/alert" style="text-decoration: none;color: #dc3545;"><span>{{item.date}}|{{item.uri}}|{{item.msg}} </span></a>
+                                                </li>
                                             </template>
                                         </template>
                                     </ul>
@@ -37,7 +39,6 @@
                             <div class="card box">
                                 <div class="card-header">{[ SVG "diagram-3-fill" 16 16 ]} 监测器列表
                                     <a @click="refreshMonitorList" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="刷新监视器列表" >{[ SVG "arrow-repeat" 18 18 ]}</a>
-
                                 </div>
                                 <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
                                     <ul class="list-group list-group-flush">
@@ -84,13 +85,13 @@
                                         <td>
 
                                             <template v-if="item.state == 0">
-                                                <span class="badge text-bg-success">未连接监测器...</span>
+                                                <span class="badge text-bg-warning">等待监测器</span>
                                             </template>
                                             <template v-if="item.state == 1">
                                                 <span class="badge text-bg-success">监测中...</span>
                                             </template>
                                             <template v-if="item.state == 2">
-                                                <a @click="openAlert(item.ID)"><span class="badge text-bg-danger">报警: {{ item.alertCount }}条 </span></a>
+                                                <a @click="openAlert(item.hostID)" style="cursor: pointer;"><span class="badge text-bg-danger">报警: {{ item.alertCount }}条 </span></a>
                                             </template>
                                         </td>
                                         <td><span style="font-size: 14px;">{{ item.monitorRate }}s/次</span></td>
@@ -99,6 +100,7 @@
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="查看网站信息" @click="openWebsiteInfo(item.hostID)">{[ SVG "house-fill" 18 18 ]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="报警信息" @click="openAlert(item.hostID)">{[ SVG "bell-fill" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="gotoWebsite(item)">{[ SVG "browser-chrome" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="修改网站监测配置" @click="openEditWebsiteConf(item)">{[ SVG "gear-fill" 18 18]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="网站扫描的Url" @click="openWebsiteUrl(item)">{[ SVG "window-stack" 18 18]}</a>

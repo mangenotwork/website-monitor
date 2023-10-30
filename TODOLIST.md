@@ -52,6 +52,8 @@
 - [ok] master 报警信息列表，新增导航
 - [ok] master 首页报警信息
 - [ok] master 监测列表报警信息
+- [ok] master 报警消息删除与清空
+- master 首页网站列表查看报警消息
 - v0.0.1 测试
 - v0.0.1 git发布
 

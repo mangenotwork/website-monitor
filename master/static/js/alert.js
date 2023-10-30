@@ -7,6 +7,8 @@ const app = createApp({
             webSite: AddWebSite,
             alert: {
                 api: "/api/alert/list",
+                read: function (id) { return  "/api/alert/read/"+id; },
+                del: function (id) {return "/api/alert/del/"+id; },
                 list: [],
             },
         }
@@ -23,6 +25,20 @@ const app = createApp({
             let t = this;
             common.AjaxGet(t.alert.api, function (data) {
                 t.alert.list = data.data.list;
+            });
+        },
+        readMark: function (id) {
+            let t = this;
+            common.AjaxGet(t.alert.read(id), function (data) {
+                common.ToastShow(data.msg);
+                t.getList();
+            });
+        },
+        delAlert: function (id) {
+            let t = this;
+            common.AjaxGet(t.alert.del(id), function (data){
+               common.ToastShow(data.msg);
+               t.getList();
             });
         },
     },

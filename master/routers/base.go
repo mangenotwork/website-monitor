@@ -89,7 +89,10 @@ func API() {
 	// alert
 	api.GET("/alert/list", ginHelper.Handle(handler.AlertList))               // 报警列表
 	api.GET("/alert/wbesite/:hostId", ginHelper.Handle(handler.AlertWebsite)) // 指定网站的报警信息
-	api.GET("/alert/red", ginHelper.Handle(handler.AlertRed))                 // 报警信息已读
+	api.GET("/alert/read/:id", ginHelper.Handle(handler.AlertRead))           // 报警信息已读
+	api.GET("/alert/info/:id", ginHelper.Handle(handler.AlertInfo))           // 报警消息详细信息
+	api.GET("/alert/del/:id", ginHelper.Handle(handler.AlertDel))             // 报警消息删除
+	api.GET("/alert/clear/:hostId", ginHelper.Handle(handler.AlertClear))     // 指定网站的报警信息清空
 
 	// tool
 	api.POST("/tool/history", ginHelper.Handle(handler.ToolHistorySet))            // 记录历史记录

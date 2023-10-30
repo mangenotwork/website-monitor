@@ -134,8 +134,11 @@ func WebsiteList(c *ginHelper.GinCtx) {
 	// 监测器状态
 	isMonitor := false
 	monitor := dao.GetClientList()
-	if len(monitor) > 0 {
-		isMonitor = true
+	for _, v := range monitor {
+		if v.Online {
+			isMonitor = true
+			break
+		}
 	}
 	// 报警数量获取
 	for _, v := range websiteList {
@@ -530,6 +533,46 @@ func AlertWebsite(c *ginHelper.GinCtx) {
 	return
 }
 
-func AlertRed(c *ginHelper.GinCtx) {
+func AlertRead(c *ginHelper.GinCtx) {
+	id := c.Param("id")
+	err := dao.NewAlert().Read(id)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("标记成功", "标记成功")
+	return
+}
 
+func AlertInfo(c *ginHelper.GinCtx) {
+	id := c.Param("id")
+	data, err := dao.NewAlert().Get(id)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut(data, "")
+	return
+}
+
+func AlertDel(c *ginHelper.GinCtx) {
+	id := c.Param("id")
+	err := dao.NewAlert().Del(id)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("成功", "成功")
+	return
+}
+
+func AlertClear(c *ginHelper.GinCtx) {
+	hostId := c.Param("hostId")
+	err := dao.NewAlert().Clear(hostId)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("成功", "成功")
+	return
 }

@@ -17,6 +17,9 @@ type AlertEr interface {
 	GetList() ([]*entity.AlertData, error)                   // 获取所有报警信息列表
 	GetAtWebsite(hostId string) ([]*entity.AlertData, error) // 获取指定网站的报警信息
 	GetWebsiteAlertIDList(hostId string) ([]string, error)   // 获取指定网站报警信息的id
+	Read(id string) error                                    // 消息标记为已读
+	Del(id string) error                                     // 删除报警信息
+	Clear(hostId string) error                               // 清空网站的报警信息
 }
 
 func NewAlert() AlertEr {
@@ -27,8 +30,7 @@ type alertDao struct {
 }
 
 func (a *alertDao) set(data *entity.AlertData) error {
-	id := utils.AnyToString(data.AlertId)
-	err := DB.Set(AlertTable, id, data)
+	err := DB.Set(AlertTable, data.AlertId, data)
 	if err != nil {
 		return err
 	}
@@ -37,7 +39,7 @@ func (a *alertDao) set(data *entity.AlertData) error {
 		log.Error("getAtHostID err = ", err)
 		return err
 	}
-	list = append(list, id)
+	list = append(list, data.AlertId)
 	err = DB.Set(AlertWebsiteTable, data.HostId, list)
 	if err != nil {
 		return err
@@ -45,10 +47,16 @@ func (a *alertDao) set(data *entity.AlertData) error {
 	return nil
 }
 
+func (a *alertDao) update(data *entity.AlertData) error {
+	return DB.Set(AlertTable, data.AlertId, data)
+}
+
 func (a *alertDao) getAtHostID(hostId string) ([]string, error) {
 	data := make([]string, 0)
-	log.Info(hostId)
 	err := DB.Get(AlertWebsiteTable, hostId, &data)
+	if err != nil {
+		log.Error("getAtHostID err  = ", err)
+	}
 	return data, err
 }
 
@@ -70,6 +78,7 @@ func (a *alertDao) GetList() ([]*entity.AlertData, error) {
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			data := &entity.AlertData{}
+			//log.Info("k = ", string(k))
 			err := json.Unmarshal(v, &data)
 			if err != nil {
 				return err
@@ -106,6 +115,50 @@ func (a *alertDao) GetWebsiteAlertIDList(hostId string) ([]string, error) {
 	return a.getAtHostID(hostId)
 }
 
+func (a *alertDao) Read(id string) error {
+	log.Error("read = ", id)
+	alert, err := a.Get(id)
+	if err != nil {
+		return err
+	}
+	alert.Read = 1 // 0:未读  1:已读
+	return a.update(alert)
+}
+
+func (a *alertDao) Del(id string) error {
+	alert, err := a.Get(id)
+	if err != nil {
+		return err
+	}
+	websiteAlert, err := a.getAtHostID(alert.HostId)
+	if err != nil {
+		log.Error("GetAtWebsite err = ", err)
+		return err
+	}
+	for n, v := range websiteAlert {
+		if id == v {
+			websiteAlert = append(websiteAlert[:n], websiteAlert[n+1:]...)
+			break
+		}
+	}
+	err = DB.Set(AlertWebsiteTable, alert.HostId, websiteAlert)
+	if err != nil {
+		return err
+	}
+	return DB.Delete(AlertTable, id)
+}
+
+func (a *alertDao) Clear(hostId string) error {
+	alertList, err := a.getAtHostID(hostId)
+	if err != nil {
+		return err
+	}
+	for _, v := range alertList {
+		_ = DB.Delete(AlertTable, v)
+	}
+	return DB.Delete(AlertWebsiteTable, hostId)
+}
+
 // AlertTimeInfoMap 记录报警超时次数
 var AlertTimeInfoMap sync.Map
 
@@ -124,7 +177,7 @@ func setAlertTimeInfoData(key string, data []*entity.MonitorLog) {
 func AddAlert(mLog *entity.MonitorLog) {
 	// 记录报警
 	alert := &entity.AlertData{
-		AlertId:         utils.ID(),
+		AlertId:         utils.IDStr(),
 		HostId:          mLog.HostId,
 		Host:            mLog.Host,
 		Date:            mLog.Time,
