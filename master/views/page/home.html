@@ -80,10 +80,10 @@
                                 <tbody>
                                 <template v-for="item in webSite.list">
                                     <tr>
-                                        <td><a @click="openAlert(item.ID)" style="cursor: pointer;"><span style="font-size: 14px;"><b>{{ item.host }}</b></span></a></td>
+                                        <td><a @click="openAlert(item.ID)" style="cursor: pointer;">
+                                            <span style="font-size: 14px;"><b>{{ item.host }}</b></span></a></td>
                                         <td><span style="font-size: 14px;">{{ item.notes }}</span></td>
                                         <td>
-
                                             <template v-if="item.state == 0">
                                                 <span class="badge text-bg-warning">等待监测器</span>
                                             </template>

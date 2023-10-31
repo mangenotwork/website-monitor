@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	gt "github.com/mangenotwork/gathertool"
+	"sort"
 	"time"
 	"website-monitor/master/business"
 
@@ -157,6 +158,12 @@ func WebsiteList(c *ginHelper.GinCtx) {
 			state,
 		})
 	}
+	sort.Slice(data, func(i, j int) bool {
+		if data[i].Created > data[j].Created {
+			return true
+		}
+		return false
+	})
 	c.APIOutPut(data, "")
 	return
 }

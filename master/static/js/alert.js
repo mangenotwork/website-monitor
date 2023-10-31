@@ -41,6 +41,10 @@ const app = createApp({
                t.getList();
             });
         },
+        gotoUrl: function (url) {
+            console.log(url);
+            window.open(url, '_blank');
+        },
     },
     computed: {
     },

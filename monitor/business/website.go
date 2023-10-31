@@ -117,6 +117,7 @@ func (item *WebsiteItem) AlertRuleMs(resMs int64) bool {
 }
 
 func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
+	mLog.Uri = item.Host
 	mLog.UriType = URIHealth
 	mLog.LogType = LogTypeInfo
 	mLog.Msg = ""
@@ -130,7 +131,6 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}
-	mLog.Uri = item.Host
 	mLog.UriCode = healthCode
 	mLog.UriMs = healthMs
 	// 监测规则
@@ -163,6 +163,7 @@ func (item *WebsiteItem) MonitorRandomUri(mLog *MonitorLog) {
 		mLog.Msg = ""                  // 复位
 		mLog.AlertType = AlertTypeNone // 复位
 		randomUri := utils.RandomString(uri)
+		mLog.Uri = randomUri
 		log.Info("=================================  随机取一个URI监测... ", randomUri)
 		randomCode, randomMs, err := request(randomUri)
 		if err != nil {
@@ -172,7 +173,6 @@ func (item *WebsiteItem) MonitorRandomUri(mLog *MonitorLog) {
 			item.Put(item.mLogSerialize(mLog))
 			return
 		}
-		mLog.Uri = randomUri
 		mLog.UriCode = randomCode
 		mLog.UriMs = randomMs
 		if item.AlertRuleCode(randomCode) {
@@ -201,6 +201,7 @@ func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
 	mLog.LogType = LogTypeInfo     // 复位
 	mLog.Msg = ""                  // 复位
 	mLog.AlertType = AlertTypeNone // 复位
+	mLog.Uri = pointUrl
 	pointCode, pointMs, err := request(pointUrl)
 	if err != nil {
 		mLog.LogType = LogTypeAlert
@@ -209,7 +210,6 @@ func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}
-	mLog.Uri = pointUrl
 	mLog.UriCode = pointCode
 	mLog.UriMs = pointMs
 	// 监测规则

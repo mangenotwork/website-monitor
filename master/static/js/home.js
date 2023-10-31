@@ -174,12 +174,12 @@ const app = createApp({
         t.mail.getInfo();
         t.getMonitorList();
         t.getAlertList();
-        // t.getMonitorErrList();
 
-
-        // t.timer = window.setInterval(() => {
-        //     t.getList();
-        // }, 10000);
+        t.timer = window.setInterval(() => {
+            t.webSite.getList();
+            t.getMonitorList();
+            t.getAlertList();
+        }, 10000);
     },
     destroyed:function () {
         let t = this;

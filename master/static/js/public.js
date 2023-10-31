@@ -248,13 +248,14 @@ let AddWebSite = {
         AddWebSite.param.websiteSlowResponseTime = Number(AddWebSite.next3Param.websiteSlowResponseTime);
         AddWebSite.param.websiteSlowResponseCount = Number(AddWebSite.next3Param.websiteSlowResponseCount);
         AddWebSite.param.SSLCertificateExpire = Number(AddWebSite.next3Param.SSLCertificateExpire);
-
         console.log(AddWebSite.param);
-
         common.AjaxPost(AddWebSite.api, AddWebSite.param, function (data){
             console.log(data);
             if (data.code === 0) {
                 $("#addHostModal").modal('toggle');
+                AddWebSite.next1Param.hostUrl = ""
+                AddWebSite.next1Param.notes = ""
+                location.reload();
             }
             common.ToastShow(data.msg);
         });
