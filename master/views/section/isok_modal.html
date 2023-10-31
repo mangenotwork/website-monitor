@@ -7,15 +7,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <template v-if="isOk === 'alertClear'">
-                    是否清空报警通知
-                </template>
-                <template v-if="isOk === 'monitorErrClear'">
-                    是否清空监控平台错误日志
-                </template>
-                <template v-if="isOk === 'deleteWebsite'">
-                    确认删除对网站 {{deleteWebsite.hostName}} 的监测?
-                </template>
+                <template v-if="isOk === 'alertClear'">是否清空报警通知</template>
+                <template v-if="isOk === 'monitorErrClear'">是否清空监控平台错误日志</template>
+                <template v-if="isOk === 'deleteWebsite'">确认删除对网站 {{deleteWebsite.hostName}} 的监测?</template>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">否</button>

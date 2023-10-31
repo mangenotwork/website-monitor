@@ -150,10 +150,11 @@ const app = createApp({
             },
             websiteAlert: {
                 hostId: "",
-                api: function () { return "/api/website/alert/" + this.hostId; },
+                api: function () { return "/api/alert/wbesite/" + this.hostId; },
                 list: [],
                 len: 0,
-                del: function (date) { return "/api/website/alert/del/" + this.hostId + "?date="+date; }
+                del: function (alertId) { return "/api/alert/del/" + alertId; },
+                clear: function () { return "/api/alert/clear/" + this.hostId; }
             },
             websiteUrl: {
                 hostId: "",
@@ -494,17 +495,17 @@ const app = createApp({
             let t = this;
             t.websiteAlert.hostId = id;
             common.AjaxGet(t.websiteAlert.api(), function (data){
-               t.websiteAlert.list = data.data;
+               t.websiteAlert.list = data.data.list;
                t.websiteAlert.len = t.websiteAlert.list.length;
             });
             $("#alertModal").modal("show");
         },
-        delAlert: function (date) {
+        delAlert: function (id, hostId) {
             let t = this;
-            common.AjaxGet(t.websiteAlert.del(date), function (data) {
+            common.AjaxGet(t.websiteAlert.del(id), function (data) {
                 common.ToastShow(data.msg);
                 if (data.code === 0) {
-                    t.openAlert(data.data);
+                    t.openAlert(hostId);
                 }
             });
         }

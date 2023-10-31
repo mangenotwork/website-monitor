@@ -16,11 +16,12 @@
                     <template v-else>
                         <template v-for="item in websiteAlert.list">
                             <div class="alert alert-danger" role="alert" style="width: 98%;">
-                                <p>{{ item.Date }} <a :href="item.Uri" class="alert-link" target=_blank>{{ item.Uri }}</a>{{ item.Msg }} ;</p>
-                                <span>[监测值=> 状态码:{{ item.UriCode }};响应:{{ item.UriMs }}] |
-                                                    [对照组:{{ item.ContrastUriMs }};ping:{{ item.PingMs }}]</span>
-                                <button type="button" class="btn btn-link">添加到误报（TODO）</button>
-                                <button type="button" class="btn btn-link" @click="delAlert(item.Date, item.Uri)">删除报警</button>
+                                <p>{{ item.date }} <a :href="item.uri" class="alert-link" target=_blank>{{ item.uri }}</a>{{ item.msg }} ;</p>
+                                <p>监测值=> 状态码:{{ item.uriCode }};响应:{{ item.uriMs }}</p>
+                                <p>网络环境=> 对照组:{{ item.contrastUri }} code:{{ item.contrastUriCode }} ms:{{ item.contrastUriMs }};
+                                    ping: {{ item.ping }} {{ item.pingMs }}</p>
+                                <p>监测器=> name:{{ item.monitorName }} ip: {{ item.monitorIP }} addr: {{ item.monitorAddr }} 内网: {{ item.clientIP }}</p>
+                                <button type="button" class="btn btn-link" @click="delAlert(item.alertId, item.hostId)">删除报警</button>
                             </div>
                         </template>
                     </template>

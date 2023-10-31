@@ -53,14 +53,36 @@
 - [ok] master 首页报警信息
 - [ok] master 监测列表报警信息
 - [ok] master 报警消息删除与清空
-- master 首页网站列表查看报警消息
+- [ok] master 首页网站列表查看报警消息
 - v0.0.1 测试
-- v0.0.1 git发布
+- v0.0.1 git发布 
+
+[bug]
+1. 首页添加了监测网站没有更新网站列表
+2. 添加监测网站成功应该清空添加参数
+3. 首页监测列表要创建时间倒叙排序
+4. ipc信息读取不到
+5. 网站详细信息中 无法修改监测设置
+6. 首页网站列表增加网站图标，没有给默认
+7. 外链采集到如下非法url
+```
+topic.url||'#'
+'/user/'+topic.uid
+'/topic/'+topic.tid+'.html'
+javascript:;
+```
+8. 弹窗标题可以加上网站信息，例如“网站Url信息” 改为 "XXX网站Url信息"
+9. 定时刷新首页网站列表
+10. 监测报警点击【打开链接】没有用
+11. 获取网站信息执行的时候增加一个等待的图标
+12. 
+
 
 #### v0.0.2
 
 主要开发请求器功能，参考postman  apiPost
 
+- 修改 v0.0.1 剩余bug
 - master 请求器 导航和页面
 - master 指定 monitor 请求，未指定默认 master请求
 - master 请求器 请求记录
@@ -86,10 +108,13 @@
 
 #### v0.0.5
 
-渗透测试开发
+使用说明
+
 
 
 #### v0.0.6
+
+渗透测试开发
 
 扫描等工具的开发
 
@@ -160,4 +185,40 @@ Webshell管理工具：   冰蝎    中国蚁剑    哥斯拉
 
 
 ```
+
+---
+网站监控参考
+```
+https://github.com/argentmoon/host-monitor
+https://github.com/dhjz/dwatch
+https://github.com/ptonlix/netdog
+https://github.com/xxscloud5722/goflame
+https://github.com/JiLoveZn/WebMonitor
+https://github.com/zmh-program/fymonitor
+https://github.com/xuexiangyou/monitor-web
+https://github.com/zjw939057120/Website-Monitoring
+```
+
+---
+
+集成  nmap , 如下参考资料
+```
+https://github.com/Ullaakut/nmap
+https://blog.csdn.net/m0_56262476/article/details/128728464
+https://github.com/lair-framework/go-nmap
+https://github.com/lcvvvv/gonmap
+https://github.com/ivopetiz/network-scanner
+https://github.com/xiaoyaochen/yscan
+https://github.com/vus520/go-scan
+https://github.com/vdjagilev/nmap-formatter
+https://github.com/CTF-MissFeng/NmapTools
+https://github.com/marco-lancini/goscan
+https://github.com/projectdiscovery/naabu
+https://github.com/Ullaakut/Gorsair
+https://github.com/Adminisme/ServerScan
+https://github.com/hktalent/scan4all
+https://github.com/luijait/GONET-Scanner
+https://github.com/qq431169079/PortScanner-3
+```
+
 
