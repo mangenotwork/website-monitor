@@ -85,6 +85,8 @@ javascript:;
 主要开发请求器功能，参考postman  apiPost
 
 - 修改 v0.0.1 剩余bug
+- [ok] master 请求器实体设计
+- [ok] user agent 列表
 - master 导航栏 快速请求
 - master 请求器 导航和页面
 - master 指定 monitor 请求，未指定默认 master请求
