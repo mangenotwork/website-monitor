@@ -7,4 +7,5 @@ type Mail struct {
 	Host     string `json:"host"`     // 邮件服务 例子:smtp.qq.com
 	Port     int    `json:"port"`     // 邮件服务端口 例子:465/587/25
 	ToList   string `json:"toList"`   // 收件人,多个分号";"逗号隔开
+	Open     bool   `json:"open"`     // 是否开启邮件通知  0:开启  1:关闭
 }

@@ -56,6 +56,10 @@ func (m *mailDao) IsMail() bool {
 }
 
 func (m *mailDao) Send(title, body string) {
+	mailInfo, _ := m.GetMail()
+	if !mailInfo.Open { // 关闭
+		return
+	}
 	data, err := m.GetMail()
 	if err != nil {
 		log.Error(err)

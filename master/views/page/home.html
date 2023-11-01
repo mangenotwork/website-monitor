@@ -102,7 +102,7 @@
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="查看网站信息" @click="openWebsiteInfo(item.hostID)">{[ SVG "house-fill" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="报警信息" @click="openAlert(item.hostID)">{[ SVG "bell-fill" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="gotoWebsite(item)">{[ SVG "browser-chrome" 18 18 ]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="修改网站监测配置" @click="openEditWebsiteConf(item)">{[ SVG "gear-fill" 18 18]}</a>
+                                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="修改网站监测配置" @click="openEditWebsiteConf(item.hostID)">{[ SVG "gear-fill" 18 18]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="网站扫描的Url" @click="openWebsiteUrl(item)">{[ SVG "window-stack" 18 18]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="设置网站监测点(Url)" @click="setUriPoint(item)">{[ SVG "broadcast" 18 18 ]}</a>
                                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="监测日志" @click="logShow(item)">{[ SVG "file-text-fill" 18 18 ]}</a>

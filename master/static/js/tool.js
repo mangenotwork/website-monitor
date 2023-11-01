@@ -315,8 +315,12 @@ const app = createApp({
                 common.ToastShow("请输入Host！");
                 return
             }
+            $("#FidWebsiteInfoRse").hide();
+            $("#FidWebsiteInfoLoading").show();
             common.AjaxGet(t.objFidWebsiteInfo.api(), function (data){
                 t.objFidWebsiteInfo.rse = data.data;
+                $("#FidWebsiteInfoRse").show();
+                $("#FidWebsiteInfoLoading").hide();
                 t.setHistory(t.objFidWebsiteInfo.id, t.objFidWebsiteInfo.host);
                 t.getHistory(t.objFidWebsiteInfo.id);
             });

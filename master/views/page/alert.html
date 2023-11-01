@@ -27,12 +27,12 @@
                             </thead>
                             <tbody>
                             <template v-for="item in alert.list">
-                                <tr>
+                                <tr style="font-size: 11px;">
                                     <td>{{ item.date }}</td>
                                     <td>{{ item.host }}</td>
                                     <td>{{ item.uri }}</td>
                                     <td>{{ item.uriCode }}</td>
-                                    <td>{{ item.uriMs }}</td>
+                                    <td>{{ item.uriMs }}ms</td>
                                     <td>{{ item.uriType }}</td>
                                     <td>{{ item.msg }}</td>
                                     <td>对照组:{{ item.contrastUri }}, code:{{ item.contrastUriCode }}, ms:{{ item.contrastUriMs }}|

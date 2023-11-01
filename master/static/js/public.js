@@ -71,12 +71,14 @@ let Mail= {
         from: "",
         authCode: "",
         toList: "",
+        open: 0,
     },
     paramHost: "smtp.qq.com",
     paramPort: 25,
     paramFrom: "",
     paramAuthCode: "",
     paramToList: "",
+    setConfApi: "/api/mail/conf",
     infoApi: "/api/mail/info",
     sendApi: "/api/mail/sendTest",
     common: new Utils(),
@@ -97,7 +99,7 @@ let Mail= {
         let t = this;
         Mail.param.toList = Mail.toListJoin(Mail.param.toList);
         Mail.param.port = Number(Mail.param.port);
-        Mail.common.AjaxPost(Mail.api, Mail.param, function (data){
+        Mail.common.AjaxPost(Mail.setConfApi, Mail.param, function (data){
             if (data.code === 0) {
                 $("#mailSetModal").modal('toggle');
                 Mail.getMail();

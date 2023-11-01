@@ -7,6 +7,7 @@ import (
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
 	udp "github.com/mangenotwork/udp_comm"
+	"strings"
 	"sync"
 	"time"
 )
@@ -127,7 +128,12 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 	if err != nil {
 		mLog.LogType = LogTypeAlert
 		mLog.Msg = "请求失败，err=" + err.Error()
-		mLog.AlertType = AlertTypeErr
+		if strings.Index(err.Error(), "timeout") != -1 ||
+			strings.Index(err.Error(), "Client.Timeout") != -1 {
+			mLog.AlertType = AlertTypeTimeout
+		} else {
+			mLog.AlertType = AlertTypeErr
+		}
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}

@@ -355,9 +355,9 @@ const app = createApp({
                 location.reload();
             });
         },
-        openEditWebsiteConf: function (item) {
+        openEditWebsiteConf: function (hostId) {
             let t = this;
-            t.editWebsiteConf.hostId = item.hostID;
+            t.editWebsiteConf.hostId = hostId;
             common.AjaxGetNotAsync(t.editWebsiteConf.confApi(), function (data) {
                 t.editWebsiteConf.base = data.data.base;
                 t.editWebsiteConf.alarmRule = data.data.alarmRule;
@@ -367,6 +367,20 @@ const app = createApp({
             })
 
         },
+
+        openEditWebsiteConfAtInfo: function (hostId) {
+            let t = this;
+            t.editWebsiteConf.hostId = hostId;
+            common.AjaxGetNotAsync(t.editWebsiteConf.confApi(), function (data) {
+                t.editWebsiteConf.base = data.data.base;
+                t.editWebsiteConf.alarmRule = data.data.alarmRule;
+                t.editWebsiteConf.scanCheckUp = data.data.scanCheckUp;
+                console.log(t.editWebsiteConf.param)
+                $("#websiteInfoModal").modal('toggle');
+                $("#setAlertModal").modal("show");
+            })
+        },
+
         editWebsiteConfSubmit: function () {
             let t = this;
             let param = {

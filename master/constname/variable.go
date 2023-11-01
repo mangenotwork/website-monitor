@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// sys
 var (
 	UserToken    string = "sign"
 	TokenExpires        = 60 * 60 * 24 * 7
@@ -11,6 +12,7 @@ var (
 	TimeStamp           = time.Now().Unix()
 )
 
+// sys
 const (
 	DayLayout     = "20060102"
 	MasterVersion = "v0.1"
@@ -29,6 +31,7 @@ var (
 	DefaultSSLCertificateExpire     int64 = 14
 )
 
+// notice
 const (
 	NoticeUpdateWebsiteAllLabel    = "websiteAll" // 通知更新网站监测所有
 	NoticeUpdateWebsiteLabel       = "website"    // 通知更新网站监测
@@ -37,6 +40,7 @@ const (
 	NoticeUpdateWebsitePointLabel  = "point"      // 通知更新网站监测点
 )
 
+// log & alert
 const (
 	URIHealth        = "Health"
 	URIRandom        = "Random"
@@ -48,4 +52,10 @@ const (
 	AlertTypeErr     = "err"
 	AlertTypeCode    = "code"
 	AlertTypeTimeout = "timeout"
+)
+
+// mail
+const (
+	MailSendOpen  = 0
+	MailSendClose = 1
 )

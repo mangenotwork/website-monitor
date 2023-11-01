@@ -14,7 +14,15 @@
                     <div class="card text-bg-light mb-3" style="margin-top:52px;">
                         <div class="card-header">结果</div>
                         <div class="card-body">
-                            <pre>{{objFidWebsiteInfo.rse}}</pre>
+                            <div id="FidWebsiteInfoLoading" style="display: none;">
+                                <div class="spinner-grow" role="status"  >
+                                    <span class="visually-hidden">Loading...</span>
+                                </div><br>
+                                获取网站信息中...
+                            </div>
+                            <div id="FidWebsiteInfoRse" style="display: none;">
+                                <pre>{{objFidWebsiteInfo.rse}}</pre>
+                            </div>
                         </div>
                     </div>
                     <div style="margin-top: 48px;">

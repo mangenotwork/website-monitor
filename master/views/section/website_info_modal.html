@@ -8,7 +8,7 @@
             </div>
             <div class="modal-body">
                 <div class="card text-bg-light mb-3">
-                    <div class="card-header">监测信息 <a href="#" class="stretched-link" style="float: right;">修改</a>
+                    <div class="card-header">监测信息 <a @click="openEditWebsiteConfAtInfo(websiteInfo.data.base.hostID)" class="stretched-link" style="float: right;cursor: pointer;">修改</a>
                     </div>
                     <div class="card-body">
                         <p style="font-size: 12px;margin-bottom: 4px;">主机: {{ websiteInfo.data.base.host }} </p>
@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 <div class="card text-bg-light mb-3">
-                    <div class="card-header">网站信息 - SSL证书信息 <a @click="refreshWebsiteInfo(websiteInfo.data.base.host, websiteInfo.data.base.hostID)" style="float: right;">刷新</a></div>
+                    <div class="card-header">网站信息 - SSL证书信息 <a @click="refreshWebsiteInfo(websiteInfo.data.base.host, websiteInfo.data.base.hostID)" style="float: right;cursor: pointer;">刷新</a></div>
                     <div class="card-body">
                         <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-有效时间:  {{ websiteInfo.data.info.SSLCertificateInfo.effectiveTime }}  </p>
                         <p style="font-size: 12px;margin-bottom: 4px;">SSL证书信息-DNSName:  {{ websiteInfo.data.info.SSLCertificateInfo.dnsName }}  </p>
@@ -76,7 +76,7 @@
                     </div>
                 </div>
                 <div class="card text-bg-light mb-3">
-                    <div class="card-header">扫描规则 <a href="#" class="stretched-link" style="float: right;">修改</a></div>
+                    <div class="card-header">扫描规则 <a @click="openEditWebsiteConfAtInfo(websiteInfo.data.base.hostID)" class="stretched-link" style="float: right;cursor: pointer;">修改</a></div>
                     <div class="card-body">
                         <p style="font-size: 12px;margin-bottom: 4px;">扫描站点深度:  {{ websiteInfo.data.scanCheckUp.uriDepth }}  </p>
                         <p style="font-size: 12px;margin-bottom: 4px;">扫描网站频率:  {{ websiteInfo.data.scanCheckUp.scanRate }} </p>
@@ -86,7 +86,7 @@
                     </div>
                 </div>
                 <div class="card text-bg-light mb-3">
-                    <div class="card-header">报警规则 <a href="#" class="stretched-link" style="float: right;">修改</a></div>
+                    <div class="card-header">报警规则 <a @click="openEditWebsiteConfAtInfo(websiteInfo.data.base.hostID)" class="stretched-link" style="float: right;cursor: pointer;">修改</a></div>
                     <div class="card-body">
                         <p style="font-size: 12px;margin-bottom: 4px;">网站响应有多慢才记录报警:  {{ websiteInfo.data.alarmRule.websiteSlowResponseTime }}  </p>
                         <p style="font-size: 12px;margin-bottom: 4px;">连续几次慢就发送邮件通知:  {{ websiteInfo.data.alarmRule.websiteSlowResponseCount }} </p>

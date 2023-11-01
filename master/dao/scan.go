@@ -2,6 +2,7 @@ package dao
 
 import (
 	"math/rand"
+	"net/url"
 	"strings"
 	"time"
 
@@ -94,7 +95,9 @@ func (scan *HostScanUrl) do(caseUrl string, df int64) {
 			caseUrl = scan.Host + caseUrl
 			goto G
 		} else if string(caseUrl[0]) != "/" && string(caseUrl[0]) != "#" {
-			scan.ExtLinks[caseUrl] = struct{}{}
+			if usefulUrl(caseUrl) {
+				scan.ExtLinks[caseUrl] = struct{}{}
+			}
 		}
 		return
 	}
@@ -209,4 +212,21 @@ func isCss(str string) bool {
 
 func isJs(str string) bool {
 	return isExt(str, []string{"js"})
+}
+
+// 判断url是否是有效的
+func usefulUrl(str string) bool {
+	_, err := url.ParseRequestURI(str)
+	if err != nil {
+		return false
+	}
+	u, err := url.Parse(str)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	// Check if the URL has a valid scheme (http or https)
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return false
+	}
+	return true
 }

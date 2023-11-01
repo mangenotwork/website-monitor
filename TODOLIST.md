@@ -56,29 +56,7 @@
 - [ok] master 首页网站列表查看报警消息
 - [ok] v0.0.1 测试
 - [ok] v0.0.1 改bug
-- [ok] v0.0.1 git发布 
-
-[bug]
-1. [ok] 首页添加了监测网站没有更新网站列表
-2. [ok] 添加监测网站成功应该清空添加参数
-3. [ok] 首页监测列表要创建时间倒叙排序
-4. ipc信息读取不到
-5. 网站详细信息中 无法修改监测设置
-6. [ok] [加图标不好看]首页网站列表增加网站图标，没有给默认
-7. 外链采集到如下非法url
-```
-topic.url||'#'
-'/user/'+topic.uid
-'/topic/'+topic.tid+'.html'
-javascript:;
-```
-8. [ok] [不处理]弹窗标题可以加上网站信息，例如“网站Url信息” 改为 "XXX网站Url信息"
-9. [ok] 定时刷新首页网站列表
-10. [ok] 监测报警点击【打开链接】没有用
-11. 获取网站信息执行的时候增加一个等待的图标
-12. 把监测到 "net/http: TLS handshake timeout" 与超时一样处理
-13. 把监测到 "context deadline exceeded (Client.Timeout exceeded while awaiting headers)" 与超时一样处理
-14. monitor 关闭 retry; retry会卡住 (等gathertool提供方法)
+- [ok] v0.0.1 git发布  2023-10-31
 
 #### v0.0.2
 
@@ -87,11 +65,21 @@ javascript:;
 - 修改 v0.0.1 剩余bug
 - [ok] master 请求器实体设计
 - [ok] user agent 列表
+- master 全局开关邮件通知
 - master 导航栏 快速请求
 - master 请求器 导航和页面
 - master 指定 monitor 请求，未指定默认 master请求
 - master 请求器 请求记录
 - master 请求器 保存请求 增删改查
+- master 扫描检查证书过期时间
+- v0.0.1 测试
+- v0.0.1 改bug
+- v0.0.1 git发布  2023-10-31
+
+[bug]
+4. ipc信息读取不到
+14. monitor 关闭 retry; retry会卡住 (等gathertool提供方法)
+15. 修改了超时时间 monitor 视乎没有起效果，报警信息还是之前的超时做对比
 
 
 #### v0.0.3

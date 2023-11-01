@@ -27,6 +27,13 @@
                     <textarea class="form-control" v-model="mail.param.toList" style="height: 98px;"></textarea>
                     <label>通知收件人，多个分号";"隔开</label>
                 </div>
+                <br>
+                <div class="form-floating">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" v-model="mail.param.open" role="switch" checked>
+                        <label class="form-check-label">开启邮件通知</label>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
