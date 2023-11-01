@@ -126,13 +126,16 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 	log.Info("=================================  监测生命URI... ", item.Host)
 	healthCode, healthMs, err := request(item.Host)
 	if err != nil {
+		mLog.ContrastUriCode = 0
 		mLog.LogType = LogTypeAlert
-		mLog.Msg = "请求失败，err=" + err.Error()
-		if strings.Index(err.Error(), "timeout") != -1 ||
-			strings.Index(err.Error(), "Client.Timeout") != -1 {
+		errStr := err.Error()
+		if strings.Index(errStr, "timeout") != -1 ||
+			strings.Index(errStr, "Client.Timeout") != -1 {
 			mLog.AlertType = AlertTypeTimeout
+			mLog.Msg = "请求超时 : " + errStr
 		} else {
 			mLog.AlertType = AlertTypeErr
+			mLog.Msg = "请求失败，err=" + errStr
 		}
 		item.Put(item.mLogSerialize(mLog))
 		return
@@ -173,9 +176,17 @@ func (item *WebsiteItem) MonitorRandomUri(mLog *MonitorLog) {
 		log.Info("=================================  随机取一个URI监测... ", randomUri)
 		randomCode, randomMs, err := request(randomUri)
 		if err != nil {
+			mLog.ContrastUriCode = 0
 			mLog.LogType = LogTypeAlert
-			mLog.Msg = "请求失败，err=" + err.Error()
-			mLog.AlertType = AlertTypeErr
+			errStr := err.Error()
+			if strings.Index(errStr, "timeout") != -1 ||
+				strings.Index(errStr, "Client.Timeout") != -1 {
+				mLog.AlertType = AlertTypeTimeout
+				mLog.Msg = "请求超时 : " + errStr
+			} else {
+				mLog.AlertType = AlertTypeErr
+				mLog.Msg = "请求失败，err=" + errStr
+			}
 			item.Put(item.mLogSerialize(mLog))
 			return
 		}
@@ -210,9 +221,17 @@ func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
 	mLog.Uri = pointUrl
 	pointCode, pointMs, err := request(pointUrl)
 	if err != nil {
+		mLog.ContrastUriCode = 0
 		mLog.LogType = LogTypeAlert
-		mLog.Msg = "请求失败，err=" + err.Error()
-		mLog.AlertType = AlertTypeErr
+		errStr := err.Error()
+		if strings.Index(errStr, "timeout") != -1 ||
+			strings.Index(errStr, "Client.Timeout") != -1 {
+			mLog.AlertType = AlertTypeTimeout
+			mLog.Msg = "请求超时 : " + errStr
+		} else {
+			mLog.AlertType = AlertTypeErr
+			mLog.Msg = "请求失败，err=" + errStr
+		}
 		item.Put(item.mLogSerialize(mLog))
 		return
 	}

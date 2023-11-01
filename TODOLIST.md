@@ -77,7 +77,7 @@
 - v0.0.1 git发布  2023-10-31
 
 [bug]
-4. ipc信息读取不到
+4. [ok] ipc信息读取不到
 14. monitor 关闭 retry; retry会卡住 (等gathertool提供方法)
 15. 修改了超时时间 monitor 视乎没有起效果，报警信息还是之前的超时做对比
 
