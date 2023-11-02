@@ -90,6 +90,10 @@
 ```
 2023-11-02 09:52:36 https://www.97654.com请求超时 : Get "https://www.97654.com": context deadline exceeded (Client.Timeout exceeded while awaiting headers) ;
 ```
+18. 随机监测的url 需要排除无效标签，如下
+```
+https://www.8300.cn/zst/ssqjbw4;
+```
 
 #### v0.0.3
 
