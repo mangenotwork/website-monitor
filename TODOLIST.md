@@ -67,7 +67,9 @@
 - [ok] user agent 列表
 - [ok] master 全局开关邮件通知
 - [ok] master 导航栏 快速请求
-- master 请求器 页面设计
+- [ok] master 请求器 页面设计
+- master 请求器 页面设计 几种Body界面设计
+- master 请求器 交互设计
 - master 指定 monitor 请求，未指定默认 master请求
 - master 请求器 请求记录
 - master 请求器 保存请求 增删改查

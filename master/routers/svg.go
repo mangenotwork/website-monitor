@@ -199,4 +199,27 @@ var svgHtml = map[string]string{
 	"lightning": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-lightning" viewBox="0 0 16 16">
 			  <path d="M5.52.359A.5.5 0 0 1 6 0h4a.5.5 0 0 1 .474.658L8.694 6H12.5a.5.5 0 0 1 .395.807l-7 9a.5.5 0 0 1-.873-.454L6.823 9.5H3.5a.5.5 0 0 1-.48-.641l2.5-8.5zM6.374 1 4.168 8.5H7.5a.5.5 0 0 1 .478.647L6.78 13.04 11.478 7H8a.5.5 0 0 1-.474-.658L9.306 1H6.374z"/>
 			</svg>`,
+	"search": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+			  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+			</svg>`,
+	"x": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+			  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+			</svg>`,
+	"x-circle": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+			  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+			  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+			</svg>`,
+	"x-circle-fill": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+			  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+			</svg>`,
+	"x-lg": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+			  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+			</svg>`,
+	"x-square": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-x-square" viewBox="0 0 16 16">
+			  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+			  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+			</svg>`,
+	"x-square-fill": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-x-square-fill" viewBox="0 0 16 16">
+			  <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3.354 4.646L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708z"/>
+			</svg>`,
 }
