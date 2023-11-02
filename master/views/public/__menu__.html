@@ -23,6 +23,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="/requester">
+                    <div class='{[ if eq .nav "requester" ]}active{[ else ]}not-active{[ end ]}'>
+                        {[ SVG "window-sidebar" 16 16 ]} <span>请求器</span>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/tool">
                     <div class='{[ if eq .nav "tool" ]}active{[ else ]}not-active{[ end ]}'>
                         {[ SVG "tools" 16 16 ]} <span>工具</span>

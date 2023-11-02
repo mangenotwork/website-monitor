@@ -51,11 +51,12 @@ func Page() {
 	pg.GET("/monitor", handler.MonitorPage)
 	pg.GET("/alert", handler.AlertPage)
 	pg.GET("/tool", handler.ToolPage)
-	pg.GET("/test/api", handler.TestAPI)
-	pg.GET("/test/stress", handler.TestStress)
-	pg.GET("/test/penetration", handler.TestPenetration)
-	pg.GET("/operation", handler.Operation)
-	pg.GET("/instructions", handler.Instructions)
+	pg.GET("/test/api", handler.TestAPIPage)
+	pg.GET("/test/stress", handler.TestStressPage)
+	pg.GET("/test/penetration", handler.TestPenetrationPage)
+	pg.GET("/operation", handler.OperationPage)
+	pg.GET("/instructions", handler.InstructionsPage)
+	pg.GET("/requester", handler.RequesterPage)
 }
 
 func API() {

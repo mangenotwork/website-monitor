@@ -192,4 +192,11 @@ var svgHtml = map[string]string{
 	"bell-fill": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
 			  <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
 			</svg>`,
+	"window-sidebar": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-window-sidebar" viewBox="0 0 16 16">
+			  <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+			  <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v2H1V3a1 1 0 0 1 1-1h12zM1 13V6h4v8H2a1 1 0 0 1-1-1zm5 1V6h9v7a1 1 0 0 1-1 1H6z"/>
+			</svg>`,
+	"lightning": `<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" fill="currentColor" class="bi bi-lightning" viewBox="0 0 16 16">
+			  <path d="M5.52.359A.5.5 0 0 1 6 0h4a.5.5 0 0 1 .474.658L8.694 6H12.5a.5.5 0 0 1 .395.807l-7 9a.5.5 0 0 1-.873-.454L6.823 9.5H3.5a.5.5 0 0 1-.48-.641l2.5-8.5zM6.374 1 4.168 8.5H7.5a.5.5 0 0 1 .478.647L6.78 13.04 11.478 7H8a.5.5 0 0 1-.474-.658L9.306 1H6.374z"/>
+			</svg>`,
 }

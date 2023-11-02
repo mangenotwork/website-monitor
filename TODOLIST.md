@@ -65,9 +65,9 @@
 - 修改 v0.0.1 剩余bug
 - [ok] master 请求器实体设计
 - [ok] user agent 列表
-- master 全局开关邮件通知
-- master 导航栏 快速请求
-- master 请求器 导航和页面
+- [ok] master 全局开关邮件通知
+- [ok] master 导航栏 快速请求
+- master 请求器 页面设计
 - master 指定 monitor 请求，未指定默认 master请求
 - master 请求器 请求记录
 - master 请求器 保存请求 增删改查
@@ -80,7 +80,14 @@
 4. [ok] ipc信息读取不到
 14. monitor 关闭 retry; retry会卡住 (等gathertool提供方法)
 15. 修改了超时时间 monitor 视乎没有起效果，报警信息还是之前的超时做对比
-
+16. 对照组 code=0 ,还继续执行了监测
+```
+请求失败，err=Get "https://www.8200.cn": dial tcp: lookup www.8200.cn: no such host	对照组:https://www.baidu.com, code:0, ms:636| Ping:223.5.5.5, ms:253
+```
+17. unexpected EOF 请求错误忽略
+```
+2023-11-02 09:52:36 https://www.97654.com请求超时 : Get "https://www.97654.com": context deadline exceeded (Client.Timeout exceeded while awaiting headers) ;
+```
 
 #### v0.0.3
 

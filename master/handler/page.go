@@ -94,7 +94,7 @@ func ToolPage(c *gin.Context) {
 	)
 }
 
-func TestAPI(c *gin.Context) {
+func TestAPIPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"testAPI.html",
@@ -104,7 +104,7 @@ func TestAPI(c *gin.Context) {
 	)
 }
 
-func TestStress(c *gin.Context) {
+func TestStressPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"testStress.html",
@@ -114,7 +114,7 @@ func TestStress(c *gin.Context) {
 	)
 }
 
-func TestPenetration(c *gin.Context) {
+func TestPenetrationPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"testPenetration.html",
@@ -124,7 +124,7 @@ func TestPenetration(c *gin.Context) {
 	)
 }
 
-func Operation(c *gin.Context) {
+func OperationPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"operation.html",
@@ -134,12 +134,22 @@ func Operation(c *gin.Context) {
 	)
 }
 
-func Instructions(c *gin.Context) {
+func InstructionsPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"instructions.html",
 		ginH(gin.H{
 			"nav": "instructions",
+		}),
+	)
+}
+
+func RequesterPage(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"requester.html",
+		ginH(gin.H{
+			"nav": "pequester",
 		}),
 	)
 }
