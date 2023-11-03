@@ -79,6 +79,64 @@ const app = createApp({
                     break;
             }
         },
+        closeRse: function () {
+            $("#rseDiv").hide();
+            $("#rseRpHeader").hide();
+            $("#rseHeader").hide();
+            $("#rseCookie").hide();
+            $("#openRse").removeClass("select_activity");
+            $("#openRseRpHeader").removeClass("select_activity");
+            $("#openRseHeader").removeClass("select_activity");
+            $("#openRseCookie").removeClass("select_activity");
+        },
+        openRseDiv: function () {
+            let t = this;
+            t.closeRse();
+            $("#rseDiv").show();
+            $("#openRse").addClass("select_activity");
+        },
+        openRseRpHeaderDiv: function () {
+            let t = this;
+            t.closeRse();
+            $("#rseRpHeader").show();
+            $("#openRseRpHeader").addClass("select_activity");
+        },
+        openRseHeaderDiv: function () {
+            let t = this;
+            t.closeRse();
+            $("#rseHeader").show();
+            $("#openRseHeader").addClass("select_activity");
+        },
+        openRseCookieDiv: function () {
+            let t = this;
+            t.closeRse();
+            $("#rseCookie").show();
+            $("#openRseCookie").addClass("select_activity");
+        },
+        openGlobalParamModal: function () {
+            let t = this;
+            $("#globalParamModal").modal("show");
+        },
+        openCookieManageModal: function () {
+            let t = this;
+            $("#cookieManageModal").modal("show");
+        },
+        openApiNoteModal: function () {
+            let t = this;
+            $("#apiNoteModal").modal("show");
+        },
+        openCodeModal: function () {
+            let t = this;
+            $("#codeModal").modal("show");
+        },
+        openGotoDirModal: function () {
+            let t = this;
+            $("#gotoDirModal").modal("show");
+        },
+        openDirModal: function () {
+            let t = this;
+            $("#dirModal").modal("show");
+        },
     },
     computed: {
     },

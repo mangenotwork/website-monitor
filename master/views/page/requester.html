@@ -11,12 +11,12 @@
                     <div class="col-2" style="border-right: 1px solid #A9A9A9;padding-top: 12px;">
                         <div>
                             <div class="input-group input-group-sm mb-3">
-                                <input type="text" class="form-control" placeholder="搜索" aria-label="Recipient's username" aria-describedby="button-addon2">
+                                <input type="text" class="form-control" placeholder="搜索" aria-describedby="button-addon2">
                                 <button class="btn btn-outline-secondary" type="button" id="button-addon2">{[ SVG "search" 16 16 ]}</button>
                             </div>
                         </div>
                         <div>
-                            <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+                            <div class="btn-group btn-group-sm" role="group">
                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="新建请求" @click="" style="font-size: 9px;">{[ SVG "lightning" 12 12 ]} </a>
                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="新建目录" @click="" style="font-size: 9px;">{[ SVG "plus-lg" 12 12 ]} </a>
                                 <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="清空历史" @click="" style="font-size: 9px;">{[ SVG "trash-fill" 12 12 ]} </a>
@@ -55,48 +55,27 @@
                             <nav class="small" id="toc">
                                 <ul class="list-unstyled">
                                     <li class="my-2">
-                                        <button class="btn btn-sm d-inline-flex align-items-center border-0 collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#contents-collapse" aria-controls="contents-collapse">接口1</button>
+                                        <button class="btn btn-sm d-inline-flex align-items-center border-0 collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#contents-collapse" aria-controls="contents-collapse">接口1 </button>
+                                        <span @click="openDirModal()" style="float: right;cursor: pointer;margin-top: 4px;">{[ SVG "gear-fill" 16 16 ]}</span>
                                         <ul class="list-unstyled ps-3 collapse" id="contents-collapse" style="">
                                             <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#typography">[GET] Typography </a></li>
                                             <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#images">[GET] Images </a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#tables">[GET] Tables </a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#figures">[GET] Figures </a></li>
                                         </ul>
                                     </li>
                                     <li class="my-2">
                                         <button class="btn btn-sm d-inline-flex align-items-center border-0 collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#forms-collapse" aria-controls="forms-collapse">Forms</button>
+                                        <span @click="openDirModal()" style="float: right;cursor: pointer;margin-top: 4px;">{[ SVG "gear-fill" 16 16 ]}</span>
                                         <ul class="list-unstyled ps-3 collapse" id="forms-collapse" style="">
                                             <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">[GET] Overview</a></li>
                                             <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#disabled-forms">[GET] Disabled forms</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#sizing">[GET] Sizing</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#input-group">[GET] Input group</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#floating-labels">[GET] Floating labels</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#validation">[GET] Validation</a></li>
                                         </ul>
                                     </li>
                                     <li class="my-2">
                                         <button class="btn btn-sm d-inline-flex align-items-center border-0 collapsed" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#components-collapse" aria-controls="components-collapse">Components</button>
+                                        <span @click="openDirModal()" style="float: right;cursor: pointer;margin-top: 4px;">{[ SVG "gear-fill" 16 16 ]}</span>
                                         <ul class="list-unstyled ps-3 collapse" id="components-collapse" style="">
                                             <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#accordion">[GET] Accordion</a></li>
                                             <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#alerts">[GET] Alerts</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#badge">[GET] Badge</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#breadcrumb">[GET] Breadcrumb</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#buttons">[GET] Buttons</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#button-group">[GET] Button group</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#card">[GET] Card</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#carousel">[GET] Carousel</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#dropdowns">[GET] Dropdowns</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#list-group">[GET] List group</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#modal">[GET] Modal</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#navs">[GET] Navs</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#navbar">[GET] Navbar</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#pagination">[GET] Pagination</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#popovers">[GET] Popovers</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#progress">[GET] Progress</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#scrollspy">[GET] Scrollspy</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#spinners">[GET] Spinners</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#toasts">[GET] Toasts</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#tooltips">[GET] Tooltips</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -120,34 +99,35 @@
                         </div>
                         <div class="row">
                             <div class="col-4">
-                                <input class="form-control form-control-sm" type="text" placeholder="接口名称" aria-label="" >
+                                <input class="form-control form-control-sm" type="text" placeholder="接口名称" >
                             </div>
                             <div class="col-8">
-                                <div class="btn-group btn-group-sm" role="group" aria-label="Small button group" style="font-size: 11px;">
-                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="">{[ SVG "lightning" 14 14 ]}新建请求</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="报警信息" @click="">全局参数</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="">Cookie管理</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="新建目录" @click="">全局环境</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="报警信息" @click="">全局参数</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="">Cookie管理</a>
+                                <div class="btn-group btn-group-sm" role="group" style="font-size: 11px;">
+                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="">{[ SVG "lightning" 14 14 ]} 新建请求</a>
+                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openGlobalParamModal()">{[ SVG "text-left" 14 14 ]} 全局参数</a>
+                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openCookieManageModal()">{[ SVG "window" 14 14 ]} Cookie管理</a>
+                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openApiNoteModal()">{[ SVG "pass" 14 14 ]} 接口说明</a>
+                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openCodeModal()">{[ SVG "braces" 14 14 ]} 生成代码</a>
+                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openGotoDirModal()">{[ SVG "folder-plus" 14 14 ]} 保存到目录</a>
                                 </div>
                             </div>
                         </div>
                         <div class="row" style="margin-top: 12px;">
                             <div class="col-8">
                                 <div class="input-group mb-3">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">GET</button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">POST</a></li>
-                                        <li><a class="dropdown-item" href="#">PUT</a></li>
-                                        <li><a class="dropdown-item" href="#">...</a></li>
-                                    </ul>
-                                    <input type="text" class="form-control" style="border-color: #343a40;" aria-label="Text input with dropdown button">
+                                    <select class="form-select" style="width: 20%;border-color: #343a40;">
+                                        <option value="get">GET</option>
+                                        <option value="post">POST</option>
+                                        <option value="put">PUT</option>
+                                        <option value="delete">DELETE</option>
+                                        <option value="options">OPTIONS</option>
+                                        <option value="head">HEAD</option>
+                                    </select>
+                                    <input type="text" class="form-control" style="width: 80%;border-color: #343a40;">
                                 </div>
                             </div>
                             <div class="col-4">
                                 <button type="button" class="btn btn-dark">发送</button>
-                                <button type="button" class="btn btn-dark" style="margin-left: 6px;">保存</button>
                                 <button type="button" class="btn btn-dark" style="margin-left: 6px;">指定发送</button>
                             </div>
                         </div>
@@ -168,38 +148,21 @@
                             <table class="table table-hover table-bordered" id="setHeaderTable">
                                 <tr>
                                     <td style="width: 5%;">
-                                        <input class="form-check-input" type="checkbox" id="gridCheck">
+                                        <input class="form-check-input" type="checkbox" checked="checked">
                                     </td>
                                     <td style="width: 15%;">
-                                        <input class="form-control form-control-sm" type="text" placeholder="Key" aria-label="" style="font-size: 11px;">
+                                        <input class="form-control form-control-sm" type="text" placeholder="Key" style="font-size: 11px;">
                                     </td>
                                     <td style="width: 25%">
-                                        <input class="form-control form-control-sm" type="text" placeholder="Value" aria-label="" style="font-size: 11px;">
-                                    </td>
-                                    <td style="width: 10%;">
-                                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" style="font-size: 11px;">
-                                            <option selected>类型</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
-                                    </td>
-                                    <td style="width: 10%;">
-                                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" style="font-size: 11px;">
-                                            <option selected>必填</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
+                                        <input class="form-control form-control-sm" type="text" placeholder="Value" style="font-size: 11px;">
                                     </td>
                                     <td style="width: 15%;">
-                                        <input class="form-control form-control-sm" type="text" placeholder="描述" aria-label="" style="font-size: 11px;">
+                                        <input class="form-control form-control-sm" type="text" placeholder="描述" style="font-size: 11px;">
                                     </td>
                                     <td style="width: 10%;">
-                                        <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="新建目录" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="报警信息" @click="">{[ SVG "bell-fill" 14 14 ]}</a>
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="">{[ SVG "browser-chrome" 14 14 ]}</a>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="增加行" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
+                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除当前行" @click="">{[ SVG "trash-fill" 14 14 ]}</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -208,38 +171,41 @@
                             <table class="table table-hover table-bordered" id="setQueryTable" style="display:none;">
                                 <tr>
                                     <td style="width: 5%;">
-                                        <input class="form-check-input" type="checkbox">
+                                        <input class="form-check-input" type="checkbox" checked="checked">
                                     </td>
                                     <td style="width: 15%;">
-                                        <input class="form-control form-control-sm" type="text" placeholder="Key" aria-label="" style="font-size: 11px;">
+                                        <input class="form-control form-control-sm" type="text" placeholder="Key" style="font-size: 11px;">
                                     </td>
                                     <td style="width: 25%">
-                                        <input class="form-control form-control-sm" type="text" placeholder="Value" aria-label="" style="font-size: 11px;">
+                                        <input class="form-control form-control-sm" type="text" placeholder="Value" style="font-size: 11px;">
                                     </td>
                                     <td style="width: 10%;">
-                                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" style="font-size: 11px;">
+                                        <select class="form-select form-select-sm" style="font-size: 11px;">
                                             <option selected>类型</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                            <option value="String">String</option>
+                                            <option value="Number">Number</option>
+                                            <option value="Integer">Integer</option>
+                                            <option value="Float">Float</option>
+                                            <option value="Double">Double</option>
+                                            <option value="Bool">Bool</option>
+                                            <option value="Array">Array</option>
+                                            <option value="Object">Object</option>
                                         </select>
                                     </td>
                                     <td style="width: 10%;">
-                                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" style="font-size: 11px;">
+                                        <select class="form-select form-select-sm" style="font-size: 11px;">
                                             <option selected>必填</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                            <option value="0">必填</option>
+                                            <option value="1">非必填</option>
                                         </select>
                                     </td>
                                     <td style="width: 15%;">
-                                        <input class="form-control form-control-sm" type="text" placeholder="描述" aria-label="" style="font-size: 11px;">
+                                        <input class="form-control form-control-sm" type="text" placeholder="描述" style="font-size: 11px;">
                                     </td>
                                     <td style="width: 10%;">
-                                        <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="新建目录" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="报警信息" @click="">{[ SVG "bell-fill" 14 14 ]}</a>
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="">{[ SVG "browser-chrome" 14 14 ]}</a>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="增加行" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
+                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除当前行" @click="">{[ SVG "trash-fill" 14 14 ]}</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -286,53 +252,166 @@
                                     <textarea class="form-control" rows="5"></textarea>
                                 </div>
                                 <div id="bodyFromData" style="display:none;">
-                                    bodyFromData
+                                    <table class="table table-hover table-bordered">
+                                        <tr>
+                                            <td style="width: 5%;">
+                                                <input class="form-check-input" type="checkbox" checked="checked">
+                                            </td>
+                                            <td style="width: 15%;">
+                                                <input class="form-control form-control-sm" type="text" placeholder="Key" style="font-size: 11px;">
+                                            </td>
+                                            <td style="width: 25%">
+                                                <div class="input-group">
+                                                    <select class="form-select" style="width: 30%;font-size: 11px;">
+                                                        <option value="text">text</option>
+                                                        <option value="file">file</option>
+                                                    </select>
+                                                    <input type="text" class="form-control" style="width: 70%;font-size: 11px;">
+                                                </div>
+                                            </td>
+                                            <td style="width: 10%;">
+                                                <select class="form-select form-select-sm" style="font-size: 11px;">
+                                                    <option selected>类型</option>
+                                                    <option value="String">String</option>
+                                                    <option value="Number">Number</option>
+                                                    <option value="Integer">Integer</option>
+                                                    <option value="Float">Float</option>
+                                                    <option value="Double">Double</option>
+                                                    <option value="Bool">Bool</option>
+                                                    <option value="Array">Array</option>
+                                                    <option value="Object">Object</option>
+                                                </select>
+                                            </td>
+                                            <td style="width: 10%;">
+                                                <select class="form-select form-select-sm" style="font-size: 11px;">
+                                                    <option selected>必填</option>
+                                                    <option value="0">必填</option>
+                                                    <option value="1">非必填</option>
+                                                </select>
+                                            </td>
+                                            <td style="width: 15%;">
+                                                <input class="form-control form-control-sm" type="text" placeholder="描述" style="font-size: 11px;">
+                                            </td>
+                                            <td style="width: 10%;">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="增加行" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
+                                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除当前行" @click="">{[ SVG "trash-fill" 14 14 ]}</a></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
                                 <div id="bodyXwwwFrom" style="display:none;">
-                                    bodyXwwwFrom
+                                    <table class="table table-hover table-bordered">
+                                        <tr>
+                                            <td style="width: 5%;">
+                                                <input class="form-check-input" type="checkbox" checked="checked">
+                                            </td>
+                                            <td style="width: 15%;">
+                                                <input class="form-control form-control-sm" type="text" placeholder="Key" style="font-size: 11px;">
+                                            </td>
+                                            <td style="width: 25%">
+                                                <input class="form-control form-control-sm" type="text" placeholder="Value" style="font-size: 11px;">
+                                            </td>
+                                            <td style="width: 10%;">
+                                                <select class="form-select form-select-sm" style="font-size: 11px;">
+                                                    <option selected>类型</option>
+                                                    <option value="String">String</option>
+                                                    <option value="Number">Number</option>
+                                                    <option value="Integer">Integer</option>
+                                                    <option value="Float">Float</option>
+                                                    <option value="Double">Double</option>
+                                                    <option value="Bool">Bool</option>
+                                                    <option value="Array">Array</option>
+                                                    <option value="Object">Object</option>
+                                                </select>
+                                            </td>
+                                            <td style="width: 10%;">
+                                                <select class="form-select form-select-sm" style="font-size: 11px;">
+                                                    <option selected>必填</option>
+                                                    <option value="0">必填</option>
+                                                    <option value="1">非必填</option>
+                                                </select>
+                                            </td>
+                                            <td style="width: 15%;">
+                                                <input class="form-control form-control-sm" type="text" placeholder="描述" style="font-size: 11px;">
+                                            </td>
+                                            <td style="width: 10%;">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="增加行" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
+                                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除当前行" @click="">{[ SVG "trash-fill" 14 14 ]}</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
                                 <div id="bodyXml" style="display:none;">
-                                    bodyXml
+                                    <textarea class="form-control" rows="5"></textarea>
                                 </div>
                                 <div id="bodyText" style="display:none;">
-                                    bodyText
+                                    <textarea class="form-control" rows="5"></textarea>
                                 </div>
-
                             </div>
-
-
                         </div>
-
                         <hr>
                         <div style="font-size: 11px;margin-top: -12px;">
                             <ul class="nav">
-                                <li class="nav-item select_activity">
-                                    <a class="nav-link" href="#">响应结果</a>
+                                <li class="nav-item select_activity" id="openRse">
+                                    <a class="nav-link" @click="openRseDiv()" style="cursor: pointer;">响应结果</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">请求头</a>
+                                <li class="nav-item" id="openRseRpHeader">
+                                    <a class="nav-link" @click="openRseRpHeaderDiv()" style="cursor: pointer;">请求头</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">响应头</a>
+                                <li class="nav-item" id="openRseHeader">
+                                    <a class="nav-link" @click="openRseHeaderDiv()" style="cursor: pointer;">响应头</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Cookie</a>
+                                <li class="nav-item" id="openRseCookie">
+                                    <a class="nav-link" @click="openRseCookieDiv()" style="cursor: pointer;">Cookie</a>
                                 </li>
                             </ul>
                         </div>
                         <p style="font-size: 11px;margin: 4px;" > >>> <span style="color: red;">响应状态码: 404;</span> 响应时间: 16ms; 请求器: node2 @192.168.3.86 |内网: 192.168.3.86 | 公网: 171.214.202.23 中国 四川省 成都市 电信 | </p>
                         <div style="height: 230px;overflow: auto;border: 1px solid #A9A9A9;">
-                            <pre style="background-color: #f3f3f3;"></pre>
-
+                            <div id="rseDiv">
+                                <pre style="background-color: #f3f3f3;"></pre>
+                            </div>
+                            <div id="rseRpHeader" style="display:none;">
+                                <table class="table table-hover table-bordered">
+                                    <tr>
+                                        <td style="width: 50%;">Key</td>
+                                        <td style="width: 50%;">Value</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="rseHeader" style="display:none;">
+                                <table class="table table-hover table-bordered">
+                                    <tr>
+                                        <td style="width: 50%;">Key</td>
+                                        <td style="width: 50%;">Value</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="rseCookie" style="display: none;">
+                                <table class="table table-hover table-bordered">
+                                    <tr>
+                                        <td style="width: 50%;">Key</td>
+                                        <td style="width: 50%;">Value</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-
                     </div>
+
+                    {[ template "add_host_modal.html" . ]}
+                    {[ template "mail_set_modal.html" . ]}
+                    {[ template "toast.html" . ]}
+                    {[ template "requester_api_note_modal.html" . ]}
+                    {[ template "requester_code_modal.html" . ]}
+                    {[ template "requester_cookie_manage_modal.html" . ]}
+                    {[ template "requester_global_param_modal.html" . ]}
+                    {[ template "requester_goto_dir_modal.html" . ]}
+                    {[ template "requester_dir_modal.html" . ]}
                 </div>
-
-
-                {[ template "add_host_modal.html" . ]}
-                {[ template "mail_set_modal.html" . ]}
-                {[ template "toast.html" . ]}
             </main>
         </div>
     </div>

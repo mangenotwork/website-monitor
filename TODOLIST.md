@@ -68,8 +68,12 @@
 - [ok] master 全局开关邮件通知
 - [ok] master 导航栏 快速请求
 - [ok] master 请求器 页面设计
-- master 请求器 页面设计 几种Body界面设计
-- master 请求器 交互设计
+- [ok] master 请求器 页面设计 几种Body界面设计
+- [ok] master 请求器 交互设计
+- master 请求接口
+- master 历史请求
+- master 创建请求目录
+- master 请求保存
 - master 指定 monitor 请求，未指定默认 master请求
 - master 请求器 请求记录
 - master 请求器 保存请求 增删改查
@@ -79,7 +83,7 @@
 - v0.0.1 git发布  2023-10-31
 
 [bug]
-4. [ok] ipc信息读取不到
+4. ipc信息读取不到 (有反爬，可以找替代或者解决反爬)
 14. monitor 关闭 retry; retry会卡住 (等gathertool提供方法)
 15. 修改了超时时间 monitor 视乎没有起效果，报警信息还是之前的超时做对比
 16. 对照组 code=0 ,还继续执行了监测
