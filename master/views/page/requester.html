@@ -153,19 +153,19 @@
                         </div>
                         <div style="border-bottom: 1px solid #A9A9A9;font-size: 11px;margin-top: -12px;">
                             <ul class="nav">
-                                <li class="nav-item" style="border-bottom: 1px solid #0C0C0C;">
-                                    <a class="nav-link" style="color: #0C0C0C;" href="#">Header</a>
+                                <li class="nav-item select_activity" id="openHeaderLi">
+                                    <a class="nav-link" @click="openHeaderTable()" style="cursor: pointer;">Header</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Query</a>
+                                <li class="nav-item" id="openQueryLi">
+                                    <a class="nav-link" @click="openQueryTable()" style="cursor: pointer;">Query</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Body</a>
+                                <li class="nav-item" id="openBodyLi">
+                                    <a class="nav-link" @click="openBodyTable()" style="cursor: pointer;">Body</a>
                                 </li>
                             </ul>
                         </div>
                         <div style="height: 180px;overflow: auto;">
-                            <table class="table table-hover table-bordered">
+                            <table class="table table-hover table-bordered" id="setHeaderTable">
                                 <tr>
                                     <td style="width: 5%;">
                                         <input class="form-check-input" type="checkbox" id="gridCheck">
@@ -204,13 +204,110 @@
                                     </td>
                                 </tr>
                             </table>
+
+                            <table class="table table-hover table-bordered" id="setQueryTable" style="display:none;">
+                                <tr>
+                                    <td style="width: 5%;">
+                                        <input class="form-check-input" type="checkbox">
+                                    </td>
+                                    <td style="width: 15%;">
+                                        <input class="form-control form-control-sm" type="text" placeholder="Key" aria-label="" style="font-size: 11px;">
+                                    </td>
+                                    <td style="width: 25%">
+                                        <input class="form-control form-control-sm" type="text" placeholder="Value" aria-label="" style="font-size: 11px;">
+                                    </td>
+                                    <td style="width: 10%;">
+                                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" style="font-size: 11px;">
+                                            <option selected>类型</option>
+                                            <option value="1">One</option>
+                                            <option value="2">Two</option>
+                                            <option value="3">Three</option>
+                                        </select>
+                                    </td>
+                                    <td style="width: 10%;">
+                                        <select class="form-select form-select-sm" aria-label=".form-select-sm example" style="font-size: 11px;">
+                                            <option selected>必填</option>
+                                            <option value="1">One</option>
+                                            <option value="2">Two</option>
+                                            <option value="3">Three</option>
+                                        </select>
+                                    </td>
+                                    <td style="width: 15%;">
+                                        <input class="form-control form-control-sm" type="text" placeholder="描述" aria-label="" style="font-size: 11px;">
+                                    </td>
+                                    <td style="width: 10%;">
+                                        <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="新建目录" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
+                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="报警信息" @click="">{[ SVG "bell-fill" 14 14 ]}</a>
+                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="">{[ SVG "browser-chrome" 14 14 ]}</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div id="setBodyTable" style="display:none;">
+                                <div style="width: 100%; margin-top: 4px; margin-bottom: 8px;">
+                                    <template v-if="bodyType=='json'">
+                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('json')">application/json</button>
+                                    </template>
+                                    <template v-else >
+                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('json')">application/json</button>
+                                    </template>
+
+                                    <template v-if="bodyType=='from-data'">
+                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('from-data')">multipart/from-data</button>
+                                    </template>
+                                    <template v-else >
+                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('from-data')">multipart/from-data</button>
+                                    </template>
+
+                                    <template v-if="bodyType=='x-www-form-urlencoded'">
+                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('x-www-form-urlencoded')">application/x-www-form-urlencoded</button>
+                                    </template>
+                                    <template v-else >
+                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('x-www-form-urlencoded')">application/x-www-form-urlencoded</button>
+                                    </template>
+
+                                    <template v-if="bodyType=='xml'">
+                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('xml')">application/xml</button>
+                                    </template>
+                                    <template v-else >
+                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('xml')">application/xml</button>
+                                    </template>
+
+                                    <template v-if="bodyType=='plain'">
+                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('plain')">text/plain</button>
+                                    </template>
+                                    <template v-else >
+                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('plain')">text/plain</button>
+                                    </template>
+                                </div>
+                                <div id="bodyJson">
+                                    <textarea class="form-control" rows="5"></textarea>
+                                </div>
+                                <div id="bodyFromData" style="display:none;">
+                                    bodyFromData
+                                </div>
+                                <div id="bodyXwwwFrom" style="display:none;">
+                                    bodyXwwwFrom
+                                </div>
+                                <div id="bodyXml" style="display:none;">
+                                    bodyXml
+                                </div>
+                                <div id="bodyText" style="display:none;">
+                                    bodyText
+                                </div>
+
+                            </div>
+
+
                         </div>
 
                         <hr>
                         <div style="font-size: 11px;margin-top: -12px;">
                             <ul class="nav">
-                                <li class="nav-item" style="border-bottom: 1px solid #0C0C0C;">
-                                    <a class="nav-link" style="color: #0C0C0C;" href="#">响应结果</a>
+                                <li class="nav-item select_activity">
+                                    <a class="nav-link" href="#">响应结果</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="#">请求头</a>
