@@ -35,7 +35,7 @@ func RunUDPServer() {
 }
 
 func MonitorRse(s *udp.Servers, c *udp.ClientInfo, param []byte) {
-	udp.Info("接收到监测结果  param = ", string(param))
+	//udp.Info("接收到监测结果  param = ", string(param))
 	ip := c.Addr.String()
 	mLogStr := string(param) + ip + "|"
 	mLogDao := dao.NewMonitorLogDao()

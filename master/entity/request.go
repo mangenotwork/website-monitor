@@ -38,3 +38,11 @@ type CookieManage struct {
 	Host   string            `json:"host"`   // host
 	Cookie map[string]string `json:"cookie"` // cookie
 }
+
+// RequesterGlobalHeader 全局header
+type RequesterGlobalHeader struct {
+	Key    string `json:"key"`
+	Value  string `json:"value"`
+	Enable bool   `json:"enable"`
+	Note   string `json:"note"` // 描述
+}

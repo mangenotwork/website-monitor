@@ -108,12 +108,23 @@ func API() {
 	api.GET("/tool/website/tdki", ginHelper.Handle(handler.GetWebSiteTDKI))        // 获取网站的T, D, K, 图标
 	api.GET("/tool/website/collectInfo", ginHelper.Handle(handler.CollectWebSite)) // 采集网站信息
 	api.GET("/tool/icp", ginHelper.Handle(handler.GetICP))                         // 查询备案
-	api.GET("/tool/ping", ginHelper.Handle(handler.Ping))                          // TODO ping
-	// TODO 端口搜索
+	api.GET("/tool/ping", ginHelper.Handle(handler.Ping))                          // ping
+	// TODO 网站宿主ip端口扫描
 
 	// monitor
 	api.GET("/monitor/list", ginHelper.Handle(handler.MonitorList))     // 监测器列表，在线情况
 	api.GET("/monitor/ipaddr", ginHelper.Handle(handler.MonitorIPAddr)) // 测试获取ip地址属地信息
+
+	// requester
+	api.POST("/requester/execute", ginHelper.Handle(handler.RequesterExecute))               // TODO 请求调试执行
+	api.GET("/requester/list", ginHelper.Handle(handler.RequesterList))                      // TODO 请求调试列表
+	api.GET("/requester/history/list", ginHelper.Handle(handler.RequesterHistoryList))       // TODO 请求调试历史列表
+	api.GET("/requester/history/delete", ginHelper.Handle(handler.RequesterHistoryDelete))   // TODO 请求调试历史删除
+	api.GET("/requester/dir/creat", ginHelper.Handle(handler.RequesterDirCreat))             // TODO 请求目录-创建
+	api.GET("/requester/dir/list", ginHelper.Handle(handler.RequesterDirList))               // TODO 请求目录-列表
+	api.GET("/requester/dir/join", ginHelper.Handle(handler.RequesterDirJoin))               // TODO 请求目录-加入
+	api.POST("/requester/global/header", ginHelper.Handle(handler.RequesterGlobalHeaderSet)) // TODO 设置全局Header
+	api.GET("/requester/global/header", ginHelper.Handle(handler.RequesterGlobalHeaderGet))  // TODO 获取全局Header
 }
 
 func Data() {

@@ -70,10 +70,11 @@
 - [ok] master 请求器 页面设计
 - [ok] master 请求器 页面设计 几种Body界面设计
 - [ok] master 请求器 交互设计
-- master 请求接口
-- master 历史请求
-- master 创建请求目录
-- master 请求保存
+- master 全局Header相关接口
+- master 请求相关接口
+- master 历史请求相关接口
+- master 创建请求目录相关接口
+- master 请求保存相关接口
 - master 指定 monitor 请求，未指定默认 master请求
 - master 请求器 请求记录
 - master 请求器 保存请求 增删改查

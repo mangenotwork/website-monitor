@@ -149,7 +149,7 @@ func RequesterPage(c *gin.Context) {
 		http.StatusOK,
 		"requester.html",
 		ginH(gin.H{
-			"nav": "pequester",
+			"nav": "requester",
 		}),
 	)
 }

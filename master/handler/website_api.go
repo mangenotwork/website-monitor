@@ -583,3 +583,91 @@ func AlertClear(c *ginHelper.GinCtx) {
 	c.APIOutPut("成功", "成功")
 	return
 }
+
+type RequesterExecuteParam struct {
+	Name         string         `json:"name"`         // api name
+	Note         string         `json:"note"`         // api note
+	Method       string         `json:"method"`       // 请求类型
+	Url          string         `json:"url"`          // 请求url
+	Header       map[string]any `json:"header"`       // 请求header
+	BodyType     string         `json:"bodyType"`     // 请求body type
+	BodyJson     string         `json:"bodyJson"`     // body json
+	BodyFromData map[string]any `json:"bodyFromData"` // body from-data
+	BodyXWWWFrom map[string]any `json:"bodyXWWWFrom"` // body x-www-from
+	BodyXml      string         `json:"bodyXml"`      // body xml
+	BodyText     string         `json:"bodyText"`     // body text
+}
+
+func RequesterExecute(c *ginHelper.GinCtx) {
+	param := &RequesterExecuteParam{}
+	err := c.GetPostArgs(param)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	if !isMethod(param.Method) {
+		c.APIOutPutError(nil, "未知的请求类型")
+		return
+	}
+	if len(param.Url) < 1 {
+		c.APIOutPutError(nil, "请求地址为空")
+		return
+	}
+	if len(param.Name) == 0 {
+		param.Name = "新建请求"
+	}
+	log.Info("param = ", param)
+}
+
+func isMethod(method string) bool {
+	rse := false
+	for _, v := range []string{"get", "post", "put", "delete", "options", "head"} {
+		if method == v {
+			rse = true
+			break
+		}
+	}
+	return rse
+}
+
+func RequesterList(c *ginHelper.GinCtx) {
+
+}
+
+func RequesterHistoryList(c *ginHelper.GinCtx) {
+
+}
+
+func RequesterHistoryDelete(c *ginHelper.GinCtx) {
+
+}
+
+func RequesterDirCreat(c *ginHelper.GinCtx) {
+
+}
+
+func RequesterDirList(c *ginHelper.GinCtx) {
+
+}
+
+func RequesterDirJoin(c *ginHelper.GinCtx) {
+
+}
+
+type RequesterGlobalHeaderSetParam struct {
+	List []*entity.RequesterGlobalHeader `json:"list"`
+}
+
+func RequesterGlobalHeaderSet(c *ginHelper.GinCtx) {
+	param := &RequesterGlobalHeaderSetParam{}
+	err := c.GetPostArgs(param)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	log.Info("param = ", param)
+}
+
+func RequesterGlobalHeaderGet(c *ginHelper.GinCtx) {
+
+}

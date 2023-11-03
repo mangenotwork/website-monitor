@@ -11,26 +11,32 @@ import (
 
 // Table
 const (
-	MailTable               = "mail_table"
-	WebSiteTable            = "website_table"
-	WebSiteInfoTable        = "website_Info_table"
-	WebsiteAlarmRuleTable   = "website_alarm_rule_table"
-	WebsiteScanCheckUpTable = "website_scan_checkup_table"
-	WebSiteURITable         = "website_url_table"
-	WebSiteUrlPointTable    = "website_url_point_table"
-	WebSiteAlertTable       = "website_alert_table"
-	IPTable                 = "ip_table"
-	MasterConfTable         = "master_conf_table"
-	HistoryWebsiteTDKITable = "History_WebsiteTDKI_table"
-	HistoryIpTable          = "History_Ip_table"
-	HistoryNsLookUpTable    = "History_NsLookUp_table"
-	HistoryWhoisTable       = "History_Whois_table"
-	HistoryICPTable         = "History_ICP_table"
-	HistoryPingTable        = "History_Ping_table"
-	HistorySSLTable         = "History_SSL_table"
-	HistoryWebsiteInfoTable = "History_WebsiteInfo_table"
-	AlertTable              = "alert_table"
-	AlertWebsiteTable       = "alert_website_table"
+	MailTable                = "mail_table"
+	WebSiteTable             = "website_table"
+	WebSiteInfoTable         = "website_Info_table"
+	WebsiteAlarmRuleTable    = "website_alarm_rule_table"
+	WebsiteScanCheckUpTable  = "website_scan_checkup_table"
+	WebSiteURITable          = "website_url_table"
+	WebSiteUrlPointTable     = "website_url_point_table"
+	WebSiteAlertTable        = "website_alert_table"
+	IPTable                  = "ip_table"
+	MasterConfTable          = "master_conf_table"
+	HistoryWebsiteTDKITable  = "History_WebsiteTDKI_table"
+	HistoryIpTable           = "History_Ip_table"
+	HistoryNsLookUpTable     = "History_NsLookUp_table"
+	HistoryWhoisTable        = "History_Whois_table"
+	HistoryICPTable          = "History_ICP_table"
+	HistoryPingTable         = "History_Ping_table"
+	HistorySSLTable          = "History_SSL_table"
+	HistoryWebsiteInfoTable  = "History_WebsiteInfo_table"
+	AlertTable               = "alert_table"
+	AlertWebsiteTable        = "alert_website_table"
+	RequestTable             = "Request_Table"             // Request
+	RequestDirTable          = "RequestDir_Table"          // RequestDir
+	RequestCookieTable       = "RequestCookie_Table"       // RequestCookie
+	RequestGlobalHeaderTable = "RequestGlobalHeader_Table" // RequestGlobalHeader
+	RequestNowListTable      = "RequestNowList_Table"      // RequestNowList 导航栏上的请求
+
 )
 
 // KeyName
@@ -56,6 +62,7 @@ var (
 		WebSiteURITable, WebSiteUrlPointTable, WebSiteAlertTable, IPTable, MasterConfTable,
 		HistoryWebsiteTDKITable, HistoryIpTable, HistoryNsLookUpTable, HistoryWhoisTable, HistoryICPTable,
 		HistoryPingTable, HistorySSLTable, HistoryWebsiteInfoTable, AlertTable, AlertWebsiteTable,
+		RequestTable, RequestDirTable, RequestCookieTable, RequestGlobalHeaderTable, RequestNowListTable,
 	}
 	DB     = NewLocalDB(DBPath, Tables)
 	ISNULL = fmt.Errorf("ISNULL")
