@@ -20,6 +20,7 @@ type AlertEr interface {
 	Read(id string) error                                    // 消息标记为已读
 	Del(id string) error                                     // 删除报警信息
 	Clear(hostId string) error                               // 清空网站的报警信息
+	ClearAll() error                                         // 清空所有报警信息
 }
 
 func NewAlert() AlertEr {
@@ -75,6 +76,9 @@ func (a *alertDao) GetList() ([]*entity.AlertData, error) {
 	err := conn.View(func(tx *bolt.Tx) error {
 		// Assume bucket exists and has keys
 		b := tx.Bucket([]byte(AlertTable))
+		if b == nil {
+			return ISNULL
+		}
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			data := &entity.AlertData{}
@@ -157,6 +161,10 @@ func (a *alertDao) Clear(hostId string) error {
 		_ = DB.Delete(AlertTable, v)
 	}
 	return DB.Delete(AlertWebsiteTable, hostId)
+}
+
+func (a *alertDao) ClearAll() error {
+	return DB.ClearTable(AlertTable)
 }
 
 // AlertTimeInfoMap 记录报警超时次数

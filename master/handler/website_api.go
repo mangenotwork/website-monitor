@@ -584,6 +584,16 @@ func AlertClear(c *ginHelper.GinCtx) {
 	return
 }
 
+func AlertAllClear(c *ginHelper.GinCtx) {
+	err := dao.NewAlert().ClearAll()
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("成功", "成功")
+	return
+}
+
 type RequesterExecuteParam struct {
 	Name         string         `json:"name"`         // api name
 	Note         string         `json:"note"`         // api note
@@ -666,8 +676,32 @@ func RequesterGlobalHeaderSet(c *ginHelper.GinCtx) {
 		return
 	}
 	log.Info("param = ", param)
+	err = dao.NewRequestTool().SetGlobalHeader(param.List)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("成功", "成功")
+	return
 }
 
 func RequesterGlobalHeaderGet(c *ginHelper.GinCtx) {
+	data, err := dao.NewRequestTool().GetGlobalHeader()
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut(data, "成功")
+	return
+}
 
+func RequesterGlobalHeaderDel(c *ginHelper.GinCtx) {
+	key := c.Query("key")
+	err := dao.NewRequestTool().DelGlobalHeader(key)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("成功", "成功")
+	return
 }

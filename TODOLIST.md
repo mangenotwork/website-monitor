@@ -70,7 +70,7 @@
 - [ok] master 请求器 页面设计
 - [ok] master 请求器 页面设计 几种Body界面设计
 - [ok] master 请求器 交互设计
-- master 全局Header相关接口
+- [ok] master 全局Header相关接口
 - master 请求相关接口
 - master 历史请求相关接口
 - master 创建请求目录相关接口
@@ -85,6 +85,17 @@
 
 [bug]
 4. ipc信息读取不到 (有反爬，可以找替代或者解决反爬)
+```
+替换地址
+
+https://www.aichaicp.com/latest
+https://m.chaicp.com/icp.html
+https://icplishi.com/
+http://freeicp.com/
+https://icp.5118.com/
+
+
+```
 14. monitor 关闭 retry; retry会卡住 (等gathertool提供方法)
 15. 修改了超时时间 monitor 视乎没有起效果，报警信息还是之前的超时做对比
 16. 对照组 code=0 ,还继续执行了监测
@@ -232,4 +243,16 @@ https://github.com/luijait/GONET-Scanner
 https://github.com/qq431169079/PortScanner-3
 ```
 
+---
 
+DOS库 参考
+```
+https://github.com/grafov/hulk
+https://github.com/marant/goloris
+https://github.com/IgorHalfeld/lagoinha
+https://github.com/UBISOFT-1/AnonymousPAK-DDoS
+https://github.com/XORbit01/ddosarmy
+https://github.com/Xart3mis/AKILT
+https://github.com/jantechner/dos-attacker
+https://github.com/a7600999/goformdos
+```
