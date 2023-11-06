@@ -85,7 +85,7 @@ func (item *WebsiteItem) ContrastActive(mLog *MonitorLog) bool {
 	}
 	mLog.ContrastUriCode = contrastCode
 	mLog.ContrastUriMs = contrastMs
-	if item.AlertRuleCode(contrastCode) {
+	if item.AlertRuleCode(contrastCode) || contrastCode == 0 {
 		contrastErr = true
 		mLog.Msg += fmt.Sprintf("对照组请求失败code=%d!", contrastCode)
 		item.Put(item.mLogSerialize(mLog))

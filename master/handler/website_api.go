@@ -3,7 +3,9 @@ package handler
 import (
 	"fmt"
 	gt "github.com/mangenotwork/gathertool"
+	"net/http"
 	"sort"
+	"strings"
 	"time"
 	"website-monitor/master/business"
 
@@ -608,6 +610,22 @@ type RequesterExecuteParam struct {
 	BodyText     string         `json:"bodyText"`     // body text
 }
 
+type RequesterExecuteOut struct {
+	ID         string              `json:"id"`         // 请求记录的id
+	Name       string              `json:"name"`       // api name
+	Note       string              `json:"note"`       // api note
+	Method     string              `json:"method"`     // 请求类型
+	Url        string              `json:"url"`        // 请求url
+	RespCode   int                 `json:"respCode"`   // 请求结果-code
+	RespMs     string              `json:"respMs"`     // 请求响应时间
+	RespBody   string              `json:"respBody"`   // 请求结果
+	RespHeader map[string][]string `json:"respHeader"` // 响应头
+	RespCookie []*http.Cookie      `json:"respCookie"` // cookie信息
+	RseHeader  map[string][]string `json:"rseHeader"`  // 请求头
+	HostIP     string              `json:"hostIP"`     // 请求主机的ip
+	HostIPAddr string              `json:"hostIPAddr"` // 请求主机的ip属地
+}
+
 func RequesterExecute(c *ginHelper.GinCtx) {
 	param := &RequesterExecuteParam{}
 	err := c.GetPostArgs(param)
@@ -615,6 +633,7 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+	param.Method = strings.ToUpper(param.Method)
 	if !isMethod(param.Method) {
 		c.APIOutPutError(nil, "未知的请求类型")
 		return
@@ -627,11 +646,51 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 		param.Name = "新建请求"
 	}
 	log.Info("param = ", param)
+
+	switch param.Method {
+	case "GET":
+		log.Info("get 请求...")
+		ctx, err := gt.Get(param.Url)
+		if err != nil {
+			log.Error(err)
+		}
+		// TODO 设计输出，body根据Content-Type序列化
+		// TODO 记录请求
+		// TODO 获取服务器IP与属地
+		log.Info(ctx.Resp.Header)
+		out := &RequesterExecuteOut{
+			Name:       param.Name,
+			Note:       param.Note,
+			Method:     param.Method,
+			Url:        param.Url,
+			RespCode:   ctx.StateCode,
+			RespMs:     ctx.Ms.String(),
+			RespBody:   string(ctx.RespBody),
+			RespHeader: ctx.Resp.Header,
+			RespCookie: ctx.Resp.Cookies(),
+			RseHeader:  ctx.Req.Header,
+			HostIP:     ctx.Req.RemoteAddr,
+			HostIPAddr: "",
+		}
+		c.APIOutPut(out, "")
+		return
+	case "POST":
+		log.Info("post 请求...")
+	case "PUT":
+		log.Info("put 请求...")
+	case "DELETE":
+		log.Info("delete 请求...")
+	case "OPTIONS":
+		log.Info("options 请求...")
+	case "HEAD":
+		log.Info("head 请求...")
+	}
+
 }
 
 func isMethod(method string) bool {
 	rse := false
-	for _, v := range []string{"get", "post", "put", "delete", "options", "head"} {
+	for _, v := range []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"} {
 		if method == v {
 			rse = true
 			break

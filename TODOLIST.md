@@ -86,27 +86,19 @@
 [bug]
 4. ipc信息读取不到 (有反爬，可以找替代或者解决反爬)
 ```
-替换地址
-
+替换地址:
 https://www.aichaicp.com/latest
 https://m.chaicp.com/icp.html
 https://icplishi.com/
 http://freeicp.com/
 https://icp.5118.com/
-
-
 ```
-14. monitor 关闭 retry; retry会卡住 (等gathertool提供方法)
 15. 修改了超时时间 monitor 视乎没有起效果，报警信息还是之前的超时做对比
-16. 对照组 code=0 ,还继续执行了监测
-```
-请求失败，err=Get "https://www.8200.cn": dial tcp: lookup www.8200.cn: no such host	对照组:https://www.baidu.com, code:0, ms:636| Ping:223.5.5.5, ms:253
-```
 17. unexpected EOF 请求错误忽略
 ```
 2023-11-02 09:52:36 https://www.97654.com请求超时 : Get "https://www.97654.com": context deadline exceeded (Client.Timeout exceeded while awaiting headers) ;
 ```
-18. 随机监测的url 需要排除无效标签，如下
+18. [ok] 随机监测的url 需要排除无效标签，如下
 ```
 https://www.8300.cn/zst/ssqjbw4;
 ```

@@ -313,11 +313,13 @@ func Struct2Buf(any2 any) []byte {
 }
 
 func request(url string) (int, int64, error) {
-	ctx, err := gt.Get(url, gt.Header{
-		"Accept-Encoding": "gzip, deflate, br",
-		"Referer":         url,
-	},
-		gt.RetryTimes(1), // 重试设为0
+	ctx, err := gt.Get(
+		url,
+		gt.Header{
+			"Accept-Encoding": "gzip, deflate, br",
+			"Referer":         url,
+		},
+		gt.IsRetry(false),
 	)
 	if err != nil {
 		log.Error(err)

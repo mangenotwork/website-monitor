@@ -52,13 +52,13 @@ func Scan(host, id string, depth int64) {
 	}
 	log.Info("扫描完成....")
 	for u, _ := range hostScan.UrlSet {
-		websiteUrl.AllUri = append(websiteUrl.AllUri, u)
+		websiteUrl.AllUri = append(websiteUrl.AllUri, cleanUrl(u))
 	}
 	for e, _ := range hostScan.ExtLinks {
-		websiteUrl.ExtLink = append(websiteUrl.ExtLink, e)
+		websiteUrl.ExtLink = append(websiteUrl.ExtLink, cleanUrl(e))
 	}
 	for b, _ := range hostScan.BadLinks {
-		websiteUrl.BadLink = append(websiteUrl.BadLink, b)
+		websiteUrl.BadLink = append(websiteUrl.BadLink, cleanUrl(b))
 	}
 	for k, v := range hostScan.NoneTDK {
 		websiteUrl.NoneTDK[k] = v
@@ -229,4 +229,20 @@ func usefulUrl(str string) bool {
 		return false
 	}
 	return true
+}
+
+// 清洗一下采集到的 url
+func cleanUrl(str string) string {
+	// bug:最后一个字符是特殊字符`;`
+	flag := false
+	strLast := str[len(str)-1:]
+	for _, v := range []string{";"} {
+		if strLast == v {
+			flag = true
+		}
+	}
+	if flag {
+		return str[:len(str)-1]
+	}
+	return str
 }
