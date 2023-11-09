@@ -31,7 +31,9 @@ const app = createApp({
                 len: 0,
             },
             createTabApi: "/api/requester/create/tab",
-            getNowApi: function (id) {return "/api/requester/data/"+id; },
+            getNowApi: function (id) { return "/api/requester/data/"+id; },
+            closeTabApi: function (id) { return "/api/requester/close/tab/"+id; },
+            deleteHistoryApi: function (id) { return  "/api/requester/history/delete/"+id; },
         }
     },
     created:function(){
@@ -67,11 +69,40 @@ const app = createApp({
                 }
             });
         },
+        openTab: function (id) {
+            let t = this;
+            t.param.reqId = id;
+
+            for (item in t.nowReqList.list) {
+                if (t.nowReqList.list[item].id === id ) {
+                    t.nowReqList.list[item].isNow = true;
+                } else {
+                    t.nowReqList.list[item].isNow = false;
+                }
+            }
+            t.getNow();
+        },
+        closeTab: function (id) {
+            let t = this;
+            common.AjaxGet(t.closeTabApi(id), function (data){
+                if (data.code === 0) {
+                    for (item in t.nowReqList.list) {
+                        if (t.nowReqList.list[item].id === id ) {
+                            t.nowReqList.list.splice(item, 1);
+                        }
+                    }
+                    if (t.nowReqList.list.length === 0) {
+                        t.getNowReqList();
+                    }
+                }
+            });
+        },
         createTab: function () {
             let t = this;
             common.AjaxGet(t.createTabApi, function (data){
                 if (data.code === 0) {
                     t.getNowReqList()
+                    $('.gdtiao').scrollLeft(0);
                 }
             });
         },
@@ -94,6 +125,14 @@ const app = createApp({
                   // t.param.bodyText = "",
               }
           });
+        },
+        deleteHistory: function (id) {
+            let t = this;
+            common.AjaxGet(this.deleteHistoryApi(id), function (data){
+                if (data.code === 0) {
+                    t.getHistory();
+                }
+            });
         },
         closeSet: function () {
             console.log("closeSet");

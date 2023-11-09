@@ -27,7 +27,7 @@
                         <div style="height: 240px;overflow: auto;">
                             <ul style="font-size: 9px;">
                                 <template v-for="item in history.list">
-                                    <li><a class="" href="#">[{{ item.method }}] {{ item.name }}</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
+                                    <li><a class="" href="#">[{{ item.method }}] {{ item.name }}</a> <span @click="deleteHistory(item.id)" style="float: right;margin-right: 4px;cursor: pointer;">{[ SVG "trash-fill" 12 12 ]}</span></li>
                                 </template>
                             </ul>
                         </div>
@@ -67,20 +67,17 @@
                     </div>
                     <div class="col-10" style="padding: 12px;padding-top: 2px;">
                         <div style="margin-bottom: 8px;">
-                            <ul class="nav nav-tabs" style="width: 100%;height:54px;flex-direction: row;flex-wrap: nowrap;overflow-x: scroll;font-size: 11px;">
-
+                            <ul class="nav nav-tabs gdtiao" style="width: 100%;height:54px;flex-direction: row;flex-wrap: nowrap;overflow-x: scroll;font-size: 11px;">
                                 <template v-for="item in nowReqList.list">
                                     <li class="nav-item">
                                         <template v-if="item.isNow == true">
-                                            <a class="nav-link active" aria-current="page" href="#" style="width: 200px;">[GET] {{ item.name }} <span style="float: right;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
+                                            <a class="nav-link active" aria-current="page" href="#" style="width: 200px;">[GET] {{ item.name }} <span @click="closeTab(item.id)" style="float: right;cursor: pointer;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
                                         </template>
                                         <template v-else>
-                                            <a class="nav-link" href="#" style="width: 200px;">[GET] {{ item.name }} <span style="float: right;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
+                                            <a class="nav-link" @click="openTab(item.id)" style="width: 200px;">[GET] {{ item.name }} <span @click="closeTab(item.id)" style="float: right;cursor: pointer;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
                                         </template>
                                     </li>
                                 </template>
-
-
                             </ul>
                         </div>
                         <div class="row">
@@ -89,7 +86,7 @@
                             </div>
                             <div class="col-8">
                                 <div class="btn-group btn-group-sm" role="group" style="font-size: 11px;">
-                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="">{[ SVG "lightning" 14 14 ]} 新建请求</a>
+                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="createTab()">{[ SVG "lightning" 14 14 ]} 新建请求</a>
                                     <a type="button" class="btn btn-outline-dark btn-sm" @click="openGlobalParamModal()">{[ SVG "text-left" 14 14 ]} 全局参数</a>
                                     <a type="button" class="btn btn-outline-dark btn-sm" @click="openCookieManageModal()">{[ SVG "window" 14 14 ]} Cookie管理</a>
                                     <a type="button" class="btn btn-outline-dark btn-sm" @click="openApiNoteModal()">{[ SVG "pass" 14 14 ]} 接口说明</a>

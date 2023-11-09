@@ -609,6 +609,17 @@ func RequesterCreateTab(c *ginHelper.GinCtx) {
 	return
 }
 
+func RequesterCloseTab(c *ginHelper.GinCtx) {
+	hostId := c.Param("reqId")
+	err := dao.NewRequestTool().DelRequestNowList(hostId)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("成功", "成功")
+	return
+}
+
 type RequesterExecuteParam struct {
 	ReqId        string         `json:"reqId"`        // 请求id 确认当前窗口
 	Name         string         `json:"name"`         // api name
@@ -764,6 +775,7 @@ func RequesterHistoryList(c *ginHelper.GinCtx) {
 func RequesterHistoryDelete(c *ginHelper.GinCtx) {
 	reqId := c.Param("reqId")
 	err := dao.NewRequestTool().HistoryDelete(reqId)
+	err = dao.NewRequestTool().DelRequestNowList(reqId)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
 		return

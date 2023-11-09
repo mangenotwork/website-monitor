@@ -118,6 +118,7 @@ func API() {
 
 	// requester
 	api.GET("/requester/create/tab", ginHelper.Handle(handler.RequesterCreateTab))                // 创建一个新请求标签页
+	api.GET("/requester/close/tab/:reqId", ginHelper.Handle(handler.RequesterCloseTab))           // 删除一个标签页
 	api.POST("/requester/execute", ginHelper.Handle(handler.RequesterExecute))                    // TODO 请求调试执行
 	api.GET("/requester/data/:reqId", ginHelper.Handle(handler.RequesterGetData))                 // 获取指定请求数据
 	api.GET("/requester/list", ginHelper.Handle(handler.RequesterList))                           // 请求调试列表

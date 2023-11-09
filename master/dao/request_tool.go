@@ -3,6 +3,8 @@ package dao
 import (
 	"encoding/json"
 	"github.com/boltdb/bolt"
+	"github.com/mangenotwork/common/log"
+	"github.com/mangenotwork/common/utils"
 	"sort"
 	"time"
 	"website-monitor/master/entity"
@@ -18,6 +20,7 @@ type RequestToolEr interface {
 	DelGlobalHeader(key string) error
 	SetRequestNowList(data *entity.RequestNowList) error
 	GetRequestNowList() ([]*entity.RequestNowList, error)
+	DelRequestNowList(id string) error
 }
 
 func NewRequestTool() RequestToolEr {
@@ -43,6 +46,10 @@ func (r *requestToolDao) Add(data *entity.RequestTool) error {
 func (r *requestToolDao) GetAtID(id string) (*entity.RequestTool, error) {
 	data := &entity.RequestTool{}
 	err := DB.Get(RequestTable, id, &data)
+	if err == ISNULL { // 空数据忽略
+		err = nil
+		data.Method = "GET"
+	}
 	return data, err
 }
 
@@ -79,11 +86,18 @@ func (r *requestToolDao) SetRequestNowList(data *entity.RequestNowList) error {
 	return DB.Set(RequestNowListTable, data.Id, data)
 }
 
+func (r *requestToolDao) initRequestNowList() (*entity.RequestNowList, error) {
+	data := &entity.RequestNowList{
+		Id:     utils.IDStr(),
+		Name:   "新建请求",
+		Method: "GET",
+	}
+	err := DB.Set(RequestNowListTable, data.Id, data)
+	return data, err
+}
+
 func (r *requestToolDao) GetRequestNowList() ([]*entity.RequestNowList, error) {
 	conn := GetDBConn()
-	defer func() {
-		_ = conn.Close()
-	}()
 	list := make([]*entity.RequestNowList, 0)
 	err := conn.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(RequestNowListTable))
@@ -101,6 +115,11 @@ func (r *requestToolDao) GetRequestNowList() ([]*entity.RequestNowList, error) {
 		}
 		return nil
 	})
+	_ = conn.Close()
+	if len(list) < 1 {
+		data, _ := r.initRequestNowList()
+		list = append(list, data)
+	}
 	sort.Slice(list, func(i, j int) bool {
 		if list[i].Time > list[j].Time {
 			return true
@@ -109,6 +128,11 @@ func (r *requestToolDao) GetRequestNowList() ([]*entity.RequestNowList, error) {
 	})
 	list[0].IsNow = true
 	return list, err
+}
+
+func (r *requestToolDao) DelRequestNowList(id string) error {
+	log.Info("id = ", id)
+	return DB.Delete(RequestNowListTable, id)
 }
 
 func (r *requestToolDao) SetGlobalHeader(list []*entity.RequesterGlobalHeader) error {
