@@ -3,7 +3,6 @@ package handler
 import (
 	"fmt"
 	gt "github.com/mangenotwork/gathertool"
-	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -596,6 +595,20 @@ func AlertAllClear(c *ginHelper.GinCtx) {
 	return
 }
 
+func RequesterCreateTab(c *ginHelper.GinCtx) {
+	err := dao.NewRequestTool().SetRequestNowList(&entity.RequestNowList{
+		Id:   utils.IDStr(),
+		Name: "新建请求",
+		Time: time.Now().Unix(),
+	})
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("成功", "成功")
+	return
+}
+
 type RequesterExecuteParam struct {
 	ReqId        string         `json:"reqId"`        // 请求id 确认当前窗口
 	Name         string         `json:"name"`         // api name
@@ -609,25 +622,6 @@ type RequesterExecuteParam struct {
 	BodyXWWWFrom map[string]any `json:"bodyXWWWFrom"` // body x-www-from
 	BodyXml      string         `json:"bodyXml"`      // body xml
 	BodyText     string         `json:"bodyText"`     // body text
-}
-
-type RequesterExecuteOut struct {
-	ID             string              `json:"id"`             // 请求记录的id
-	Name           string              `json:"name"`           // api name
-	Note           string              `json:"note"`           // api note
-	Method         string              `json:"method"`         // 请求类型
-	Url            string              `json:"url"`            // 请求url
-	RespCode       int                 `json:"respCode"`       // 请求结果-code
-	RespMs         string              `json:"respMs"`         // 请求响应时间
-	RespBody       string              `json:"respBody"`       // 请求结果
-	RespHeader     map[string][]string `json:"respHeader"`     // 响应头
-	RespCookie     []*http.Cookie      `json:"respCookie"`     // cookie信息
-	RseHeader      map[string][]string `json:"rseHeader"`      // 请求头
-	HostIP         string              `json:"hostIP"`         // 请求主机的ip
-	HostIPAddr     string              `json:"hostIPAddr"`     // 请求主机的ip属地
-	ClientName     string              `json:"clientName"`     // 请求器昵称
-	ClientIP       string              `json:"clientIP"`       // 内网
-	ClientPublicIP string              `json:"clientPublicIP"` // 公网
 }
 
 func RequesterExecute(c *ginHelper.GinCtx) {
@@ -651,7 +645,8 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 	}
 	log.Info("param = ", param)
 	if param.ReqId == "" {
-		param.ReqId = utils.IDMd5()
+		c.APIOutPutError(nil, "请求id为空")
+		return
 	}
 	switch param.Method {
 	case "GET":
@@ -663,12 +658,12 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 
 		// TODO 设计输出，body根据Content-Type序列化
 		// TODO 记录请求
-		addErr := dao.NewRequestTool().Add(&entity.RequestTool{
+		out := &entity.RequestTool{
 			ID:     param.ReqId,
 			Name:   param.Name,
-			Notes:  param.Note,
-			Url:    param.Url,
+			Note:   param.Note,
 			Method: param.Method,
+			Url:    param.Url,
 			// TODO...
 			//UserAgent      : ctx.Req    string            `json:"userAgent"`          // 指定userAgent
 			//UserAgentRandom    int               `json:"userAgentRandom"`    // userAgent 随机
@@ -686,26 +681,13 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 			ResponseHeader: ctx.Resp.Header,
 			ResponseCookie: ctx.Resp.Cookies(),
 			ResponseBody:   string(ctx.RespBody),
-		})
+			RequestHeader:  ctx.Req.Header,
+			HostIP:         ctx.Req.RemoteAddr,
+			HostIPAddr:     "",
+		}
+		addErr := dao.NewRequestTool().Add(out)
 		if addErr != nil {
 			log.Error(addErr)
-		}
-		// TODO 获取服务器IP与属地
-
-		out := &RequesterExecuteOut{
-			ID:         param.ReqId,
-			Name:       param.Name,
-			Note:       param.Note,
-			Method:     param.Method,
-			Url:        param.Url,
-			RespCode:   ctx.StateCode,
-			RespMs:     ctx.Ms.String(),
-			RespBody:   string(ctx.RespBody),
-			RespHeader: ctx.Resp.Header,
-			RespCookie: ctx.Resp.Cookies(),
-			RseHeader:  ctx.Req.Header,
-			HostIP:     ctx.Req.RemoteAddr,
-			HostIPAddr: "",
 		}
 		c.APIOutPut(out, "")
 		return
@@ -734,16 +716,60 @@ func isMethod(method string) bool {
 	return rse
 }
 
-func RequesterList(c *ginHelper.GinCtx) {
+func RequesterGetData(c *ginHelper.GinCtx) {
+	reqId := c.Param("reqId")
+	data, err := dao.NewRequestTool().GetAtID(reqId)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut(data, "成功")
+	return
+}
 
+func RequesterList(c *ginHelper.GinCtx) {
+	data, err := dao.NewRequestTool().GetRequestNowList()
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut(data, "成功")
+	return
+}
+
+type OutRequesterHistoryList struct {
+	Id     string `json:"id"`
+	Method string `json:"method"`
+	Name   string `json:"name"`
 }
 
 func RequesterHistoryList(c *ginHelper.GinCtx) {
-
+	data, err := dao.NewRequestTool().History()
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	list := make([]*OutRequesterHistoryList, 0)
+	for _, v := range data {
+		list = append(list, &OutRequesterHistoryList{
+			Id:     v.ID,
+			Method: v.Method,
+			Name:   v.Name,
+		})
+	}
+	c.APIOutPut(list, "成功")
+	return
 }
 
 func RequesterHistoryDelete(c *ginHelper.GinCtx) {
-
+	reqId := c.Param("reqId")
+	err := dao.NewRequestTool().HistoryDelete(reqId)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("成功", "成功")
+	return
 }
 
 func RequesterDirCreat(c *ginHelper.GinCtx) {

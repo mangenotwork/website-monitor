@@ -25,28 +25,10 @@
                         <hr>
                         <span style="font-size: 9px;">历史</span>
                         <div style="height: 240px;overflow: auto;">
-
                             <ul style="font-size: 9px;">
-                                <li><a class="" href="#accordion">[GET] Accordion</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#alerts">[GET] Alerts</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#badge">[GET] Badge</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#breadcrumb">[GET] Breadcrumb</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#buttons">[GET] Buttons</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#button-group">[GET] Button group</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#card">[GET] Card</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#carousel">[GET] Carousel</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#dropdowns">[GET] Dropdowns</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#list-group">[GET] List group</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#modal">[GET] Modal</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#navs">[GET] Navs</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#navbar">[GET] Navbar</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#pagination">[GET] Pagination</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#popovers">[GET] Popovers</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#progress">[GET] Progress</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#scrollspy">[GET] Scrollspy</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#spinners">[GET] Spinners</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#toasts">[GET] Toasts</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#tooltips">[GET] Tooltips</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
+                                <template v-for="item in history.list">
+                                    <li><a class="" href="#">[{{ item.method }}] {{ item.name }}</a> <span style="float: right;margin-right: 4px;">{[ SVG "trash-fill" 12 12 ]}</span></li>
+                                </template>
                             </ul>
                         </div>
                         <hr>
@@ -86,15 +68,19 @@
                     <div class="col-10" style="padding: 12px;padding-top: 2px;">
                         <div style="margin-bottom: 8px;">
                             <ul class="nav nav-tabs" style="width: 100%;height:54px;flex-direction: row;flex-wrap: nowrap;overflow-x: scroll;font-size: 11px;">
-                                <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#" style="width: 200px;">[GET] Activeasdasdasda <span style="float: right;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#" style="width: 200px;">[GET]Link <span style="float: right;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#" style="width: 200px;">[GET]Link <span style="float: right;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
-                                </li>
+
+                                <template v-for="item in nowReqList.list">
+                                    <li class="nav-item">
+                                        <template v-if="item.isNow == true">
+                                            <a class="nav-link active" aria-current="page" href="#" style="width: 200px;">[GET] {{ item.name }} <span style="float: right;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
+                                        </template>
+                                        <template v-else>
+                                            <a class="nav-link" href="#" style="width: 200px;">[GET] {{ item.name }} <span style="float: right;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
+                                        </template>
+                                    </li>
+                                </template>
+
+
                             </ul>
                         </div>
                         <div class="row">
@@ -116,12 +102,12 @@
                             <div class="col-8">
                                 <div class="input-group mb-3">
                                     <select class="form-select" v-model="param.method" style="width: 20%;border-color: #343a40;">
-                                        <option value="get">GET</option>
-                                        <option value="post">POST</option>
-                                        <option value="put">PUT</option>
-                                        <option value="delete">DELETE</option>
-                                        <option value="options">OPTIONS</option>
-                                        <option value="head">HEAD</option>
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                        <option value="PUT">PUT</option>
+                                        <option value="DELETE">DELETE</option>
+                                        <option value="OPTIONS">OPTIONS</option>
+                                        <option value="HEAD">HEAD</option>
                                     </select>
                                     <input type="text" class="form-control" v-model="param.url" style="width: 80%;border-color: #343a40;">
                                 </div>
@@ -380,7 +366,7 @@
                             </div>
                             <div id="rseRpHeader" style="display:none;">
                                 <table class="table table-hover table-bordered" style="font-size: 11px;">
-                                    <template v-for="v,k in resp.rseHeader ">
+                                    <template v-for="v,k in resp.reqHeader ">
                                         <tr><td style="width: 30%;">{{ k }}</td><td style="width: 70%;">{{ v }}</td></tr>
                                     </template>
                                 </table>

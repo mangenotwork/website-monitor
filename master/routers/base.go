@@ -117,16 +117,20 @@ func API() {
 	api.GET("/monitor/ipaddr", ginHelper.Handle(handler.MonitorIPAddr)) // 测试获取ip地址属地信息
 
 	// requester
-	api.POST("/requester/execute", ginHelper.Handle(handler.RequesterExecute))                  // TODO 请求调试执行
-	api.GET("/requester/list", ginHelper.Handle(handler.RequesterList))                         // TODO 请求调试列表
-	api.GET("/requester/history/list", ginHelper.Handle(handler.RequesterHistoryList))          // TODO 请求调试历史列表
-	api.GET("/requester/history/delete", ginHelper.Handle(handler.RequesterHistoryDelete))      // TODO 请求调试历史删除
-	api.GET("/requester/dir/creat", ginHelper.Handle(handler.RequesterDirCreat))                // TODO 请求目录-创建
-	api.GET("/requester/dir/list", ginHelper.Handle(handler.RequesterDirList))                  // TODO 请求目录-列表
-	api.GET("/requester/dir/join", ginHelper.Handle(handler.RequesterDirJoin))                  // TODO 请求目录-加入
-	api.POST("/requester/global/header", ginHelper.Handle(handler.RequesterGlobalHeaderSet))    // 设置全局Header
-	api.GET("/requester/global/header", ginHelper.Handle(handler.RequesterGlobalHeaderGet))     // 获取全局Header
-	api.GET("/requester/global/header/del", ginHelper.Handle(handler.RequesterGlobalHeaderDel)) // 删除指定Header
+	api.GET("/requester/create/tab", ginHelper.Handle(handler.RequesterCreateTab))                // 创建一个新请求标签页
+	api.POST("/requester/execute", ginHelper.Handle(handler.RequesterExecute))                    // TODO 请求调试执行
+	api.GET("/requester/data/:reqId", ginHelper.Handle(handler.RequesterGetData))                 // 获取指定请求数据
+	api.GET("/requester/list", ginHelper.Handle(handler.RequesterList))                           // 请求调试列表
+	api.GET("/requester/history/list", ginHelper.Handle(handler.RequesterHistoryList))            // 请求调试历史列表
+	api.GET("/requester/history/delete/:reqId", ginHelper.Handle(handler.RequesterHistoryDelete)) // 请求调试历史删除
+	api.GET("/requester/history/creat", ginHelper.Handle(handler.RequesterHistoryDelete))         // TODO 请求调试历史删除
+	api.GET("/requester/dir/creat", ginHelper.Handle(handler.RequesterDirCreat))                  // TODO 请求目录-创建
+	api.GET("/requester/dir/list", ginHelper.Handle(handler.RequesterDirList))                    // TODO 请求目录-列表
+	api.GET("/requester/dir/join", ginHelper.Handle(handler.RequesterDirJoin))                    // TODO 请求目录-加入
+	api.POST("/requester/global/header", ginHelper.Handle(handler.RequesterGlobalHeaderSet))      // 设置全局Header
+	api.GET("/requester/global/header", ginHelper.Handle(handler.RequesterGlobalHeaderGet))       // 获取全局Header
+	api.GET("/requester/global/header/del", ginHelper.Handle(handler.RequesterGlobalHeaderDel))   // 删除指定Header
+
 }
 
 func Data() {

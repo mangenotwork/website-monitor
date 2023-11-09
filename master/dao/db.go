@@ -36,7 +36,6 @@ const (
 	RequestCookieTable       = "RequestCookie_Table"       // RequestCookie
 	RequestGlobalHeaderTable = "RequestGlobalHeader_Table" // RequestGlobalHeader
 	RequestNowListTable      = "RequestNowList_Table"      // RequestNowList 导航栏上的请求
-
 )
 
 // KeyName

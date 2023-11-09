@@ -7,9 +7,10 @@ const app = createApp({
             webSite: AddWebSite,
             bodyType: "json",
             param: {
+                reqId: "",
                 name : "新建请求",
                 note : "",
-                method : "get",
+                method : "GET",
                 url : "",
                 header : {},
                 bodyType : "",
@@ -20,15 +21,80 @@ const app = createApp({
                 bodyText : "",
             },
             resp:{},
+            history: {
+                api: "/api/requester/history/list",
+                list: [],
+            },
+            nowReqList: {
+                api: "/api/requester/list",
+                list: [],
+                len: 0,
+            },
+            createTabApi: "/api/requester/create/tab",
+            getNowApi: function (id) {return "/api/requester/data/"+id; },
         }
     },
     created:function(){
         let t = this;
         t.mail.getInfo();
+
+        t.getHistory();
+        t.getNowReqList();
     },
     destroyed:function () {
     },
     methods: {
+        getHistory: function () {
+            let t = this;
+            common.AjaxGet(t.history.api, function (data) {
+               if (data.code === 0) {
+                   t.history.list = data.data;
+               }
+            });
+        },
+        getNowReqList: function () {
+            let t = this;
+            common.AjaxGet(t.nowReqList.api, function (data) {
+                if (data.code === 0) {
+                    t.nowReqList.list = data.data;
+                    t.nowReqList.len = t.nowReqList.list.length;
+                    if (t.nowReqList.len === 0) {
+                       t.createTab();
+                    }else {
+                        t.param.reqId = t.nowReqList.list[0].id;
+                        t.getNow();
+                    }
+                }
+            });
+        },
+        createTab: function () {
+            let t = this;
+            common.AjaxGet(t.createTabApi, function (data){
+                if (data.code === 0) {
+                    t.getNowReqList()
+                }
+            });
+        },
+        getNow: function () {
+          let t = this;
+          common.AjaxGet(t.getNowApi(t.param.reqId), function (data) {
+              if (data.code === 0) {
+                  console.log(data.data);
+                  t.resp = data.data;
+                  t.param.name = data.data.name;
+                  t.param.note = data.data.note;
+                  t.param.method = data.data.method;
+                  t.param.url = data.data.url;
+                  t.param.header = data.data.header;
+                  // t.param.bodyType = data.data.bodyType;
+                  // t.param.bodyJson = data.data.bodyJson;
+                  // t.param.bodyFromData = data.data.bodyFromData;
+                  // t.param.bodyXWWWFrom = ""
+                  // t.param.bodyXml = ""
+                  // t.param.bodyText = "",
+              }
+          });
+        },
         closeSet: function () {
             console.log("closeSet");
             $("#setHeaderTable").hide();
@@ -159,6 +225,8 @@ const app = createApp({
                 console.log(data);
                 if (data.code === 0 ){
                     t.resp = data.data;
+                    t.getNowReqList();
+                    t.getHistory();
                 }
             });
         },

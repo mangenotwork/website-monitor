@@ -6,7 +6,7 @@ import "net/http"
 type RequestTool struct {
 	ID                 string              `json:"id"`                 // id
 	Name               string              `json:"name"`               // 请求名称
-	Notes              string              `json:"notes"`              // 请求描述
+	Note               string              `json:"note"`               // 请求描述
 	Url                string              `json:"url"`                //
 	Method             string              `json:"method"`             // 请求方法
 	UserAgent          string              `json:"userAgent"`          // 指定userAgent
@@ -19,12 +19,18 @@ type RequestTool struct {
 	BodyText           string              `json:"bodyText"`           // text/plain
 	IsOpenRetry        int                 `json:"isOpenRetry"`        // 是否开启重试 0:关  1:开
 	RetryItems         int                 `json:"retryItems"`         // 重试次数
-	RequestTime        string              `json:"requestTime"`        // 请求时间 什么时候开始请求的
-	ResponseCode       int                 `json:"responseCode"`       // Response code
-	ResponseTime       string              `json:"responseTime"`       // Response time
-	ResponseHeader     map[string][]string `json:"responseHeader"`     // 响应头
-	ResponseCookie     []*http.Cookie      `json:"responseCookie"`     //  Response cookie
-	ResponseBody       string              `json:"responseBody"`       // Response body text
+	RequestTime        string              `json:"reqTime"`            // 请求时间 什么时候开始请求的
+	ResponseCode       int                 `json:"respCode"`           // Response code
+	ResponseTime       string              `json:"respTime"`           // Response time
+	ResponseHeader     map[string][]string `json:"respHeader"`         // 响应头
+	ResponseCookie     []*http.Cookie      `json:"respCookie"`         //  Response cookie
+	ResponseBody       string              `json:"respBody"`           // Response body text
+	RequestHeader      map[string][]string `json:"reqHeader"`          // request header
+	HostIP             string              `json:"hostIP"`             // 请求主机的ip
+	HostIPAddr         string              `json:"hostIPAddr"`         // 请求主机的ip属地
+	ClientName         string              `json:"clientName"`         // 请求器昵称
+	ClientIP           string              `json:"clientIP"`           // 内网
+	ClientPublicIP     string              `json:"clientPublicIP"`     // 公网
 }
 
 // RequestToolDir 请求目录
@@ -47,4 +53,14 @@ type RequesterGlobalHeader struct {
 	Value  string `json:"value"`
 	Enable bool   `json:"enable"`
 	Note   string `json:"note"` // 描述
+}
+
+// RequestNowList 当前请求列表
+type RequestNowList struct {
+	Id     string `json:"id"`
+	Method string `json:"method"`
+	Url    string `json:"url"`
+	Name   string `json:"name"`
+	IsNow  bool   `json:"isNow"`
+	Time   int64  `json:"time"` // 主要用于排序
 }
