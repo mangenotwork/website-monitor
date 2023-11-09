@@ -597,6 +597,7 @@ func AlertAllClear(c *ginHelper.GinCtx) {
 }
 
 type RequesterExecuteParam struct {
+	ReqId        string         `json:"reqId"`        // 请求id 确认当前窗口
 	Name         string         `json:"name"`         // api name
 	Note         string         `json:"note"`         // api note
 	Method       string         `json:"method"`       // 请求类型
@@ -611,19 +612,22 @@ type RequesterExecuteParam struct {
 }
 
 type RequesterExecuteOut struct {
-	ID         string              `json:"id"`         // 请求记录的id
-	Name       string              `json:"name"`       // api name
-	Note       string              `json:"note"`       // api note
-	Method     string              `json:"method"`     // 请求类型
-	Url        string              `json:"url"`        // 请求url
-	RespCode   int                 `json:"respCode"`   // 请求结果-code
-	RespMs     string              `json:"respMs"`     // 请求响应时间
-	RespBody   string              `json:"respBody"`   // 请求结果
-	RespHeader map[string][]string `json:"respHeader"` // 响应头
-	RespCookie []*http.Cookie      `json:"respCookie"` // cookie信息
-	RseHeader  map[string][]string `json:"rseHeader"`  // 请求头
-	HostIP     string              `json:"hostIP"`     // 请求主机的ip
-	HostIPAddr string              `json:"hostIPAddr"` // 请求主机的ip属地
+	ID             string              `json:"id"`             // 请求记录的id
+	Name           string              `json:"name"`           // api name
+	Note           string              `json:"note"`           // api note
+	Method         string              `json:"method"`         // 请求类型
+	Url            string              `json:"url"`            // 请求url
+	RespCode       int                 `json:"respCode"`       // 请求结果-code
+	RespMs         string              `json:"respMs"`         // 请求响应时间
+	RespBody       string              `json:"respBody"`       // 请求结果
+	RespHeader     map[string][]string `json:"respHeader"`     // 响应头
+	RespCookie     []*http.Cookie      `json:"respCookie"`     // cookie信息
+	RseHeader      map[string][]string `json:"rseHeader"`      // 请求头
+	HostIP         string              `json:"hostIP"`         // 请求主机的ip
+	HostIPAddr     string              `json:"hostIPAddr"`     // 请求主机的ip属地
+	ClientName     string              `json:"clientName"`     // 请求器昵称
+	ClientIP       string              `json:"clientIP"`       // 内网
+	ClientPublicIP string              `json:"clientPublicIP"` // 公网
 }
 
 func RequesterExecute(c *ginHelper.GinCtx) {
@@ -646,7 +650,9 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 		param.Name = "新建请求"
 	}
 	log.Info("param = ", param)
-
+	if param.ReqId == "" {
+		param.ReqId = utils.IDMd5()
+	}
 	switch param.Method {
 	case "GET":
 		log.Info("get 请求...")
@@ -654,11 +660,40 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 		if err != nil {
 			log.Error(err)
 		}
+
 		// TODO 设计输出，body根据Content-Type序列化
 		// TODO 记录请求
+		addErr := dao.NewRequestTool().Add(&entity.RequestTool{
+			ID:     param.ReqId,
+			Name:   param.Name,
+			Notes:  param.Note,
+			Url:    param.Url,
+			Method: param.Method,
+			// TODO...
+			//UserAgent      : ctx.Req    string            `json:"userAgent"`          // 指定userAgent
+			//UserAgentRandom    int               `json:"userAgentRandom"`    // userAgent 随机
+			//Header             map[string]string `json:"header"`             // header
+			//Query              map[string]string `json:"query"`              // url上的请求参数
+			//BodyFormData       map[string]string `json:"bodyFormData"`       // multipart/from-data
+			//BodyFromUrlEncoded map[string]string `json:"bodyFromUrlEncoded"` // application/x-www-from-urlencoded
+			//BodyJson           string            `json:"bodyJson"`           // application/json
+			//BodyText           string            `json:"bodyText"`           // text/plain
+			//IsOpenRetry        int               `json:"isOpenRetry"`        // 是否开启重试 0:关  1:开
+			//RetryItems         int               `json:"retryItems"`         // 重试次数
+			RequestTime:    utils.NowDate(),
+			ResponseCode:   ctx.StateCode,
+			ResponseTime:   ctx.Ms.String(),
+			ResponseHeader: ctx.Resp.Header,
+			ResponseCookie: ctx.Resp.Cookies(),
+			ResponseBody:   string(ctx.RespBody),
+		})
+		if addErr != nil {
+			log.Error(addErr)
+		}
 		// TODO 获取服务器IP与属地
-		log.Info(ctx.Resp.Header)
+
 		out := &RequesterExecuteOut{
+			ID:         param.ReqId,
 			Name:       param.Name,
 			Note:       param.Note,
 			Method:     param.Method,

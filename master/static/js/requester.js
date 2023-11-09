@@ -6,6 +6,20 @@ const app = createApp({
             mail: Mail,
             webSite: AddWebSite,
             bodyType: "json",
+            param: {
+                name : "新建请求",
+                note : "",
+                method : "get",
+                url : "",
+                header : {},
+                bodyType : "",
+                bodyJson : "",
+                bodyFromData : {},
+                bodyXWWWFrom : {},
+                bodyXml : "",
+                bodyText : "",
+            },
+            resp:{},
         }
     },
     created:function(){
@@ -136,6 +150,17 @@ const app = createApp({
         openDirModal: function () {
             let t = this;
             $("#dirModal").modal("show");
+        },
+        // 发送
+        execute: function () {
+            let t = this;
+            console.log(t.param);
+            common.AjaxPost("/api/requester/execute", t.param, function (data){
+                console.log(data);
+                if (data.code === 0 ){
+                    t.resp = data.data;
+                }
+            });
         },
     },
     computed: {

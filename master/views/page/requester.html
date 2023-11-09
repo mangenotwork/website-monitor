@@ -99,7 +99,7 @@
                         </div>
                         <div class="row">
                             <div class="col-4">
-                                <input class="form-control form-control-sm" type="text" placeholder="接口名称" >
+                                <input class="form-control form-control-sm" v-model="param.name" type="text" placeholder="接口名称" >
                             </div>
                             <div class="col-8">
                                 <div class="btn-group btn-group-sm" role="group" style="font-size: 11px;">
@@ -115,7 +115,7 @@
                         <div class="row" style="margin-top: 12px;">
                             <div class="col-8">
                                 <div class="input-group mb-3">
-                                    <select class="form-select" style="width: 20%;border-color: #343a40;">
+                                    <select class="form-select" v-model="param.method" style="width: 20%;border-color: #343a40;">
                                         <option value="get">GET</option>
                                         <option value="post">POST</option>
                                         <option value="put">PUT</option>
@@ -123,11 +123,11 @@
                                         <option value="options">OPTIONS</option>
                                         <option value="head">HEAD</option>
                                     </select>
-                                    <input type="text" class="form-control" style="width: 80%;border-color: #343a40;">
+                                    <input type="text" class="form-control" v-model="param.url" style="width: 80%;border-color: #343a40;">
                                 </div>
                             </div>
                             <div class="col-4">
-                                <button type="button" class="btn btn-dark">发送</button>
+                                <button type="button" class="btn btn-dark" @click="execute()">发送</button>
                                 <button type="button" class="btn btn-dark" style="margin-left: 6px;">指定发送</button>
                             </div>
                         </div>
@@ -370,33 +370,50 @@
                                 </li>
                             </ul>
                         </div>
-                        <p style="font-size: 11px;margin: 4px;" > >>> <span style="color: red;">响应状态码: 404;</span> 响应时间: 16ms; 请求器: node2 @192.168.3.86 |内网: 192.168.3.86 | 公网: 171.214.202.23 中国 四川省 成都市 电信 | </p>
+                        <p style="font-size: 11px;margin: 4px;" > >>> <span style="color: red;">响应状态码: {{ resp.respCode }};</span>
+                            响应时间: {{ resp.respMs }}; 请求器: {{ resp.clientName }} |内网: {{ resp.clientIP }} | 公网: {{ resp.clientPublicIP }} | </p>
                         <div style="height: 230px;overflow: auto;border: 1px solid #A9A9A9;">
                             <div id="rseDiv">
-                                <pre style="background-color: #f3f3f3;"></pre>
+                                <pre style="background-color: #f3f3f3;">
+                                    {{ resp.respBody }}
+                                </pre>
                             </div>
                             <div id="rseRpHeader" style="display:none;">
-                                <table class="table table-hover table-bordered">
-                                    <tr>
-                                        <td style="width: 50%;">Key</td>
-                                        <td style="width: 50%;">Value</td>
-                                    </tr>
+                                <table class="table table-hover table-bordered" style="font-size: 11px;">
+                                    <template v-for="v,k in resp.rseHeader ">
+                                        <tr><td style="width: 30%;">{{ k }}</td><td style="width: 70%;">{{ v }}</td></tr>
+                                    </template>
                                 </table>
                             </div>
                             <div id="rseHeader" style="display:none;">
-                                <table class="table table-hover table-bordered">
-                                    <tr>
-                                        <td style="width: 50%;">Key</td>
-                                        <td style="width: 50%;">Value</td>
-                                    </tr>
+                                <table class="table table-hover table-bordered" style="font-size: 11px;">
+                                    <template v-for="v,k in resp.respHeader ">
+                                        <tr><td style="width: 30%;">{{ k }}</td><td style="width: 70%;">{{ v }}</td></tr>
+                                    </template>
                                 </table>
                             </div>
                             <div id="rseCookie" style="display: none;">
-                                <table class="table table-hover table-bordered">
+                                <table class="table table-hover table-bordered" style="font-size: 11px;">
                                     <tr>
-                                        <td style="width: 50%;">Key</td>
-                                        <td style="width: 50%;">Value</td>
+                                        <td style="width: 50px;">Name</td>
+                                        <td style="width: 100px;">Value</td>
+                                        <td style="width: 25px;">HttpOnly</td>
+                                        <td style="width: 50px;">Domain</td>
+                                        <td style="width: 50px;">RawExpires</td>
+                                        <td style="width: 25px;">Path</td>
+                                        <td style="width: 25px;">Secure</td>
                                     </tr>
+                                    <template v-for="item in resp.respCookie ">
+                                        <tr>
+                                            <td>{{ item.Name }}</td>
+                                            <td>{{ item.Value }}</td>
+                                            <td>{{ item.HttpOnly }}</td>
+                                            <td>{{ item.Domain }}</td>
+                                            <td>{{ item.RawExpires }}</td>
+                                            <td>{{ item.Path }}</td>
+                                            <td>{{ item.Secure }}</td>
+                                        </tr>
+                                    </template>
                                 </table>
                             </div>
                         </div>

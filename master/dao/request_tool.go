@@ -7,6 +7,7 @@ import (
 )
 
 type RequestToolEr interface {
+	Add(data *entity.RequestTool) error
 	SetGlobalHeader(list []*entity.RequesterGlobalHeader) error
 	GetGlobalHeader() ([]*entity.RequesterGlobalHeader, error)
 	DelGlobalHeader(key string) error
@@ -17,6 +18,10 @@ func NewRequestTool() RequestToolEr {
 }
 
 type requestToolDao struct{}
+
+func (r *requestToolDao) Add(data *entity.RequestTool) error {
+	return DB.Set(RequestTable, data.ID, data)
+}
 
 func (r *requestToolDao) SetGlobalHeader(list []*entity.RequesterGlobalHeader) error {
 	var err error
