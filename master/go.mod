@@ -3,7 +3,6 @@ module website-monitor/master
 go 1.19
 
 require (
-	gitee.com/mangenotework/commander/common v0.0.0-20230831141532-5893fcd6005c
 	github.com/boltdb/bolt v1.3.1
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.9.1
