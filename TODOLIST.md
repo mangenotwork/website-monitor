@@ -72,6 +72,10 @@
 - [ok] master 全局Header相关接口
 
 #### v0.0.3
+
+主要是优化和改bug
+
+- 增加代码可读性 [ok]
 - 代码评审和优化
 - UI界面优化
 - 交互逻辑优化
@@ -79,15 +83,13 @@
 - 修改bug
 
 #### v0.0.4
-- 使用说明
-- master 请求相关接口
-- master 历史请求相关接口
-- master 创建请求目录相关接口
-- master 请求保存相关接口
-- master 指定 monitor 请求，未指定默认 master请求
-- master 请求器 请求记录
-- master 请求器 保存请求 增删改查
-- master 扫描检查证书过期时间
+
+主要是提升监控的准确性和监控维度的调优
+
+
+
+
+
 
 
 [bug]
@@ -113,6 +115,15 @@ https://www.8300.cn/zst/ssqjbw4;
 
 
 ### 需求池
+- 使用说明
+- master 请求相关接口
+- master 历史请求相关接口
+- master 创建请求目录相关接口
+- master 请求保存相关接口
+- master 指定 monitor 请求，未指定默认 master请求
+- master 请求器 请求记录
+- master 请求器 保存请求 增删改查
+- master 扫描检查证书过期时间
 - master 接口测试 页面
 - master 接口测试 脚本编写
 - master 接口测试 管理 与 增删改查

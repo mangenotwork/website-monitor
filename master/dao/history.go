@@ -40,8 +40,8 @@ func NewHistory(toolId int) (History, error) {
 	case FidWebsiteInfo:
 		return new(historyWebsiteInfo), nil
 	}
+	
 	return nil, fmt.Errorf("没有这个工具的历史记录")
-
 }
 
 func sizeValue(list []any, i any) []any {

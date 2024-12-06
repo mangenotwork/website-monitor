@@ -38,7 +38,9 @@ func Scan(host, id string, depth int64) {
 		BadLinks: make(map[string]struct{}),
 		NoneTDK:  make(map[string]string),
 	}
+
 	hostScan.Run()
+
 	websiteUrl := &entity.WebSiteUrl{
 		Host:    host,
 		HostID:  id,
@@ -50,28 +52,36 @@ func Scan(host, id string, depth int64) {
 		CssLink: make([]string, 0),
 		ImgLink: make([]string, 0),
 	}
+
 	log.Info("扫描完成....")
 	for u, _ := range hostScan.UrlSet {
 		websiteUrl.AllUri = append(websiteUrl.AllUri, cleanUrl(u))
 	}
+
 	for e, _ := range hostScan.ExtLinks {
 		websiteUrl.ExtLink = append(websiteUrl.ExtLink, cleanUrl(e))
 	}
+
 	for b, _ := range hostScan.BadLinks {
 		websiteUrl.BadLink = append(websiteUrl.BadLink, cleanUrl(b))
 	}
+
 	for k, v := range hostScan.NoneTDK {
 		websiteUrl.NoneTDK[k] = v
 	}
+
 	for j, _ := range hostScan.JsLinks {
 		websiteUrl.JsLink = append(websiteUrl.JsLink, j)
 	}
+
 	for c, _ := range hostScan.CssLinks {
 		websiteUrl.CssLink = append(websiteUrl.CssLink, c)
 	}
+
 	for i, _ := range hostScan.ImgLinks {
 		websiteUrl.ImgLink = append(websiteUrl.ImgLink, i)
 	}
+
 	err := DB.Set(WebSiteURITable, id, websiteUrl)
 	if err != nil {
 		log.Error("保存扫描的数据失败 err = ", err)
@@ -86,36 +96,47 @@ func (scan *HostScanUrl) do(caseUrl string, df int64) {
 	if len(caseUrl) < 1 {
 		return
 	}
+
 	if df > scan.Depth {
 		return
 	}
+
 	// 如果不是host下的域名,就是外链
 	if strings.Index(caseUrl, scan.Host) == -1 {
+
 		if string(caseUrl[0]) == "/" {
 			caseUrl = scan.Host + caseUrl
 			goto G
+
 		} else if string(caseUrl[0]) != "/" && string(caseUrl[0]) != "#" {
+
 			if usefulUrl(caseUrl) {
 				scan.ExtLinks[caseUrl] = struct{}{}
 			}
 		}
+
 		return
 	}
+
 G:
 	if _, ok := scan.UrlSet[caseUrl]; ok {
 		return
 	}
+
 	log.Info("执行扫描网站 --> ", caseUrl)
 	sleepMs(500, 2500)
+
 	ctx, err := gt.Get(caseUrl)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
 	// 记录死链接
 	if ctx.StateCode >= 400 {
 		scan.BadLinks[caseUrl] = struct{}{}
 	}
+
 	// 检查空TDK
 	contentType := ctx.Resp.Header.Get("Content-Type")
 	if strings.Index(contentType, "text/html") != -1 {
@@ -124,36 +145,48 @@ G:
 			scan.NoneTDK[caseUrl] = rse
 		}
 	}
+
 	// 采集 img, js
 	srcList := gt.RegHtmlSrcTxt(ctx.Html)
 	for _, v := range srcList {
+
 		if isImg(v) {
 			scan.ImgLinks[v] = struct{}{}
 		}
+
 		if isJs(v) {
 			scan.JsLinks[v] = struct{}{}
 		}
 	}
+
 	// 采集 css
 	hrefList := gt.RegHtmlHrefTxt(ctx.Html)
 	for _, v := range hrefList {
+
 		if isCss(v) {
 			scan.CssLinks[v] = struct{}{}
 		}
 	}
+
 	df++
+
 	scan.UrlSet[caseUrl] = struct{}{}
 	scan.Count++
 	a := gt.RegHtmlA(ctx.Html)
+
 	for _, v := range a {
+
 		links := gt.RegHtmlHrefTxt(v)
 		if len(links) < 1 {
 			continue
 		}
+
 		link := links[0]
 		// 请求并验证
 		scan.do(link, df)
+
 	}
+
 }
 
 func checkTDK(html string) string {
@@ -162,19 +195,22 @@ func checkTDK(html string) string {
 	if len(title) < 1 {
 		rse += "title:none;"
 	}
+
 	description := gt.RegHtmlDescriptionTxt(html)
 	if len(description) < 1 {
 		rse += "description:none;"
 	}
+
 	keyword := gt.RegHtmlKeywordTxt(html)
 	if len(keyword) < 1 {
 		rse += "keyword:none;"
 	}
+
 	return rse
 }
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
 var randEr = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -188,15 +224,18 @@ func sleepMs(min, max int) {
 func isExt(str string, extList []string) bool {
 	strList := strings.Split(str, "?")
 	sList := strings.Split(strList[0], ".")
+
 	if len(sList) > 0 {
 		s := sList[len(sList)-1]
 		ext := strings.Split(s, "/")
+
 		for _, v := range extList {
 			if ext[0] == v {
 				return true
 			}
 		}
 	}
+
 	return false
 }
 
@@ -220,14 +259,17 @@ func usefulUrl(str string) bool {
 	if err != nil {
 		return false
 	}
+
 	u, err := url.Parse(str)
 	if err != nil || u.Scheme == "" || u.Host == "" {
 		return false
 	}
+
 	// Check if the URL has a valid scheme (http or https)
 	if u.Scheme != "http" && u.Scheme != "https" {
 		return false
 	}
+
 	return true
 }
 
@@ -236,13 +278,17 @@ func cleanUrl(str string) string {
 	// bug:最后一个字符是特殊字符`;`
 	flag := false
 	strLast := str[len(str)-1:]
+
 	for _, v := range []string{";"} {
+
 		if strLast == v {
 			flag = true
 		}
 	}
+
 	if flag {
 		return str[:len(str)-1]
 	}
+	
 	return str
 }

@@ -4,15 +4,13 @@ import (
 	"time"
 )
 
-// sys
 var (
-	UserToken    string = "sign"
-	TokenExpires        = 60 * 60 * 24 * 7
-	LastSendMail int64  = 0
-	TimeStamp           = time.Now().Unix()
+	UserToken          = "sign"
+	TokenExpires       = 60 * 60 * 24 * 7
+	LastSendMail int64 = 0
+	TimeStamp          = time.Now().Unix()
 )
 
-// sys
 const (
 	DayLayout     = "20060102"
 	MasterVersion = "v0.1"
@@ -31,7 +29,7 @@ var (
 	DefaultSSLCertificateExpire     int64 = 14
 )
 
-// notice
+// notice 通知相关
 const (
 	NoticeUpdateWebsiteAllLabel    = "websiteAll" // 通知更新网站监测所有
 	NoticeUpdateWebsiteLabel       = "website"    // 通知更新网站监测

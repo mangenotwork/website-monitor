@@ -13,8 +13,10 @@ func urlStr(url string) string {
 
 // InspectCode 请求状态码出现 >=400, >=500 的状态码视为网站url有问题
 func InspectCode(code int) bool {
-	if code >= 400 || code >= 500 {
+
+	if code >= 400 {
 		return false
 	}
+
 	return true
 }

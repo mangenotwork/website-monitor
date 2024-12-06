@@ -2,6 +2,7 @@ package dao
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/boltdb/bolt"
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
@@ -34,6 +35,7 @@ func (r *requestToolDao) Add(data *entity.RequestTool) error {
 	if err != nil {
 		return err
 	}
+
 	return r.SetRequestNowList(&entity.RequestNowList{
 		Id:     data.ID,
 		Method: data.Method,
@@ -45,36 +47,45 @@ func (r *requestToolDao) Add(data *entity.RequestTool) error {
 
 func (r *requestToolDao) GetAtID(id string) (*entity.RequestTool, error) {
 	data := &entity.RequestTool{}
+
 	err := DB.Get(RequestTable, id, &data)
-	if err == ISNULL { // 空数据忽略
+	if errors.Is(err, ISNULL) { // 空数据忽略
 		err = nil
 		data.Method = "GET"
 	}
+
 	return data, err
 }
 
 func (r *requestToolDao) History() ([]*entity.RequestTool, error) {
 	conn := GetDBConn()
+
 	defer func() {
 		_ = conn.Close()
 	}()
+
 	list := make([]*entity.RequestTool, 0)
 	err := conn.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(RequestTable))
 		if b == nil {
 			return ISNULL
 		}
+
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			data := &entity.RequestTool{}
+
 			err := json.Unmarshal(v, &data)
 			if err != nil {
 				return err
 			}
+
 			list = append(list, data)
 		}
+
 		return nil
 	})
+
 	return list, err
 }
 
@@ -92,41 +103,53 @@ func (r *requestToolDao) initRequestNowList() (*entity.RequestNowList, error) {
 		Name:   "新建请求",
 		Method: "GET",
 	}
+
 	err := DB.Set(RequestNowListTable, data.Id, data)
 	return data, err
 }
 
 func (r *requestToolDao) GetRequestNowList() ([]*entity.RequestNowList, error) {
 	conn := GetDBConn()
+
 	list := make([]*entity.RequestNowList, 0)
+
 	err := conn.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(RequestNowListTable))
 		if b == nil {
 			return ISNULL
 		}
+
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			data := &entity.RequestNowList{}
+
 			err := json.Unmarshal(v, &data)
 			if err != nil {
 				return err
 			}
+
 			list = append(list, data)
 		}
+
 		return nil
 	})
+
 	_ = conn.Close()
+
 	if len(list) < 1 {
 		data, _ := r.initRequestNowList()
 		list = append(list, data)
 	}
+
 	sort.Slice(list, func(i, j int) bool {
 		if list[i].Time > list[j].Time {
 			return true
 		}
 		return false
 	})
+
 	list[0].IsNow = true
+
 	return list, err
 }
 
@@ -137,34 +160,44 @@ func (r *requestToolDao) DelRequestNowList(id string) error {
 
 func (r *requestToolDao) SetGlobalHeader(list []*entity.RequesterGlobalHeader) error {
 	var err error
+
 	for _, v := range list {
 		err = DB.Set(RequestGlobalHeaderTable, v.Key, v)
 	}
+
 	return err
 }
 
 func (r *requestToolDao) GetGlobalHeader() ([]*entity.RequesterGlobalHeader, error) {
 	conn := GetDBConn()
+
 	defer func() {
 		_ = conn.Close()
 	}()
+
 	list := make([]*entity.RequesterGlobalHeader, 0)
+
 	err := conn.View(func(tx *bolt.Tx) error {
 		// Assume bucket exists and has keys
 		b := tx.Bucket([]byte(RequestGlobalHeaderTable))
 		if b == nil {
 			return ISNULL
 		}
+
 		c := b.Cursor()
+
 		for k, v := c.First(); k != nil; k, v = c.Next() {
+
 			data := &entity.RequesterGlobalHeader{}
 			//log.Info("k = ", string(k))
 			err := json.Unmarshal(v, &data)
 			if err != nil {
 				return err
 			}
+
 			list = append(list, data)
 		}
+
 		return nil
 	})
 	return list, err

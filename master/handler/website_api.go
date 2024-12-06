@@ -41,39 +41,50 @@ func analysisWebsiteAddParam(c *ginHelper.GinCtx) (*WebsiteAddParam, error) {
 	if err != nil {
 		return param, err
 	}
+
 	if len(param.Host) < 1 {
 		return param, fmt.Errorf("参数错误: host不能为空")
 	}
 	if param.MonitorRate < 1 {
 		param.MonitorRate = constname.DefaultMonitorRate
 	}
+
 	if len(param.ContrastUrl) < 1 {
 		param.ContrastUrl = constname.DefaultContrastUrl
 	}
+
 	if param.ContrastTime < 1 {
 		param.ContrastTime = constname.DefaultContrastTime
 	}
+
 	if len(param.Ping) < 1 {
 		param.Ping = constname.DefaultPing
 	}
+
 	if param.PingTime < 1 {
 		param.PingTime = constname.DefaultPingTime
 	}
+
 	if param.UriDepth < 1 {
 		param.UriDepth = constname.DefaultUriDepth
 	}
+
 	if param.ScanRate < 1 {
 		param.ScanRate = constname.DefaultScanRate
 	}
+
 	if param.WebsiteSlowResponseTime < 100 {
 		return param, fmt.Errorf("网站响应慢不能小于100ms")
 	}
+
 	if param.WebsiteSlowResponseCount < 1 {
 		param.WebsiteSlowResponseCount = constname.DefaultWebsiteSlowResponseCount
 	}
+
 	if param.SSLCertificateExpire < 1 {
 		param.SSLCertificateExpire = constname.DefaultSSLCertificateExpire
 	}
+
 	return param, nil
 }
 
@@ -83,7 +94,7 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
-	log.Info("param = ", param)
+
 	website := &entity.Website{
 		Host:         param.Host,
 		MonitorRate:  param.MonitorRate,
@@ -94,6 +105,7 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 		Notes:        param.Notes,
 		Created:      time.Now().Unix(),
 	}
+
 	alarmRule := &entity.WebsiteAlarmRule{
 		Host:                     param.Host,
 		WebsiteSlowResponseTime:  param.WebsiteSlowResponseTime,
@@ -103,6 +115,7 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 		BadLink:                  param.ScanBadLink,
 		ExtLinkChange:            param.ScanExtLinks,
 	}
+
 	scan := &entity.WebsiteScanCheckUp{
 		Host:         param.Host,
 		ScanDepth:    param.UriDepth,
@@ -111,11 +124,13 @@ func WebsiteAdd(c *ginHelper.GinCtx) {
 		ScanBadLink:  param.ScanBadLink,
 		ScanExtLinks: param.ScanExtLinks,
 	}
+
 	err = dao.NewWebsite().Add(website, alarmRule, scan)
 	if err != nil {
 		c.APIOutPutError(err, "创建失败, err = "+err.Error())
 		return
 	}
+
 	c.APIOutPut("创建成功", "创建成功")
 	return
 }
@@ -133,38 +148,47 @@ func WebsiteList(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	// 监测器状态
 	isMonitor := false
 	monitor := dao.GetClientList()
 	for _, v := range monitor {
+
 		if v.Online {
 			isMonitor = true
 			break
 		}
+
 	}
+
 	// 报警数量获取
 	for _, v := range websiteList {
 		alertList, _ := dao.NewAlert().GetWebsiteAlertIDList(v.HostID)
 		alertLen := len(alertList)
+
 		state := 0
 		if isMonitor {
 			state = 1
 		}
+
 		if alertLen > 0 {
 			state = 2
 		}
+
 		data = append(data, &WebsiteListOutItem{
 			v,
 			alertLen,
 			state,
 		})
 	}
+
 	sort.Slice(data, func(i, j int) bool {
 		if data[i].Created > data[j].Created {
 			return true
 		}
 		return false
 	})
+
 	c.APIOutPut(data, "")
 	return
 }
@@ -178,26 +202,35 @@ type WebsiteConfOut struct {
 func WebsiteConf(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
 	website := dao.NewWebsite()
+
 	base, err := website.Select(hostId)
-	log.Info("base = ", base)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+
 	alertRule, err := website.GetConfAlarmRule(hostId)
 	checkUp, err := website.GetConfScanCheckUp(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	out := &WebsiteConfOut{base, alertRule, checkUp}
+
 	c.APIOutPut(out, "")
 	return
 }
 
 func WebsiteDelete(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
+
 	err := dao.NewWebsite().Del(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	c.APIOutPut("ok", "成功删除")
 	return
 }
@@ -218,8 +251,13 @@ func WebsiteInfo(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
 	website := dao.NewWebsite()
 	output := &WebsiteInfoOutPut{}
-	var err error
+
 	base, err := website.Select(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+
 	output.Base = WebsiteOutPut{base, utils.Timestamp2Date(base.Created)}
 	output.Info, err = website.GetInfo(hostId)
 	output.AlarmRule, err = website.GetAlarmRule(hostId)
@@ -228,6 +266,7 @@ func WebsiteInfo(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	c.APIOutPut(output, "")
 	return
 }
@@ -235,12 +274,13 @@ func WebsiteInfo(c *ginHelper.GinCtx) {
 func WebsiteInfoRefresh(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
 	hostId := c.GetQuery("id")
-	log.Info("WebsiteInfoRefresh")
+
 	err := dao.NewWebsite().SaveCollectInfo(host, hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	c.APIOutPut("ok", "")
 	return
 }
@@ -252,6 +292,7 @@ func WebsiteUrls(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	c.APIOutPut(data, "")
 	return
 }
@@ -259,16 +300,19 @@ func WebsiteUrls(c *ginHelper.GinCtx) {
 func WebsiteAllUrl(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
 	obj := dao.NewWebsite()
+
 	data, err := obj.GetWebSiteUrl(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	website, _ := obj.Select(hostId)
 	if len(data.AllUri) == 1 && data.AllUri[0] == website.Host {
 		c.APIOutPut([]string{}, "")
 		return
 	}
+
 	c.APIOutPut(data.AllUri, "")
 	return
 }
@@ -276,18 +320,23 @@ func WebsiteAllUrl(c *ginHelper.GinCtx) {
 func AllWebsite(c *ginHelper.GinCtx) {
 	data := make([]*WebsiteDataOut, 0)
 	obj := dao.NewWebsite()
+
 	websiteList, _, err := obj.SelectList()
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	for _, v := range websiteList {
+
 		rule, rErr := obj.GetAlarmRule(v.HostID)
 		if rErr != nil {
 			continue
 		}
+
 		data = append(data, &WebsiteDataOut{v, rule.WebsiteSlowResponseTime})
 	}
+
 	c.APIOutPut(data, "")
 	return
 }
@@ -300,16 +349,19 @@ type WebsiteDataOut struct {
 func GetWebsiteData(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
 	obj := dao.NewWebsite()
+
 	website, err := obj.Select(hostId)
 	rule, err := obj.GetAlarmRule(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	data := &WebsiteDataOut{
 		website,
 		rule.WebsiteSlowResponseTime,
 	}
+
 	c.APIOutPut(data, "")
 	return
 }
@@ -321,7 +373,7 @@ func WebsiteEdit(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
-	log.Info("param = ", param)
+
 	website := &entity.Website{
 		Host:         param.Host,
 		HostID:       hostId,
@@ -333,6 +385,7 @@ func WebsiteEdit(c *ginHelper.GinCtx) {
 		Notes:        param.Notes,
 		Created:      time.Now().Unix(),
 	}
+
 	alarmRule := &entity.WebsiteAlarmRule{
 		Host:                     param.Host,
 		HostID:                   hostId,
@@ -343,6 +396,7 @@ func WebsiteEdit(c *ginHelper.GinCtx) {
 		BadLink:                  param.ScanBadLink,
 		ExtLinkChange:            param.ScanExtLinks,
 	}
+
 	scan := &entity.WebsiteScanCheckUp{
 		Host:         param.Host,
 		HostID:       hostId,
@@ -352,11 +406,13 @@ func WebsiteEdit(c *ginHelper.GinCtx) {
 		ScanBadLink:  param.ScanBadLink,
 		ScanExtLinks: param.ScanExtLinks,
 	}
+
 	err = dao.NewWebsite().Edit(website, alarmRule, scan)
 	if err != nil {
 		c.APIOutPutError(err, "修改监测配置失败, err = "+err.Error())
 		return
 	}
+
 	c.APIOutPut("修改监测配置成功", "修改监测配置成功")
 	return
 }
@@ -367,28 +423,36 @@ func WebsiteChart(c *ginHelper.GinCtx) {
 	if len(day) < 1 {
 		day = utils.NowDateLayout(constname.DayLayout)
 	}
-	uri := c.GetQuery("uri") // Health:根URI,健康URI  Random:随机URI  Point:监测点URI
+
+	// Health:根URI,健康URI  Random:随机URI  Point:监测点URI
+	uri := c.GetQuery("uri")
 	data, err := dao.NewMonitorLogDao().ReadAll(hostId, day)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	out := make([][]int64, 0)
 	for _, v := range data {
+
 		if len(uri) > 0 { // 指定类型
+
 			if v.UriType == uri {
 				item := make([]int64, 0)
 				item = append(item, utils.Date2Timestamp(v.Time)*1000)
 				item = append(item, v.UriMs)
 				out = append(out, item)
 			}
+
 		} else {
 			item := make([]int64, 0)
 			item = append(item, utils.Date2Timestamp(v.Time)*1000)
 			item = append(item, v.UriMs)
 			out = append(out, item)
 		}
+
 	}
+
 	c.APIOutPut(out, "")
 	return
 }
@@ -408,6 +472,7 @@ func MonitorLogList(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	c.APIOutPut(data, "")
 	return
 }
@@ -420,8 +485,8 @@ func MonitorLogUpload(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
-	c.Writer.Header().Add("Content-Disposition",
-		fmt.Sprintf("attachment; filename=%s", fmt.Sprintf("%s.log", day)))
+
+	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fmt.Sprintf("%s.log", day)))
 	c.Writer.Header().Add("Content-Type", "application/text/plain")
 	c.File(logPath)
 	return
@@ -433,23 +498,26 @@ type WebsitePointParam struct {
 
 func WebsitePointAdd(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
-	log.Info("hostId = ", hostId)
+
 	param := &WebsitePointParam{}
 	err := c.GetPostArgs(param)
 	if err != nil {
 		c.APIOutPutError(err, "参数或参数类型错误")
 		return
 	}
+
 	ctx, _ := gt.Get(param.Uri)
 	if business.AlertRuleCode(ctx.StateCode) {
 		c.APIOutPutError(nil, fmt.Sprintf("%s请求失败，状态码:%d", param.Uri, ctx.StateCode))
 		return
 	}
+
 	err = dao.NewWebsite().SetPoint(hostId, param.Uri)
 	if err != nil {
 		c.APIOutPutError(err, "添加监测点失败:"+err.Error())
 		return
 	}
+
 	c.APIOutPut("", "添加成功")
 	return
 }
@@ -461,24 +529,27 @@ func WebsitePointList(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	c.APIOutPut(data, "成功")
 	return
 }
 
 func WebsitePointDel(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
-	log.Info("hostId = ", hostId)
+
 	param := &WebsitePointParam{}
 	err := c.GetPostArgs(param)
 	if err != nil {
 		c.APIOutPutError(err, "参数或参数类型错误")
 		return
 	}
+
 	err = dao.NewWebsite().DelPoint(hostId, param.Uri)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	c.APIOutPut("", "成功")
 	return
 }
@@ -490,6 +561,7 @@ func WebsitePointClear(c *ginHelper.GinCtx) {
 		c.APIOutPutError(err, err.Error())
 		return
 	}
+
 	c.APIOutPut("", "成功")
 	return
 }
@@ -518,10 +590,12 @@ func AlertList(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	data := &AlertListOut{
 		List:  list,
 		Count: len(list),
 	}
+
 	c.APIOutPut(data, "")
 	return
 }
@@ -533,10 +607,12 @@ func AlertWebsite(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	data := &AlertListOut{
 		List:  list,
 		Count: len(list),
 	}
+
 	c.APIOutPut(data, "")
 	return
 }
@@ -548,6 +624,7 @@ func AlertRead(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("标记成功", "标记成功")
 	return
 }
@@ -559,6 +636,7 @@ func AlertInfo(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut(data, "")
 	return
 }
@@ -570,6 +648,7 @@ func AlertDel(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("成功", "成功")
 	return
 }
@@ -581,6 +660,7 @@ func AlertClear(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("成功", "成功")
 	return
 }
@@ -591,6 +671,7 @@ func AlertAllClear(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("成功", "成功")
 	return
 }
@@ -601,10 +682,12 @@ func RequesterCreateTab(c *ginHelper.GinCtx) {
 		Name: "新建请求",
 		Time: time.Now().Unix(),
 	})
+
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("成功", "成功")
 	return
 }
@@ -616,6 +699,7 @@ func RequesterCloseTab(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("成功", "成功")
 	return
 }
@@ -642,23 +726,27 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	param.Method = strings.ToUpper(param.Method)
 	if !isMethod(param.Method) {
 		c.APIOutPutError(nil, "未知的请求类型")
 		return
 	}
+
 	if len(param.Url) < 1 {
 		c.APIOutPutError(nil, "请求地址为空")
 		return
 	}
+
 	if len(param.Name) == 0 {
 		param.Name = "新建请求"
 	}
-	log.Info("param = ", param)
+
 	if param.ReqId == "" {
 		c.APIOutPutError(nil, "请求id为空")
 		return
 	}
+
 	switch param.Method {
 	case "GET":
 		log.Info("get 请求...")
@@ -734,6 +822,7 @@ func RequesterGetData(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut(data, "成功")
 	return
 }
@@ -744,6 +833,7 @@ func RequesterList(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut(data, "成功")
 	return
 }
@@ -760,7 +850,9 @@ func RequesterHistoryList(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	list := make([]*OutRequesterHistoryList, 0)
+
 	for _, v := range data {
 		list = append(list, &OutRequesterHistoryList{
 			Id:     v.ID,
@@ -768,32 +860,35 @@ func RequesterHistoryList(c *ginHelper.GinCtx) {
 			Name:   v.Name,
 		})
 	}
+
 	c.APIOutPut(list, "成功")
 	return
 }
 
 func RequesterHistoryDelete(c *ginHelper.GinCtx) {
 	reqId := c.Param("reqId")
+
 	err := dao.NewRequestTool().HistoryDelete(reqId)
 	err = dao.NewRequestTool().DelRequestNowList(reqId)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("成功", "成功")
 	return
 }
 
 func RequesterDirCreat(c *ginHelper.GinCtx) {
-
+	log.Info(c)
 }
 
 func RequesterDirList(c *ginHelper.GinCtx) {
-
+	log.Info(c)
 }
 
 func RequesterDirJoin(c *ginHelper.GinCtx) {
-
+	log.Info(c)
 }
 
 type RequesterGlobalHeaderSetParam struct {
@@ -807,12 +902,13 @@ func RequesterGlobalHeaderSet(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
-	log.Info("param = ", param)
+
 	err = dao.NewRequestTool().SetGlobalHeader(param.List)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("成功", "成功")
 	return
 }
@@ -823,6 +919,7 @@ func RequesterGlobalHeaderGet(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut(data, "成功")
 	return
 }
@@ -834,6 +931,7 @@ func RequesterGlobalHeaderDel(c *ginHelper.GinCtx) {
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
+
 	c.APIOutPut("成功", "成功")
 	return
 }

@@ -152,31 +152,39 @@ func Test() {
 
 // AuthPG 权限验证中间件
 func AuthPG() gin.HandlerFunc {
+
 	return func(c *gin.Context) {
 		token, _ := c.Cookie(constname.UserToken)
+
 		j := utils.NewJWT(conf.Conf.Default.Jwt.Secret, conf.Conf.Default.Jwt.Expire)
 		if err := j.ParseToken(token); err == nil {
 			c.Next()
 			return
 		}
+
 		c.Redirect(http.StatusFound, "/")
 		c.Abort()
 		return
 	}
+
 }
 
 // AuthAPI 权限验证中间件
 func AuthAPI() gin.HandlerFunc {
+
 	return func(c *gin.Context) {
+
 		token, _ := c.Cookie(constname.UserToken)
 		j := utils.NewJWT(conf.Conf.Default.Jwt.Secret, conf.Conf.Default.Jwt.Expire)
 		if err := j.ParseToken(token); err == nil {
 			c.Next()
 			return
 		}
+
 		ginHelper.AuthErrorOut(c)
 		c.Abort()
 		return
 
 	}
+
 }

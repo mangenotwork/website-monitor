@@ -17,6 +17,7 @@ type PingRse struct {
 
 func Ping(ip string) []*PingRse {
 	rse := make([]*PingRse, 0)
+
 	for i := 0; i < 4; i++ {
 		ping, err := gt.Ping(ip)
 		errStr := ""
@@ -30,7 +31,10 @@ func Ping(ip string) []*PingRse {
 			Ms:   fmt.Sprintf("%.2f ms", float64(ping)/1000000),
 			Err:  errStr,
 		})
+
 		time.Sleep(500 * time.Millisecond)
+
 	}
+
 	return rse
 }

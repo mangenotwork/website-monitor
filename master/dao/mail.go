@@ -60,38 +60,49 @@ func (m *mailDao) Send(title, body string) {
 	if !mailInfo.Open { // 关闭
 		return
 	}
+
 	data, err := m.GetMail()
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
 	send := mail.NewMail(data.Host, data.From, data.AuthCode, data.Port)
 	toList := strings.Split(data.ToList, ";")
+
 	err = send.Title(title).HtmlBody(body).SendMore(toList)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
 }
 
 func (m *mailDao) Check(data *entity.Mail) error {
 	errFormat := "邮件设置参数错误: %s"
+
 	if len(data.From) < 1 {
 		return fmt.Errorf(errFormat, "发件人不能为空!")
 	}
+
 	if len(data.Host) < 1 {
 		return fmt.Errorf(errFormat, "邮件服务器不能为空!")
 	}
+
 	if len(data.AuthCode) < 1 {
 		return fmt.Errorf(errFormat, "邮件服务授权码不能为空!")
 	}
+
 	if len(data.ToList) < 1 {
 		return fmt.Errorf(errFormat, "通知收件人不能为空!")
 	}
+
 	if data.Port == 0 {
 		data.Port = 25
 	}
+
 	data.ToList = utils.CleaningStr(data.ToList)
 	data.ToList = strings.Replace(data.ToList, "；", ";", -1)
+
 	return nil
 }

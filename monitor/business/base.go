@@ -94,6 +94,7 @@ func Business(item *WebsiteItem) {
 		// 计算频率复位
 		item.RateItem = item.MonitorRate
 		log.Info("执行 " + item.Host)
+
 		// 报警数据初始化
 		// 日志数据
 		mLog := &MonitorLog{
@@ -134,6 +135,7 @@ func Business(item *WebsiteItem) {
 			if item.LoopPoint >= pointLen {
 				item.LoopPoint = 0
 			}
+
 			pointUrl := point[item.LoopPoint]
 			item.LoopPoint++
 			log.Info("本次监测的监测点是 = ", pointUrl)
@@ -159,22 +161,28 @@ func GetWebsiteAll() {
 		log.Error(err)
 		return
 	}
+
 	list := make([]*Website, 0)
 	err = AnalysisData(ctx.Json, &list)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
 	// 清空 websiteItem
 	EmptyAllWebsiteData()
 	for _, v := range list {
+
 		log.Info("v = ", v)
 		item := &WebsiteItem{v, 0, nil, 0}
 		item.Add()
+
 		// 获取监测点
 		GetWebsitePoint(v.HostID)
+
 		// 获取所有url
 		SetWebsiteUrlData(v.HostID)
+
 	}
 }
 
@@ -184,16 +192,20 @@ func GetWebsite(hostID string) {
 		log.Error(err)
 		return
 	}
+
 	data := &Website{}
 	log.Info(ctx.Json)
+
 	err = AnalysisData(ctx.Json, &data)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
 	log.Info(data)
 	item := &WebsiteItem{data, 0, nil, 0}
 	item.Add()
+
 	// 获取监测点
 	GetWebsitePoint(data.HostID)
 }
@@ -208,12 +220,14 @@ func GetWebsitePoint(hostID string) {
 		log.Error(err)
 		return
 	}
+
 	data := &WebSitePoint{}
 	err = AnalysisData(ctx.Json, &data)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
 	log.Info(data)
 	WebsitePointDataMap.Store(hostID, data)
 }
@@ -240,6 +254,7 @@ func getIPAddr() *IPInfo {
 	ip, _ := gt.JsonFind2Str(ctx.Json, "/ip")
 	address, _ := gt.JsonFind2Str(ctx.Json, "/address")
 	log.Info("获取到ip属地= ", address)
+
 	return &IPInfo{
 		IP:      ip,
 		Address: address,
@@ -260,6 +275,7 @@ func AnalysisBody(jsonStr string) (any, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return body.Date, nil
 }
 
@@ -268,16 +284,19 @@ func AnalysisData(jsonStr string, data any) error {
 	if err != nil {
 		return err
 	}
+
 	bodyStr, err := json.Marshal(body)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
+
 	err = json.Unmarshal(bodyStr, &data)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
+
 	return nil
 }
 
@@ -309,6 +328,7 @@ func Struct2Buf(any2 any) []byte {
 	if err != nil {
 		log.Error(err)
 	}
+
 	return buf.Bytes()
 }
 
@@ -321,9 +341,11 @@ func request(url string) (int, int64, error) {
 		},
 		gt.IsRetry(false),
 	)
+
 	if err != nil {
 		log.Error(err)
 		return 0, 0, err
 	}
+
 	return ctx.StateCode, ctx.Ms.Milliseconds(), nil
 }

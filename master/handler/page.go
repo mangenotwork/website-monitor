@@ -18,7 +18,6 @@ func ginH(h gin.H) gin.H {
 }
 
 func NotFond(c *gin.Context) {
-	// 实现内部重定向
 	c.HTML(
 		http.StatusOK,
 		"notfond.html",
@@ -38,13 +37,17 @@ func ErrPage(c *gin.Context, err error) {
 
 func LoginPage(c *gin.Context) {
 	token, _ := c.Cookie(constname.UserToken)
+
 	if token != "" {
+
 		j := utils.NewJWT(conf.Conf.Default.Jwt.Secret, conf.Conf.Default.Jwt.Expire)
 		if err := j.ParseToken(token); err == nil {
 			c.Redirect(http.StatusFound, "/home")
 			return
 		}
+
 	}
+
 	c.HTML(
 		http.StatusOK,
 		"login.html",
@@ -52,6 +55,7 @@ func LoginPage(c *gin.Context) {
 			"csrf": ginHelper.FormSetCSRF(c.Request),
 		}),
 	)
+
 }
 
 func HomePage(c *gin.Context) {

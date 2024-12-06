@@ -14,21 +14,28 @@ func RunUDPServer() {
 	if err != nil {
 		connCode = udp.DefaultConnectCode
 	}
+
 	connSecret, err := conf.YamlGetString("connSecret")
 	if err != nil {
 		connSecret = udp.DefaultSecretKey
 	}
+
 	// 初始化 s端
 	dao.Servers, err = udp.NewServers("0.0.0.0",
 		utils.AnyToInt(conf.Conf.Default.UdpServer.Prod),
 		udp.SetServersConf("s", connCode, connSecret))
+
 	if err != nil {
 		panic(err)
 	}
 
 	// 定义put方法
-	dao.Servers.PutHandleFunc("monitor", MonitorRse) // 监测结果
-	dao.Servers.PutHandleFunc("stress", StressRse)   // TODO... 并发请求结果
+
+	// 监测结果
+	dao.Servers.PutHandleFunc("monitor", MonitorRse)
+
+	// TODO... 并发请求结果
+	dao.Servers.PutHandleFunc("stress", StressRse)
 
 	// 启动servers
 	dao.Servers.Run()
@@ -40,12 +47,14 @@ func MonitorRse(s *udp.Servers, c *udp.ClientInfo, param []byte) {
 	mLogStr := string(param) + ip + "|"
 	mLogDao := dao.NewMonitorLogDao()
 	mLog := mLogDao.ToMonitorLogObj(mLogStr)
+
 	// 写日志
 	mLogDao.Write(mLog.HostId, mLogStr)
 	if mLog.LogType == constname.LogTypeAlert {
 		// 监测到报警
 		dao.AddAlert(mLog)
 	}
+
 }
 
 func StressRse(s *udp.Servers, c *udp.ClientInfo, param []byte) {

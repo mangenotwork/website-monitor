@@ -15,12 +15,14 @@ func SetWebsiteUrlData(hostId string) {
 		log.Error(err)
 		return
 	}
+
 	allUrl := make([]string, 0)
 	err = AnalysisData(ctx.Json, &allUrl)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
 	log.Info("allUrl = ", allUrl)
 	WebsiteUrlDataMap.Store(hostId, allUrl)
 }
@@ -30,5 +32,6 @@ func GetWebsiteUrlDataMap(hostId string) []string {
 	if !ok {
 		return make([]string, 0)
 	}
+
 	return v.([]string)
 }

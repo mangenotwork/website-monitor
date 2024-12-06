@@ -44,7 +44,9 @@ type MonitorInfo struct {
 func GetClientList() []*MonitorInfo {
 	data := make([]*MonitorInfo, 0)
 	table := Servers.OnLineTable()
+
 	for k, v := range table {
+
 		info := &MonitorInfo{
 			Key:         k,
 			Name:        v.Name,
@@ -54,10 +56,12 @@ func GetClientList() []*MonitorInfo {
 			LastTime:    v.LastTime,
 			DiscardTime: v.DiscardTime,
 		}
+
 		info.PublicIP, info.PublicIPAddr = getIPAddr(v.Name, v.IP)
 		info.OSInfo = getOSInfo(v.Name, v.IP)
 		data = append(data, info)
 	}
+
 	return data
 }
 
@@ -66,11 +70,13 @@ func getIPAddr(name, ip string) (string, string) {
 	if err != nil {
 		log.Error(err)
 	}
+
 	ipInfo := &IPInfo{}
 	err = json.Unmarshal(data, &ipInfo)
 	if err != nil {
 		log.Error(err)
 	}
+
 	log.Info("ipInfo = ", ipInfo)
 	return ipInfo.IP, ipInfo.Address
 }
@@ -88,28 +94,33 @@ func getOSInfo(name, ip string) *OSInfo {
 	if err != nil {
 		log.Error(err)
 	}
+
 	osInfo := &OSInfo{}
 	err = json.Unmarshal(data, &osInfo)
 	if err != nil {
 		log.Error(err)
 	}
+
 	log.Info("osInfo = ", osInfo)
 	return osInfo
 }
 
 func GetClientList2() {
 	table := Servers.OnLineTable()
+
 	for k, v := range table {
 		log.Info(k, v)
 		data, err := Servers.GetAtIP("ipAddr", v.Name, v.IP, []byte(""))
 		if err != nil {
 			log.Error(err)
 		}
+
 		inInfo := &IPInfo{}
 		err = json.Unmarshal(data, &inInfo)
 		if err != nil {
 			log.Error(err)
 		}
+
 		log.Info("inInfo = ", inInfo)
 	}
 

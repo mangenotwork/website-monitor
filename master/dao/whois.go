@@ -21,26 +21,30 @@ func Whois(host string) *entity.WhoisInfo {
 	rootRse := whois(RootWhoisServers, host)
 	info.Root = rootRse
 	referList := regFindTxt(`(?is:refer:(.*?)\n)`, rootRse)
+
 	if len(referList) > 0 {
 		refer := utils.StrDeleteSpace(referList[0])
 		rse := whois(refer+":43", host)
 		info.Rse = rse
 	}
+
 	return info
 }
 
 func whois(server, host string) string {
 	conn, _ := net.Dial("tcp", server)
-	conn.Write([]byte(host + " \r\n"))
+	_, _ = conn.Write([]byte(host + " \r\n"))
 	buf := make([]byte, 1024*10)
 	n, err := conn.Read(buf)
 	if err != nil && err != io.EOF {
 		log.Error(err)
 	}
+
 	rse := string(buf[:n])
 	defer func() {
-		conn.Close()
+		_ = conn.Close()
 	}()
+
 	return rse
 }
 
@@ -55,13 +59,17 @@ func RegFindAll(regStr, rest string) [][]string {
 func regFindTxt(regStr, txt string, property ...string) (dataList []string) {
 	reg := regexp.MustCompile(regStr)
 	resList := reg.FindAllStringSubmatch(txt, -1)
+
 	for _, v := range resList {
 		if len(v) < 1 {
 			continue
 		}
+
 		if len(property) == 0 || strings.Count(v[0], strings.Join(property, " ")) > 0 {
 			dataList = append(dataList, v[1])
 		}
+
 	}
+
 	return
 }

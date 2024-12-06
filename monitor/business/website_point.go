@@ -15,6 +15,7 @@ func GetWebSitePoint(hostId string) ([]string, int64) {
 	if !ok {
 		return []string{}, 0
 	}
+
 	data := value.(*WebSitePoint)
 	return data.URL, int64(len(data.URL))
 }

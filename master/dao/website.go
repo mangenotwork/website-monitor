@@ -87,27 +87,34 @@ func (w *websiteDao) Add(data *entity.Website, rule *entity.WebsiteAlarmRule, sc
 	if err != nil {
 		return err
 	}
+
 	if !InspectCode(ctx.StateCode) {
 		return fmt.Errorf("网站:%s 请求状态码为 %d , 无法添加。", data.Host, ctx.StateCode)
 	}
+
 	hostKey := utils.GetMD5Encode(data.Host)
 	data.HostID = hostKey
+
 	// 判断是否存在
 	has, _ := w.Select(hostKey)
 	if has.Host == data.Host {
 		return fmt.Errorf("网站:%s 已创建监测, 无法重复添加。", data.Host)
 	}
+
 	err = w.addWebsite(data)
 	if err != nil {
 		return err
 	}
+
 	// 保存报警规则信息
 	rule.Host = data.Host
 	rule.HostID = hostKey
+
 	err = w.addWebsiteAlarmRule(rule)
 	if err != nil {
 		return err
 	}
+
 	// 保存扫描规则信息
 	scan.Host = data.Host
 	scan.HostID = hostKey
@@ -115,6 +122,7 @@ func (w *websiteDao) Add(data *entity.Website, rule *entity.WebsiteAlarmRule, sc
 	if err != nil {
 		return err
 	}
+
 	// 异步获取网站信息
 	go func() {
 		_ = w.SaveCollectInfo(data.Host, hostKey)
@@ -166,18 +174,24 @@ func (w *websiteDao) addWebsiteScanCheckUp(scan *entity.WebsiteScanCheckUp) erro
 func (w *websiteDao) Del(hostID string) error {
 	// 删除 Website
 	err := DB.Delete(WebSiteTable, hostID)
+
 	// 删除 WebsiteAlarmRule
 	err = DB.Delete(WebsiteAlarmRuleTable, hostID)
+
 	// 删除 WebsiteScanCheckUp
 	err = DB.Delete(WebsiteScanCheckUpTable, hostID)
+
 	// 删除 WebsiteInfo
 	err = DB.Delete(WebSiteInfoTable, hostID)
+
 	// 删除监测点 Website
 	err = DB.Delete(WebSiteUrlPointTable, hostID)
+
 	// 通知更新监测网站
 	go func() {
 		NoticeDelWebsite(hostID)
 	}()
+
 	return err
 }
 
@@ -190,28 +204,35 @@ func (w *websiteDao) Edit(base *entity.Website, alarmRule *entity.WebsiteAlarmRu
 
 func (w *websiteDao) SelectList() ([]*entity.Website, int, error) {
 	DB.Open()
+
 	defer func() {
 		_ = DB.Conn.Close()
 	}()
+
 	count := 0
 	data := make([]*entity.Website, 0)
+
 	err := DB.Conn.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(WebSiteTable))
 		if b == nil {
 			return fmt.Errorf(WebSiteTable + "表不存在")
 		}
+
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			count++
 			value := &entity.Website{}
+
 			e := json.Unmarshal(v, value)
 			if e != nil {
 				log.Error("数据解析错误")
 			}
+
 			data = append(data, value)
 		}
 		return nil
 	})
+
 	return data, count, err
 }
 
@@ -226,11 +247,12 @@ func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
 	info := &entity.WebsiteInfo{
 		Host: host,
 	}
-	tdki := w.CollectTDK(host)
-	info.Title = tdki.Title
-	info.Keywords = tdki.Keywords
-	info.Description = tdki.Description
-	info.Icon = tdki.Icon
+
+	tdkI := w.CollectTDK(host)
+	info.Title = tdkI.Title
+	info.Keywords = tdkI.Keywords
+	info.Description = tdkI.Description
+	info.Icon = tdkI.Icon
 
 	// dns
 	info.DNS = NsLookUpLocal(host)
@@ -239,8 +261,9 @@ func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
 	info.IPAddr = make([]*entity.IPAddr, 0)
 	for _, v := range info.DNS.IPs {
 		addr := GetIP(v)
-		info.IPAddr = append(info.IPAddr, &entity.IPAddr{v, addr})
+		info.IPAddr = append(info.IPAddr, &entity.IPAddr{IP: v, Address: addr})
 	}
+
 	// SSLCertificateInfo
 	info.SSLCertificateInfo, _ = GetCertificateInfo(host)
 
@@ -282,23 +305,27 @@ func (w *websiteDao) responseHeaders(url string) http.Header {
 
 func (w *websiteDao) CollectTDK(host string) *entity.TDKI {
 	host = urlStr(host)
-	tdki := &entity.TDKI{
+	tdkI := &entity.TDKI{
 		Icon: host + "/favicon.ico",
 	}
+
 	ctx, _ := gt.Get(host)
 	title := gt.RegHtmlTitleTxt(ctx.Html)
 	if len(title) > 0 {
-		tdki.Title = title[0]
+		tdkI.Title = title[0]
 	}
+
 	keyword := gt.RegHtmlKeywordTxt(ctx.Html)
 	if len(keyword) > 0 {
-		tdki.Keywords = keyword[0]
+		tdkI.Keywords = keyword[0]
 	}
+
 	description := gt.RegHtmlDescriptionTxt(ctx.Html)
 	if len(description) > 0 {
-		tdki.Description = description[0]
+		tdkI.Description = description[0]
 	}
-	return tdki
+
+	return tdkI
 }
 
 func (w *websiteDao) CollectDNS(host string) error {
@@ -306,6 +333,7 @@ func (w *websiteDao) CollectDNS(host string) error {
 	if err != nil {
 		return err
 	}
+
 	info.DNS = NsLookUpLocal(host)
 	return DB.Set(WebSiteInfoTable, host, info)
 }
@@ -315,12 +343,15 @@ func (w *websiteDao) CollectIPAddr(host string) error {
 	if err != nil {
 		return err
 	}
+
 	ipAddr := make([]*entity.IPAddr, 0)
 	for _, v := range info.DNS.IPs {
 		addr := GetIP(v)
-		ipAddr = append(ipAddr, &entity.IPAddr{v, addr})
+		ipAddr = append(ipAddr, &entity.IPAddr{IP: v, Address: addr})
 	}
+
 	info.IPAddr = ipAddr
+
 	return DB.Set(WebSiteInfoTable, host, info)
 }
 
@@ -329,6 +360,7 @@ func (w *websiteDao) CollectSSLCertificateInfo(host string) error {
 	if err != nil {
 		return err
 	}
+
 	info.SSLCertificateInfo, _ = GetCertificateInfo(host)
 	return DB.Set(WebSiteInfoTable, host, info)
 }
@@ -338,6 +370,7 @@ func (w *websiteDao) CollectWhois(host string) error {
 	if err != nil {
 		return err
 	}
+
 	info.Whois = Whois(host)
 	return DB.Set(WebSiteInfoTable, host, info)
 }
@@ -347,6 +380,7 @@ func (w *websiteDao) CollectICP(host string) error {
 	if err != nil {
 		return err
 	}
+
 	info.IPC = GetICP(host)
 	return DB.Set(WebSiteInfoTable, host, info)
 }
@@ -363,22 +397,28 @@ func (w *websiteDao) GetWebSiteUrl(hostId string) (*entity.WebSiteUrl, error) {
 
 func (w *websiteDao) SetPoint(hostID, url string) error {
 	data, err := w.GetPoint(hostID)
+
 	if err != nil && !errors.Is(err, ISNULL) {
 		return err
 	}
+
 	for _, v := range data.URL {
 		if v == url {
 			return fmt.Errorf("监测点存在")
 		}
 	}
+
 	data.URL = append(data.URL, url)
 	data.HostID = hostID
+
 	err = DB.Set(WebSiteUrlPointTable, hostID, data)
 	if err == nil {
+
 		go func() {
 			NoticeUpdateWebsitePoint(hostID)
 		}()
 	}
+
 	return err
 }
 
@@ -386,6 +426,7 @@ func (w *websiteDao) GetPoint(hostID string) (*entity.WebSitePoint, error) {
 	data := &entity.WebSitePoint{
 		HostID: hostID,
 	}
+
 	err := DB.Get(WebSiteUrlPointTable, hostID, &data)
 	return data, err
 }
@@ -395,28 +436,36 @@ func (w *websiteDao) DelPoint(hostID, url string) error {
 	if err != nil && !errors.Is(err, ISNULL) {
 		return err
 	}
+
 	for n, v := range data.URL {
+
 		if v == url {
 			data.URL = append(data.URL[:n], data.URL[n+1:]...)
 			break
 		}
+
 	}
+
 	err = DB.Set(WebSiteUrlPointTable, hostID, data)
 	if err == nil {
+
 		go func() {
 			NoticeUpdateWebsitePoint(hostID)
 		}()
 	}
+
 	return err
 }
 
 func (w *websiteDao) ClearPoint(hostID string) error {
 	err := DB.Delete(WebSiteUrlPointTable, hostID)
 	if err == nil {
+
 		go func() {
 			NoticeUpdateWebsitePoint(hostID)
 		}()
 	}
+
 	return err
 }
 

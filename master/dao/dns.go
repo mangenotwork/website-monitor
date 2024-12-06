@@ -12,7 +12,9 @@ import (
 )
 
 func NsLookUpLocal(host string) *entity.DNSInfo {
+
 	log.Info("NsLookUpLocal...")
+
 	host = strings.Replace(host, "https://", "", -1)
 	host = strings.Replace(host, "http://", "", -1)
 	dnsInfo := &entity.DNSInfo{
@@ -20,13 +22,16 @@ func NsLookUpLocal(host string) *entity.DNSInfo {
 		DnsServerName: "Local",
 		IsCDN:         false,
 	}
+
 	start := time.Now().UnixNano()
 	ips, err := net.LookupHost(host)
+
 	if err != nil {
 		log.Error(err)
 	} else {
 		dnsInfo.IPs = ips
 	}
+
 	dnsInfo.Ms = float64(time.Now().UnixNano()-start) / 100000
 	cname, err := net.LookupCNAME(host)
 	if err != nil {
@@ -34,13 +39,16 @@ func NsLookUpLocal(host string) *entity.DNSInfo {
 	} else {
 		dnsInfo.LookupCNAME = cname
 	}
+
 	if len(dnsInfo.LookupCNAME) > 0 && strings.Index(dnsInfo.LookupCNAME, host) == -1 {
 		dnsInfo.IsCDN = true
 	}
+
 	return dnsInfo
 }
 
 func NsLookUpFromDNSServer(host, dnsServer string) *entity.DNSInfo {
+
 	r := &net.Resolver{
 		PreferGo:     true,
 		StrictErrors: false,
@@ -50,10 +58,12 @@ func NsLookUpFromDNSServer(host, dnsServer string) *entity.DNSInfo {
 			return c, e
 		},
 	}
+
 	dnsInfo := &entity.DNSInfo{
 		DnsServerIP: dnsServer,
 		IsCDN:       false,
 	}
+
 	start := time.Now().UnixNano()
 	ip, err := r.LookupHost(context.Background(), host)
 	if err == nil {
@@ -61,6 +71,7 @@ func NsLookUpFromDNSServer(host, dnsServer string) *entity.DNSInfo {
 	} else {
 		log.Error(dnsServer, " | ", err)
 	}
+
 	dnsInfo.Ms = float64(time.Now().UnixNano()-start) / 100000
 	cname, err := r.LookupCNAME(context.Background(), host)
 	if err == nil {
@@ -68,14 +79,17 @@ func NsLookUpFromDNSServer(host, dnsServer string) *entity.DNSInfo {
 	} else {
 		log.Error(dnsServer, " | ", err)
 	}
+
 	if len(dnsInfo.LookupCNAME) > 0 && strings.Index(dnsInfo.LookupCNAME, host) == -1 {
 		dnsInfo.IsCDN = true
 	}
+
 	log.Info("获取完成: ", dnsServer)
 	return dnsInfo
 }
 
 func NsLookUp(host, dnsServer, name string) *entity.DNSInfo {
+
 	log.Info("dnsServer = ", dnsServer)
 	r := &net.Resolver{
 		PreferGo:     true,
@@ -86,11 +100,13 @@ func NsLookUp(host, dnsServer, name string) *entity.DNSInfo {
 			return c, e
 		},
 	}
+
 	dnsInfo := &entity.DNSInfo{
 		DnsServerIP:   dnsServer,
 		DnsServerName: name,
 		IsCDN:         false,
 	}
+
 	start := time.Now().UnixNano()
 	ip, err := r.LookupHost(context.Background(), host)
 	if err == nil {
@@ -98,6 +114,7 @@ func NsLookUp(host, dnsServer, name string) *entity.DNSInfo {
 	} else {
 		log.Error(dnsServer, " | ", err)
 	}
+
 	dnsInfo.Ms = float64(time.Now().UnixNano()-start) / 100000
 	cname, err := r.LookupCNAME(context.Background(), host)
 	if err == nil {
@@ -105,35 +122,43 @@ func NsLookUp(host, dnsServer, name string) *entity.DNSInfo {
 	} else {
 		log.Error(dnsServer, " | ", err)
 	}
+
 	if len(dnsInfo.LookupCNAME) > 0 && strings.Index(dnsInfo.LookupCNAME, host) == -1 {
 		dnsInfo.IsCDN = true
 	}
+
 	log.Info("获取完成: ", dnsServer)
 	return dnsInfo
 }
 
 func NsLookUpAll(host string) ([]*entity.DNSInfo, []string) {
+
 	all := make([]*entity.DNSInfo, 0)
 	allIPMap := make(map[string]struct{})
 	allIP := make([]string, 0)
 	results := make(chan *entity.DNSInfo, len(DNSServer))
+
 	for k, v := range DNSServer {
 		go func(k, v string) {
 			results <- NsLookUp(host, k+":53", v)
 		}(k, v)
 	}
+
 	for i := 0; i < len(DNSServer); i++ {
 		res := <-results
 		all = append(all, res)
 	}
+
 	for _, v := range all {
 		for _, i := range v.IPs {
 			allIPMap[i] = struct{}{}
 		}
 	}
+
 	for k, _ := range allIPMap {
 		allIP = append(allIP, k)
 	}
+
 	return all, allIP
 }
 

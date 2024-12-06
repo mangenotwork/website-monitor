@@ -23,12 +23,14 @@ func GetIP(ip string) string {
 	if len(ipList) > 0 {
 		ip = ipList[0]
 	}
+
 	address := ""
 	err := DB.Get(IPTable, ip, &address)
 	if err != nil || address == "" {
 		req := ReqIP(ip)
 		address = req.Address
 	}
+
 	return address
 }
 
@@ -53,6 +55,7 @@ func GetNativeIP() *IPInfo {
 		IP:      ip,
 		Address: address,
 	}
+
 	_ = SetIP(ipInfo)
 	return ipInfo
 }
@@ -61,12 +64,14 @@ func ReqIP(ipStr string) *IPInfo {
 	ctx, _ := gt.Get(fmt.Sprintf(GetIPInfoUrl, ipStr))
 	ip, _ := gt.JsonFind2Str(ctx.Json, "/ip")
 	log.Info("ip = ", ip)
+
 	address, _ := gt.JsonFind2Str(ctx.Json, "/address")
 	log.Info("address = ", address)
 	ipInfo := &IPInfo{
 		IP:      ip,
 		Address: address,
 	}
+
 	_ = SetIP(ipInfo)
 	return ipInfo
 }

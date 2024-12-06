@@ -42,17 +42,23 @@ func GetCpuCoreNumber() string {
 func GetInterfaceInfo() string {
 	rse := ""
 	iFaces, _ := net.Interfaces()
+
 	for _, v := range iFaces {
 		addr, err := v.Addrs()
 		if err != nil {
 			continue
 		}
+
 		for _, a := range addr {
 			ipNet, ok := a.(*net.IPNet)
+
 			if ok && !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil {
 				rse += fmt.Sprintf("网卡:%s;ip:%s;mac:%s;\n", v.Name, ipNet.IP, v.HardwareAddr.String())
 			}
+
 		}
+
 	}
+
 	return rse
 }

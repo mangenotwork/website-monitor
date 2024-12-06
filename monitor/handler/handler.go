@@ -43,10 +43,12 @@ func GetIPAddr(c *udp.Client, param []byte) (int, []byte) {
 	log.Info("获取ip地址与属地")
 	data := business.GetMyIP()
 	log.Info("data = ", data)
+
 	b, err := json.Marshal(data)
 	if err != nil {
 		log.Error(err)
 	}
+
 	return 0, b
 }
 
@@ -59,9 +61,11 @@ func GetOSInfo(c *udp.Client, param []byte) (int, []byte) {
 		CpuCoreNumber: GetCpuCoreNumber(),
 		InterfaceInfo: GetInterfaceInfo(),
 	}
+
 	b, err := json.Marshal(data)
 	if err != nil {
 		log.Error(err)
 	}
+
 	return 0, b
 }

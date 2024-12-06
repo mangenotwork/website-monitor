@@ -19,9 +19,12 @@ func GetCertificateInfo(caseUrl string) (*entity.SSLCertificateInfo, bool) {
 	var info = &entity.SSLCertificateInfo{
 		Url: caseUrl,
 	}
+
 	var cert *x509.Certificate
 	var err error
+
 	client := http.Client{}
+
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
 			VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
@@ -33,10 +36,12 @@ func GetCertificateInfo(caseUrl string) (*entity.SSLCertificateInfo, bool) {
 			},
 		},
 	}
+
 	_, err = client.Get(caseUrl)
 	if err != nil || cert == nil {
 		return info, false
 	}
+
 	info.NotBefore = cert.NotBefore.Unix()
 	info.NotAfter = cert.NotAfter.Unix()
 	info.EffectiveTime = fmt.Sprintf("%s 到 %s", utils.Timestamp2Date(info.NotBefore), utils.Timestamp2Date(info.NotAfter))
@@ -49,5 +54,6 @@ func GetCertificateInfo(caseUrl string) (*entity.SSLCertificateInfo, bool) {
 	info.Subject = cert.Subject.String()
 	info.Version = strconv.Itoa(cert.Version)
 	info.SignatureAlgorithm = cert.SignatureAlgorithm.String()
+
 	return info, true
 }

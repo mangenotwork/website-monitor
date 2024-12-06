@@ -22,23 +22,28 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	business.MasterHTTP, err = conf.YamlGetString("masterHTTP")
 	if err != nil {
 		panic(err)
 	}
+
 	log.Info(master)
 	clientName, err := conf.YamlGetString("clientName")
 	if err != nil {
 		clientName = randStringBytes(maxNameLen)
 	}
+
 	connectCode, err := conf.YamlGetString("connCode")
 	if err != nil {
 		connectCode = udp.DefaultConnectCode
 	}
+
 	secretKey, err := conf.YamlGetString("connSecret")
 	if err != nil {
 		secretKey = udp.DefaultSecretKey
 	}
+
 	client, err := udp.NewClient(master, udp.ClientConf{
 		Name:        clientName,
 		ConnectCode: connectCode,

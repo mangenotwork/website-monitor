@@ -12,7 +12,7 @@ type Website struct {
 	// 默认取根url进行检测，主键
 	Host string `json:"host"`
 
-	HostID string `json:"hostID"` // host MD5值
+	HostID string `json:"hostID"`
 
 	// 监测频率  单位 ms
 	MonitorRate int64 `json:"monitorRate"`
@@ -126,6 +126,7 @@ type SSLCertificateInfo struct {
 }
 
 func (s SSLCertificateInfo) Echo() {
+	
 	txt := `
 Url: %s 
 有效时间: %s 
@@ -138,6 +139,7 @@ Url: %s
 DNSName: %s 
 CRL分发点: %s 
 OCSPServer: %s `
+
 	log.Info(fmt.Sprintf(txt, s.Url, s.EffectiveTime, s.Subject, s.Issuer, s.IssuingCertificateURL, s.PublicKeyAlgorithm,
 		s.SignatureAlgorithm, s.Version, s.DNSName, s.CRLDistributionPoints, s.OCSPServer))
 }

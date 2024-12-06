@@ -84,48 +84,60 @@ var AgentType = map[UserAgentType][]int{
 
 // GetAgent 随机获取那种类型的 user-agent
 func GetAgent(agentType UserAgentType) string {
-	rand.Seed(time.Now().UnixNano())
+
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	switch agentType {
 	case PCAgent:
 		if v, ok := UserAgentMap[listPCAgent[rand.Intn(len(listPCAgent))]]; ok {
 			return v
 		}
+
 	case WindowsAgent:
 		if v, ok := UserAgentMap[listWindowsAgent[rand.Intn(len(listWindowsAgent))]]; ok {
 			return v
 		}
+
 	case LinuxAgent:
 		if v, ok := UserAgentMap[listLinuxAgent[rand.Intn(len(listLinuxAgent))]]; ok {
 			return v
 		}
+
 	case MacAgent:
 		if v, ok := UserAgentMap[listMacAgent[rand.Intn(len(listMacAgent))]]; ok {
 			return v
 		}
+
 	case AndroidAgent:
 		if v, ok := UserAgentMap[listAndroidAgent[rand.Intn(len(listAndroidAgent))]]; ok {
 			return v
 		}
+
 	case IosAgent:
 		if v, ok := UserAgentMap[listIosAgent[rand.Intn(len(listIosAgent))]]; ok {
 			return v
 		}
+
 	case PhoneAgent:
 		if v, ok := UserAgentMap[listPhoneAgent[rand.Intn(len(listPhoneAgent))]]; ok {
 			return v
 		}
+
 	case WindowsPhoneAgent:
 		if v, ok := UserAgentMap[listWindowsPhoneAgent[rand.Intn(len(listWindowsPhoneAgent))]]; ok {
 			return v
 		}
+
 	case UCAgent:
 		if v, ok := UserAgentMap[listUCAgent[rand.Intn(len(listUCAgent))]]; ok {
 			return v
 		}
+
 	default:
 		if v, ok := UserAgentMap[rand.Intn(len(UserAgentMap))]; ok {
 			return v
 		}
+		
 	}
 	return ""
 }
