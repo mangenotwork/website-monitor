@@ -176,9 +176,9 @@ func WebsiteList(c *ginHelper.GinCtx) {
 		}
 
 		data = append(data, &WebsiteListOutItem{
-			v,
-			alertLen,
-			state,
+			Website:    v,
+			AlertCount: alertLen,
+			State:      state,
 		})
 	}
 
@@ -258,7 +258,11 @@ func WebsiteInfo(c *ginHelper.GinCtx) {
 		return
 	}
 
-	output.Base = WebsiteOutPut{base, utils.Timestamp2Date(base.Created)}
+	output.Base = WebsiteOutPut{
+		Website: base,
+		Date:    utils.Timestamp2Date(base.Created),
+	}
+
 	output.Info, err = website.GetInfo(hostId)
 	output.AlarmRule, err = website.GetAlarmRule(hostId)
 	output.ScanCheckUp, err = website.GetScanCheckUp(hostId)
@@ -287,6 +291,7 @@ func WebsiteInfoRefresh(c *ginHelper.GinCtx) {
 
 func WebsiteUrls(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
+
 	data, err := dao.NewWebsite().GetWebSiteUrl(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -328,7 +333,6 @@ func AllWebsite(c *ginHelper.GinCtx) {
 	}
 
 	for _, v := range websiteList {
-
 		rule, rErr := obj.GetAlarmRule(v.HostID)
 		if rErr != nil {
 			continue
@@ -351,6 +355,11 @@ func GetWebsiteData(c *ginHelper.GinCtx) {
 	obj := dao.NewWebsite()
 
 	website, err := obj.Select(hostId)
+	if err != nil {
+		c.APIOutPutError(err, err.Error())
+		return
+	}
+
 	rule, err := obj.GetAlarmRule(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -358,8 +367,8 @@ func GetWebsiteData(c *ginHelper.GinCtx) {
 	}
 
 	data := &WebsiteDataOut{
-		website,
-		rule.WebsiteSlowResponseTime,
+		Website:                 website,
+		WebsiteSlowResponseTime: rule.WebsiteSlowResponseTime,
 	}
 
 	c.APIOutPut(data, "")
@@ -368,6 +377,7 @@ func GetWebsiteData(c *ginHelper.GinCtx) {
 
 func WebsiteEdit(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
+
 	param, err := analysisWebsiteAddParam(c)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -460,6 +470,7 @@ func WebsiteChart(c *ginHelper.GinCtx) {
 func MonitorLog(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
 	day := c.GetQuery("day")
+
 	data := dao.NewMonitorLogDao().ReadLog(hostId, day)
 	c.APIOutPut(data, "")
 	return
@@ -467,6 +478,7 @@ func MonitorLog(c *ginHelper.GinCtx) {
 
 func MonitorLogList(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
+
 	data, err := dao.NewMonitorLogDao().LogListDay(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -480,6 +492,7 @@ func MonitorLogList(c *ginHelper.GinCtx) {
 func MonitorLogUpload(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
 	day := c.GetQuery("day")
+
 	logPath, err := dao.NewMonitorLogDao().Upload(hostId, day)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -524,6 +537,7 @@ func WebsitePointAdd(c *ginHelper.GinCtx) {
 
 func WebsitePointList(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
+
 	data, err := dao.NewWebsite().GetPoint(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -556,6 +570,7 @@ func WebsitePointDel(c *ginHelper.GinCtx) {
 
 func WebsitePointClear(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
+
 	err := dao.NewWebsite().ClearPoint(hostId)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -619,6 +634,7 @@ func AlertWebsite(c *ginHelper.GinCtx) {
 
 func AlertRead(c *ginHelper.GinCtx) {
 	id := c.Param("id")
+
 	err := dao.NewAlert().Read(id)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
@@ -631,6 +647,7 @@ func AlertRead(c *ginHelper.GinCtx) {
 
 func AlertInfo(c *ginHelper.GinCtx) {
 	id := c.Param("id")
+
 	data, err := dao.NewAlert().Get(id)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
@@ -643,6 +660,7 @@ func AlertInfo(c *ginHelper.GinCtx) {
 
 func AlertDel(c *ginHelper.GinCtx) {
 	id := c.Param("id")
+
 	err := dao.NewAlert().Del(id)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
@@ -655,6 +673,7 @@ func AlertDel(c *ginHelper.GinCtx) {
 
 func AlertClear(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
+
 	err := dao.NewAlert().Clear(hostId)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
@@ -694,6 +713,7 @@ func RequesterCreateTab(c *ginHelper.GinCtx) {
 
 func RequesterCloseTab(c *ginHelper.GinCtx) {
 	hostId := c.Param("reqId")
+
 	err := dao.NewRequestTool().DelRequestNowList(hostId)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
@@ -748,6 +768,7 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 	}
 
 	switch param.Method {
+
 	case "GET":
 		log.Info("get 请求...")
 		ctx, err := gt.Get(param.Url)
@@ -790,33 +811,44 @@ func RequesterExecute(c *ginHelper.GinCtx) {
 		}
 		c.APIOutPut(out, "")
 		return
+
 	case "POST":
 		log.Info("post 请求...")
+
 	case "PUT":
 		log.Info("put 请求...")
+
 	case "DELETE":
 		log.Info("delete 请求...")
+
 	case "OPTIONS":
 		log.Info("options 请求...")
+
 	case "HEAD":
 		log.Info("head 请求...")
 	}
 
+	c.APIOutPut("todo...", "")
+	return
 }
 
 func isMethod(method string) bool {
 	rse := false
+	method = strings.ToUpper(method)
+
 	for _, v := range []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"} {
 		if method == v {
 			rse = true
 			break
 		}
 	}
+
 	return rse
 }
 
 func RequesterGetData(c *ginHelper.GinCtx) {
 	reqId := c.Param("reqId")
+
 	data, err := dao.NewRequestTool().GetAtID(reqId)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
@@ -869,6 +901,11 @@ func RequesterHistoryDelete(c *ginHelper.GinCtx) {
 	reqId := c.Param("reqId")
 
 	err := dao.NewRequestTool().HistoryDelete(reqId)
+	if err != nil {
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+
 	err = dao.NewRequestTool().DelRequestNowList(reqId)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())
@@ -926,6 +963,7 @@ func RequesterGlobalHeaderGet(c *ginHelper.GinCtx) {
 
 func RequesterGlobalHeaderDel(c *ginHelper.GinCtx) {
 	key := c.Query("key")
+
 	err := dao.NewRequestTool().DelGlobalHeader(key)
 	if err != nil {
 		c.APIOutPutError(nil, err.Error())

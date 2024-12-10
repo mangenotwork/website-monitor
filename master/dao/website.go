@@ -16,13 +16,18 @@ import (
 
 type WebsiteEr interface {
 	Add(data *entity.Website, alarmRule *entity.WebsiteAlarmRule, scan *entity.WebsiteScanCheckUp) error
+
 	Del(hostID string) error
+
 	Edit(base *entity.Website, alarmRule *entity.WebsiteAlarmRule, scan *entity.WebsiteScanCheckUp) error
+
 	SelectList() ([]*entity.Website, int, error)
+
 	Select(hostID string) (*entity.Website, error)
 
-	// GetConfAlarmRule GetConfScanCheckUp 获取网站的监测配置
+	// GetConfAlarmRule 获取网站的监测配置
 	GetConfAlarmRule(hostID string) (*entity.WebsiteAlarmRule, error)
+
 	GetConfScanCheckUp(hostID string) (*entity.WebsiteScanCheckUp, error)
 
 	// GetAlarmRule 获取监测报警规则
@@ -39,6 +44,8 @@ type WebsiteEr interface {
 
 	// Collect 采集网站信息
 	Collect(host string) *entity.WebsiteInfo
+
+	// SaveCollectInfo 保存采集网站信息
 	SaveCollectInfo(host, hostID string) error
 
 	// GetInfo 获取网站信息

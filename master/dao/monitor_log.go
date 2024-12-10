@@ -34,7 +34,6 @@ func NewMonitorLogDao() MonitorLogEr {
 type monitorLogDao struct {
 }
 
-// 写日志
 func (m *monitorLogDao) Write(hostId, mLog string) {
 	logPath, err := conf.YamlGetString("logPath")
 	if err != nil {
@@ -182,7 +181,6 @@ func (m *monitorLogDao) ToMonitorLogObj(str string) *entity.MonitorLog {
 	}
 }
 
-// DeleteLog 删除日志
 func (m *monitorLogDao) DeleteLog(hostId string) error {
 	logPath, err := conf.YamlGetString("logPath")
 	if err != nil {

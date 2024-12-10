@@ -20,19 +20,23 @@ func ginH(h gin.H) gin.H {
 func NotFond(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
-		"notfond.html",
+		"not_fond.html",
 		ginH(gin.H{}),
 	)
+	return
 }
 
-func ErrPage(c *gin.Context, err error) {
+func ErrPage(c *gin.Context) {
+	msg := c.Query("msg")
 	c.HTML(
 		http.StatusOK,
 		"err.html",
 		ginH(gin.H{
-			"err": err.Error(),
+			"err":       msg,
+			"returnUrl": "/",
 		}),
 	)
+	return
 }
 
 func LoginPage(c *gin.Context) {
@@ -55,7 +59,7 @@ func LoginPage(c *gin.Context) {
 			"csrf": ginHelper.FormSetCSRF(c.Request),
 		}),
 	)
-
+	return
 }
 
 func HomePage(c *gin.Context) {
@@ -66,6 +70,7 @@ func HomePage(c *gin.Context) {
 			"nav": "home",
 		}),
 	)
+	return
 }
 
 func MonitorPage(c *gin.Context) {
@@ -76,6 +81,7 @@ func MonitorPage(c *gin.Context) {
 			"nav": "monitor",
 		}),
 	)
+	return
 }
 
 func AlertPage(c *gin.Context) {
@@ -86,6 +92,7 @@ func AlertPage(c *gin.Context) {
 			"nav": "alert",
 		}),
 	)
+	return
 }
 
 func ToolPage(c *gin.Context) {
@@ -96,36 +103,40 @@ func ToolPage(c *gin.Context) {
 			"nav": "tool",
 		}),
 	)
+	return
 }
 
 func TestAPIPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
-		"testAPI.html",
+		"test_api.html",
 		ginH(gin.H{
 			"nav": "api-test",
 		}),
 	)
+	return
 }
 
 func TestStressPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
-		"testStress.html",
+		"test_stress.html",
 		ginH(gin.H{
 			"nav": "stress-test",
 		}),
 	)
+	return
 }
 
 func TestPenetrationPage(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
-		"testPenetration.html",
+		"test_penetration.html",
 		ginH(gin.H{
 			"nav": "penetration-test",
 		}),
 	)
+	return
 }
 
 func OperationPage(c *gin.Context) {
@@ -136,6 +147,7 @@ func OperationPage(c *gin.Context) {
 			"nav": "operation",
 		}),
 	)
+	return
 }
 
 func InstructionsPage(c *gin.Context) {
@@ -146,6 +158,7 @@ func InstructionsPage(c *gin.Context) {
 			"nav": "instructions",
 		}),
 	)
+	return
 }
 
 func RequesterPage(c *gin.Context) {
@@ -156,4 +169,5 @@ func RequesterPage(c *gin.Context) {
 			"nav": "requester",
 		}),
 	)
+	return
 }

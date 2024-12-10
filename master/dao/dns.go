@@ -155,7 +155,7 @@ func NsLookUpAll(host string) ([]*entity.DNSInfo, []string) {
 		}
 	}
 
-	for k, _ := range allIPMap {
+	for k := range allIPMap {
 		allIP = append(allIP, k)
 	}
 

@@ -76,7 +76,7 @@
 主要是优化和改bug
 
 - 增加代码可读性 [ok]
-- 代码评审和优化
+- 代码评审和优化 [ok]
 - UI界面优化
 - 交互逻辑优化
 - [优化]面板数据加载很慢
@@ -85,8 +85,6 @@
 #### v0.0.4
 
 主要是提升监控的准确性和监控维度的调优
-
-
 
 
 
@@ -110,6 +108,43 @@ https://icp.5118.com/
 18. [ok] 随机监测的url 需要排除无效标签，如下
 ```
 https://www.8300.cn/zst/ssqjbw4;
+```
+19. monitor panic
+```azure
+panic: runtime error: invalid memory address or nil pointer dereference
+        panic: runtime error: invalid memory address or nil pointer dereference
+[signal 0xc0000005 code=0x0 addr=0x68 pc=0xe1c56e]
+
+goroutine 15 [running]:
+compress/gzip.(*Reader).Close(0xc000684380?)
+        D:/go1.22.2/src/compress/gzip/gunzip.go:290 +0xe
+github.com/mangenotwork/gathertool.(*Context).Do.func1(...)
+        D:/go/pkg/mod/github.com/mangenotwork/gathertool@v0.4.7/context.go:264
+panic({0x1131ce0?, 0x16e0c80?})
+        D:/go1.22.2/src/runtime/panic.go:770 +0x132
+compress/gzip.(*Reader).Read(0xc000842080?, {0xc000028200?, 0x0?, 0x80?})
+        D:/go1.22.2/src/compress/gzip/gunzip.go:247 +0x22
+io.ReadAll({0x287715bd838, 0x0})
+        D:/go1.22.2/src/io/io.go:712 +0x7e
+github.com/mangenotwork/gathertool.(*Context).Do(0xc0003cea20)
+        D:/go/pkg/mod/github.com/mangenotwork/gathertool@v0.4.7/context.go:286 +0x136f
+github.com/mangenotwork/gathertool.Get({0xc0004c04c8?, 0xc0001c0570?}, {0xc000039c88?, 0x7?, 0x11103a0?})
+        D:/go/pkg/mod/github.com/mangenotwork/gathertool@v0.4.7/gathertool.go:31 +0x27
+website-monitor/monitor/business.request({0xc0004c04c8, 0x15})
+        D:/go/src/github.com/mangenotwork/website-monitor/monitor/business/base.go:316 +0x117
+website-monitor/monitor/business.(*WebsiteItem).ContrastActive(0xc0003dc1c0, 0xc000039da0)
+        D:/go/src/github.com/mangenotwork/website-monitor/monitor/business/website.go:80 +0x45
+website-monitor/monitor/business.Business(0xc0003dc1c0)
+        D:/go/src/github.com/mangenotwork/website-monitor/monitor/business/base.go:119 +0x1df
+website-monitor/monitor/business.Initialize.func1.1({0xc00003e360?, 0xc0000af6e0?}, {0x11864c0?, 0xc0003dc1c0?})
+        D:/go/src/github.com/mangenotwork/website-monitor/monitor/business/base.go:50 +0x50
+sync.(*Map).Range(0xc0000d8690?, 0xc000039fc0)
+        D:/go1.22.2/src/sync/map.go:477 +0x1f8
+website-monitor/monitor/business.Initialize.func1()
+        D:/go/src/github.com/mangenotwork/website-monitor/monitor/business/base.go:47 +0x65
+created by website-monitor/monitor/business.Initialize in goroutine 1
+        D:/go/src/github.com/mangenotwork/website-monitor/monitor/business/base.go:42 +0x59
+exit status 2
 ```
 
 

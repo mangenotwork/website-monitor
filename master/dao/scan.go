@@ -13,7 +13,7 @@ import (
 )
 
 type HostScanUrl struct {
-	Host     string
+	Host     string              //
 	Depth    int64               // 页面深度
 	UrlSet   map[string]struct{} // 采集到host下的链接
 	CssLinks map[string]struct{} // 采集到的css文件链接
@@ -22,8 +22,8 @@ type HostScanUrl struct {
 	ExtLinks map[string]struct{} // 采集到外链
 	BadLinks map[string]struct{} // 采集到死链接
 	NoneTDK  map[string]string   // 检查空tdk
-	Count    int64
-	MaxCount int64
+	Count    int64               // 采集到的数量
+	MaxCount int64               // 采集到的最大数量
 }
 
 func Scan(host, id string, depth int64) {
@@ -182,6 +182,7 @@ G:
 		}
 
 		link := links[0]
+
 		// 请求并验证
 		scan.do(link, df)
 
@@ -289,6 +290,6 @@ func cleanUrl(str string) string {
 	if flag {
 		return str[:len(str)-1]
 	}
-	
+
 	return str
 }

@@ -49,7 +49,7 @@ func (r *requestToolDao) GetAtID(id string) (*entity.RequestTool, error) {
 	data := &entity.RequestTool{}
 
 	err := DB.Get(RequestTable, id, &data)
-	if errors.Is(err, ISNULL) { // 空数据忽略
+	if errors.Is(err, ISNULL) {
 		err = nil
 		data.Method = "GET"
 	}

@@ -41,10 +41,12 @@ func Login() {
 }
 
 func Page() {
+
 	// 404 && 405 && err page
 	Router.NoRoute(handler.NotFond)
 	Router.NoMethod(handler.NotFond)
-	// page group
+	Router.GET("/err", handler.ErrPage)
+
 	pg := Router.Group("")
 	pg.Use(AuthPG())
 	pg.GET("/home", handler.HomePage)
@@ -89,7 +91,7 @@ func API() {
 
 	// alert
 	api.GET("/alert/list", ginHelper.Handle(handler.AlertList))               // 报警列表
-	api.GET("/alert/wbesite/:hostId", ginHelper.Handle(handler.AlertWebsite)) // 指定网站的报警信息
+	api.GET("/alert/website/:hostId", ginHelper.Handle(handler.AlertWebsite)) // 指定网站的报警信息
 	api.GET("/alert/read/:id", ginHelper.Handle(handler.AlertRead))           // 报警信息已读
 	api.GET("/alert/info/:id", ginHelper.Handle(handler.AlertInfo))           // 报警消息详细信息
 	api.GET("/alert/del/:id", ginHelper.Handle(handler.AlertDel))             // 报警消息删除
@@ -137,7 +139,7 @@ func API() {
 func Data() {
 	// 提供监测器获取数据
 	data := Router.Group("/data")
-	data.GET("/allurl/:hostId", ginHelper.Handle(handler.WebsiteAllUrl))           // 获取网站下的所有url
+	data.GET("/allUrl/:hostId", ginHelper.Handle(handler.WebsiteAllUrl))           // 获取网站下的所有url
 	data.GET("/all/website", ginHelper.Handle(handler.AllWebsite))                 // 获取所有需要监测的网站
 	data.GET("/website/point/:hostId", ginHelper.Handle(handler.WebsitePointList)) // 获取网站监测点
 	data.GET("/website/:hostId", ginHelper.Handle(handler.GetWebsiteData))         // 获取指定网站信息

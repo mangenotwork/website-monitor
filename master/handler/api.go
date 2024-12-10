@@ -52,6 +52,7 @@ func Login(c *gin.Context) {
 func Out(c *gin.Context) {
 	c.SetCookie("sign", "", 60*60*24*7, "/", "", false, true)
 	c.Redirect(http.StatusFound, "/")
+	return
 }
 
 func MailInit(c *ginHelper.GinCtx) {
@@ -152,6 +153,7 @@ func ToolHistorySet(c *ginHelper.GinCtx) {
 
 func ToolHistoryGet(c *ginHelper.GinCtx) {
 	toolID := c.GetQueryInt("toolID")
+
 	h, err := dao.NewHistory(toolID)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
@@ -175,6 +177,7 @@ func ToolHistoryGet(c *ginHelper.GinCtx) {
 
 func ToolHistoryClear(c *ginHelper.GinCtx) {
 	toolID := c.GetQueryInt("toolID")
+
 	h, err := dao.NewHistory(toolID)
 	if err != nil {
 		c.APIOutPutError(err, err.Error())
