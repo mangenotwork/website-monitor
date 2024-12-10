@@ -77,7 +77,11 @@
 
 - 增加代码可读性 [ok]
 - 代码评审和优化 [ok]
-- UI界面优化
+- UI界面优化 - 面板 [ok]
+- UI界面优化 - 监测器
+- UI界面优化 - 监测报警
+- UI界面优化 - 请求调试
+- UI界面优化 - 工具
 - 交互逻辑优化
 - [优化]面板数据加载很慢
 - 修改bug
@@ -146,6 +150,63 @@ created by website-monitor/monitor/business.Initialize in goroutine 1
         D:/go/src/github.com/mangenotwork/website-monitor/monitor/business/base.go:42 +0x59
 exit status 2
 ```
+20. master panic
+```azure
+024-12-10 15:20:16.895 [Error] mangenotwork/gathertool@v0.4.7/context.go:247   | 【日志】 请求 err = Get "https://www.doubao.com/": dial tcp: lookup www.doubao.com: no such host
+2024-12-10 15:20:16.895 [INFO]  master/dao/dns.go:16    | NsLookUpLocal...
+2024-12-10 15:20:16.895 [ERROR] master/dao/dns.go:30    | lookup www.doubao.com/: no such host
+2024-12-10 15:20:16.896 [ERROR] master/dao/dns.go:38    | lookup www.doubao.com/: dnsquery: DNS name contains an invalid character.
+
+
+2024/12/10 15:20:16 [Recovery] 2024/12/10 - 15:20:16 panic recovered:
+GET /api/tool/website/collectInfo?host=https://www.doubao.com/ HTTP/1.1
+Host: 127.0.0.1:18888
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: zh-CN,zh;q=0.9
+Connection: keep-alive
+Cookie: browseKey_o6i66X0=f9f47022c7a777c4; browseSign_o6i66X0=803843fbacc25655efe006543c869752; sign=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFeHBpcmUiOjE3MzM0NTIyNzAsIm5hbWUiOiJhZG1pbiJ9.c0KTOAmLpWL3pPThH_9l_rOIXIhHUD79HilZHzlOW4A
+Referer: http://127.0.0.1:18888/home
+Sec-Ch-Ua: "Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+
+runtime error: invalid memory address or nil pointer dereference
+D:/go1.22.2/src/runtime/panic.go:261 (0xe24be6)
+        panicmem: panic(memoryError)
+D:/go1.22.2/src/runtime/signal_windows.go:401 (0xe24bb6)
+        sigpanic: panicmem()
+D:/go/src/github.com/mangenotwork/website-monitor/master/dao/whois.go:36 (0x142844a)
+        whois: _, _ = conn.Write([]byte(host + " \r\n"))
+D:/go/src/github.com/mangenotwork/website-monitor/master/dao/whois.go:21 (0x14282b9)
+        Whois: rootRse := whois(RootWhoisServers, host)
+D:/go/src/github.com/mangenotwork/website-monitor/master/dao/website.go:278 (0x14268de)
+        (*websiteDao).Collect: info.Whois = Whois(host)
+D:/go/src/github.com/mangenotwork/website-monitor/master/handler/api.go:295 (0x15a1a5a)
+        CollectWebSite: data := dao.NewWebsite().Collect(host)
+D:/go/pkg/mod/github.com/mangenotwork/common@v0.1.3/ginHelper/rw.go:25 (0x15ace29)
+        API.Handle.func39: h(ctx)
+D:/go/pkg/mod/github.com/gin-gonic/gin@v1.9.1/context.go:174 (0x157b28a)
+        (*Context).Next: c.handlers[c.index](c)
+D:/go/src/github.com/mangenotwork/website-monitor/master/routers/base.go:182 (0x15ae554)
+        API.AuthAPI.func1: c.Next()
+D:/go/pkg/mod/github.com/gin-gonic/gin@v1.9.1/context.go:174 (0x15a8db5)
+        (*Context).Next: c.handlers[c.index](c)
+D:/go/pkg/mod/github.com/gin-contrib/gzip@v0.0.6/handler.go:60 (0x15a8d9d)
+        (*gzipHandler).Handle: c.Next()
+D:/go/pkg/mod/github.com/gin-gonic/gin@v1.9.1/context.go:174 (0x1588239)
+        (*Context).Next: c.handlers[c.index](c)
+D:/go/pkg/mod/github.com/gin-gonic/gin@v1.9.1/recovery.go:102 (0x1588227)
+        CustomRecoveryWithWriter.func1: c.Next()
+D:/go/pkg/mod/github.com/gin-gonic/gin@v1.9.1/context.go:174 (0x158737c)
+```
+
 
 
 

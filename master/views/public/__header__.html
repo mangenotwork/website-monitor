@@ -1,14 +1,30 @@
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow" style="height: 56px;">
-    <div class="col-lg-2">
-        <h2 class="me-0 px-3 fs-6 " style="color: #ffffff;">{[ .Title ]}</h2>
-    </div>
+
     <div class="col-lg-10">
-        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addHostModal" style="color: #FFFFFF;float: left;margin-left: 4px;">
-            {[ SVG "plus-lg" 18 18 ]} 创建监测
-        </button>
-        <a type="button" class="btn btn-outline-secondary" href="/requester" style="color: #FFFFFF;float: left;margin-left: 4px;">
-            {[ SVG "lightning" 18 18 ]} 快速请求
-        </a>
+        <nav class="navbar navbar-expand-lg" style="margin-left: 1rem;float: left;">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #ffffff">开始</a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addHostModal"><span> {[ SVG "plus-lg" 18 18 ]} 创建监测</span></a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="#"  data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark">
+                                    <span style="margin-right: 4px;position: relative;top: -2px;"></span>
+                                    <span>设置</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="col-lg-2">
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark" style="margin-right: 24px;float: right;">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -22,7 +38,7 @@
         <div class="offcanvas-body">
             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" data-bs-toggle="modal" data-bs-target="#mailSetModal" >邮件设置</a>
+                    <a class="nav-link active" style="cursor: pointer;" aria-current="page" data-bs-toggle="modal" data-bs-target="#mailSetModal" >邮件设置</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">监视器连接信息(TODO...)</a>
@@ -36,4 +52,5 @@
             </ul>
         </div>
     </div>
+
 </header>

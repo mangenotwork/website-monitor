@@ -5,10 +5,30 @@
         <div class="container-fluid">
             <div class="row">
                 {[ template "__menu__.html" . ]}
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                    <template v-if="mail.init.data===false">
-                        <div class="alert alert-danger" role="alert"><a aria-current="page" data-bs-toggle="modal" data-bs-target="#mailSetModal">还未设置邮件通知! 请点击 <span style="text-decoration:underline;">邮件设置</span> 进行设置</a></div>
-                    </template>
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="padding-top: 1.1rem;">
+
+                    <div class="row" style="margin-bottom: 1.2rem;">
+
+                        <div class="btn-group btn-group-lg" role="group" aria-label="Large button group" style="width: 76%;">
+                            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#addHostModal">
+                                {[ SVG "plus-lg" 18 18 ]} 创建监测
+                            </button>
+                            <button type="button" class="btn btn-outline-dark" href="/requester" >
+                                {[ SVG "lightning" 18 18 ]} 快速请求
+                            </button>
+                            <button type="button" class="btn btn-outline-dark" @click="open(8)">
+                                {[ SVG "tv" 18 18 ]} 获取网站信息
+                            </button>
+                            <button type="button" class="btn btn-outline-dark" @click="open(3)">
+                                {[ SVG "hdd-rack" 18 18 ]} DNS查询
+                            </button>
+                            <button type="button" class="btn btn-outline-dark" @click="open(4)">
+                                {[ SVG "globe" 18 18 ]} Whois查询
+                            </button>
+                        </div>
+
+                    </div>
+
                     <div class="row" style="margin-bottom: 24px;">
                         <div class="col">
                             <div class="card box">
@@ -21,13 +41,15 @@
                                     </template>
                                     <a @click="refreshAlertList" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="刷新报警信息" >{[ SVG "arrow-repeat" 18 18 ]}</a>
                                 </div>
-                                <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
+                                <div class="card-body" style="height: 220px;overflow: auto;padding: 2px;">
                                     <ul class="list-group list-group-flush">
                                         <template v-if="alertList.len === 0"><p style="text-align: center;">占无报警通知</p></template>
                                         <template v-else>
                                             <template v-for="item in alertList.list">
                                                 <li class="list-group-item list-group-item-action">
-                                                    <a href="/alert" style="text-decoration: none;color: #dc3545;"><span>{{item.date}}|{{item.uri}}|{{item.msg}} </span></a>
+                                                    <a href="/alert" style="text-decoration: none;color: #dc3545;">
+                                                        <span style="font-size: 12px;">{{item.date}} | {{item.uri}} | {{item.msg}} </span>
+                                                    </a>
                                                 </li>
                                             </template>
                                         </template>
@@ -40,13 +62,13 @@
                                 <div class="card-header">{[ SVG "diagram-3-fill" 16 16 ]} 监测器列表
                                     <a @click="refreshMonitorList" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="刷新监视器列表" >{[ SVG "arrow-repeat" 18 18 ]}</a>
                                 </div>
-                                <div class="card-body" style="height: 120px;overflow: auto;padding: 2px;">
+                                <div class="card-body" style="height: 220px;overflow: auto;padding: 2px;">
                                     <ul class="list-group list-group-flush">
                                         <template v-if="monitor.list.length<=0"><p style="text-align: center;color: red;">没有连接监测器,请部署监测器!!!</p></template>
                                         <template v-else>
                                             <template v-for="item in monitor.list">
                                                 <li class="list-group-item list-group-item-action">
-                                                    <span>{{item.key}} |
+                                                    <span style="font-size: 14px;">{{item.key}} |
                                                         <template v-if="item.online===true">
                                                             <span class="badge text-bg-success">执行监测中...</span>
                                                         </template>
@@ -63,8 +85,9 @@
                             </div>
                         </div>
                     </div>
+
                     <div style="margin-top: 24px;padding: 0px;">
-                        <div class="box" style="height: calc(100vh - 320px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
+                        <div class="box" style="height: calc(100vh - 468px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
                             <table class="table table-hover">
                                 <thead style="z-index: 99;">
                                     <tr>
@@ -127,11 +150,34 @@
                     {[ template "chart_modal.html" . ]}
                     {[ template "alert_modal.html" . ]}
                     {[ template "url_info_modal.html" . ]}
+                    {[ template "tool_FidWebsiteInfo_modal.html" . ]}
+                    {[ template "tool_FidNsLookUp_modal.html" . ]}
+                    {[ template "tool_FidWhois_modal.html" . ]}
                 </main>
             </div>
         </div>
     </div>
 </body>
+<script>
+    const FidWebsiteTDKI = 1; // 获取网站的T, D, K, 图标
+    const FidIp = 2; // ip信息查询
+    const FidNsLookUp = 3; // 查询dns
+    const FidWhois = 4; // Whois查询
+    const FidICP = 5; // 查询备案
+    const FidPing = 6; // 在线ping
+    const FidSSL = 7; // 获取证书
+    const FidWebsiteInfo = 8; // 网站信息获取
+    const funcData = [
+        {fid: FidWebsiteTDKI, title: "获取网页的TDK", content: "Title Keywords Description Icon .", svg: '{[ SVG "window" 24 24 ]}'},
+        {fid: FidIp, title: "IP属地查询", content: "查询IP属地.", svg: '{[ SVG "hdd-network" 24 24 ]}'},
+        {fid: FidNsLookUp, title: "DNS查询", content: "在线nslookup.", svg: '{[ SVG "hdd-rack" 24 24 ]}'},
+        {fid: FidWhois, title: "Whois查询", content: "Whois查询.", svg: '{[ SVG "globe" 24 24 ]}'},
+        {fid: FidICP, title: "ICP查询", content: "网站备案查询.", svg: '{[ SVG "menu-button-wide" 24 24 ]}'},
+        {fid: FidPing, title: "Ping", content: "在线ping功能.", svg: '{[ SVG "terminal" 24 24 ]}'},
+        {fid: FidSSL, title: "SSL证书信息查询", content: "获取网站的证书信息.", svg: '{[ SVG "shield-check" 24 24 ]}'},
+        {fid: FidWebsiteInfo, title: "获取网站信息", content: "获取网站信息.", svg: '{[ SVG "tv" 24 24 ]}'}
+    ]
+</script>
 {[ template "__js__.html" . ]}
 <script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
 <script src="/static/js/home.js?v={[ .TimeStamp ]}"></script>

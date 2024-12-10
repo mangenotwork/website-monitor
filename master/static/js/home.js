@@ -165,6 +165,30 @@ const app = createApp({
                 api: "/api/monitor/list",
                 list: [],
             },
+            objFidWebsiteInfo: {
+                id: FidWebsiteInfo,
+                host: "",
+                api: function (){ return "/api/tool/website/collectInfo?host=" + this.host; },
+                rse: {},
+            },
+            history: {
+                add: function (id, value) { return "/api/tool/history?toolID="+id+"&value="+value; },
+                get: function (id) { return "/api/tool/history?toolID="+id; },
+                clear: function (id) {return "/api/tool/history/clear?toolID="+id; },
+                data: [],
+            },
+            objFidNsLookUp: {
+                id: FidNsLookUp,
+                host: "",
+                api: function (){ return "/api/tool/nsLookUp/all?host=" + this.host; },
+                rse: {},
+            },
+            objFidWhois: {
+                id: FidWhois,
+                host: "",
+                api: function (){ return "/api/tool/whois?host=" + this.host; },
+                rse: {},
+            },
         }
     },
     created:function(){
@@ -193,20 +217,24 @@ const app = createApp({
                 t.alertList.len = t.alertList.list.length;
             });
         },
+
         refreshAlertList: function () {
             let t = this;
             t.getAlertList();
         },
+
         getMonitorList: function () {
             let t = this;
             common.AjaxGet(t.monitor.api, function (data) {
                 t.monitor.list = data.data;
             });
         },
+
         refreshMonitorList: function () {
             let t = this;
             t.getMonitorList();
         },
+
         getMonitorErrList: function () {
             let t = this;
             common.AjaxGet(t.monitorErrList.api, function (data){
@@ -214,11 +242,13 @@ const app = createApp({
                 t.monitorErrList.len = t.monitorErrList.list.length;
             });
         },
+
         monitorErrClear: function () {
             let t = this;
             t.isOk = "monitorErrClear";
             $("#isOkModal").modal("show");
         },
+
         monitorErrClearSubmit: function () {
             let t = this;
             common.AjaxGet(t.monitorErrList.clear, function (data){
@@ -227,6 +257,7 @@ const app = createApp({
                 $("#isOkModal").modal('toggle');
             });
         },
+
         gotoList: function (pg) {
             let t = this;
             t.websiteList.page = pg;
@@ -242,6 +273,7 @@ const app = createApp({
             t.getUriPoint();
             $("#setUriModal").modal('show');
         },
+
         getUriPoint: function () {
             let t = this;
             common.AjaxGet(t.point.apiList(), function (data){
@@ -251,6 +283,7 @@ const app = createApp({
                 }
             });
         },
+
         addUriPoint: function () {
             let t = this;
             if (t.point.nowUri === "") {
@@ -263,6 +296,7 @@ const app = createApp({
                 t.getUriPoint();
             });
         },
+
         gotoUriPoint: function (hostId, uri) {
             let t = this;
             t.point.hostId = hostId;
@@ -272,6 +306,7 @@ const app = createApp({
                 t.getUriPoint();
             });
         },
+
         delUriPoint: function (uri) {
             let t = this;
             t.point.param.uri = uri;
@@ -280,6 +315,7 @@ const app = createApp({
                 t.getUriPoint();
             });
         },
+
         openWebsiteInfo: function (id) {
             let t = this;
             t.websiteInfo.hostId = id;
@@ -293,6 +329,7 @@ const app = createApp({
                 }
             });
         },
+
         refreshWebsiteInfo: function (host, id) {
             let t = this;
             t.websiteInfo.host = host;
@@ -305,9 +342,11 @@ const app = createApp({
                 }
             });
         },
+
         gotoWebsite: function (item) {
             window.open(item.host, '_blank');
         },
+
         logShow: function (item) {
             let t = this;
             t.monitorLog.hostId = item.hostID;
@@ -324,6 +363,7 @@ const app = createApp({
                 }
             });
         },
+
         loadLog: function () {
             let t = this;
             common.AjaxGet(t.monitorLog.loadApi(), function (data){
@@ -335,10 +375,12 @@ const app = createApp({
                 }
             });
         },
+
         uploadLog: function () {
             let t = this;
             window.location = t.monitorLog.logUpload();
         },
+
         deleteWebsiteOpen: function (item) {
             let t = this;
             t.deleteWebsite.hostId = item.hostID;
@@ -346,6 +388,7 @@ const app = createApp({
             t.isOk = "deleteWebsite";
             $("#isOkModal").modal("show");
         },
+
         deleteWebsiteSubmit: function () {
             let t = this;
             common.AjaxGet(t.deleteWebsite.api(), function (data){
@@ -355,6 +398,7 @@ const app = createApp({
                 location.reload();
             });
         },
+
         openEditWebsiteConf: function (hostId) {
             let t = this;
             t.editWebsiteConf.hostId = hostId;
@@ -405,6 +449,7 @@ const app = createApp({
                 $("#setAlertModal").modal('toggle');
             })
         },
+
         openWebsiteUrl: function (item) {
             let t =this;
             t.websiteUrl.hostId = item.hostID;
@@ -413,6 +458,7 @@ const app = createApp({
                 $("#urlInfoModal").modal("show");
             });
         },
+
         copy: function () {
             let t = this;
             let clipboard = new ClipboardJS('.copy');
@@ -424,6 +470,7 @@ const app = createApp({
                 common.ToastShow("复制失败！请重试或者手动复制内容!");
             });
         },
+
         openChart: function (item){
             let t = this;
             t.chartData.hostId = item.hostID;
@@ -439,6 +486,7 @@ const app = createApp({
             );
             $("#chartModal").modal("show");
         },
+
         loadingChart: function () {
             let t = this;
             t.$nextTick(() => {
@@ -446,6 +494,7 @@ const app = createApp({
                 }
             );
         },
+
         DrawChart: function () {
             let t = this;
             common.AjaxGetNotAsync(t.chartData.api(), function (data) {
@@ -505,6 +554,7 @@ const app = createApp({
             // 使用刚指定的配置项和数据显示图表。
             myChart.setOption(option);
         },
+
         openAlert: function (id) {
             let t = this;
             t.websiteAlert.hostId = id;
@@ -514,6 +564,7 @@ const app = createApp({
             });
             $("#alertModal").modal("show");
         },
+
         delAlert: function (id, hostId) {
             let t = this;
             common.AjaxGet(t.websiteAlert.del(id), function (data) {
@@ -522,7 +573,151 @@ const app = createApp({
                     t.openAlert(hostId);
                 }
             });
-        }
+        },
+
+        submitFidWebsiteInfo: function () {
+            let t = this;
+            if (t.objFidWebsiteInfo.host === "") {
+                common.ToastShow("请输入Host！");
+                return
+            }
+            $("#FidWebsiteInfoRse").hide();
+            $("#FidWebsiteInfoLoading").show();
+            common.AjaxGet(t.objFidWebsiteInfo.api(), function (data){
+                t.objFidWebsiteInfo.rse = data.data;
+                $("#FidWebsiteInfoRse").show();
+                $("#FidWebsiteInfoLoading").hide();
+                t.setHistory(t.objFidWebsiteInfo.id, t.objFidWebsiteInfo.host);
+                t.getHistory(t.objFidWebsiteInfo.id);
+            });
+        },
+
+        gotoFidWebsiteInfo: function (value) {
+            let t = this;
+            t.objFidWebsiteInfo.host = value;
+            t.submitFidWebsiteInfo();
+        },
+
+        clearFidWebsiteInfoHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidWebsiteInfo.id);
+            t.getHistory(t.objFidWebsiteInfo.id);
+        },
+
+        getHistory: function (id) {
+            let t = this;
+            common.AjaxGet(t.history.get(id), function (data){
+                t.history.data = data.data;
+            });
+        },
+
+        setHistory: function (id, value) {
+            let t = this;
+            common.AjaxPost(t.history.add(id, value), "", function (data){
+                console.log(data)
+            });
+        },
+
+        clearHistory: function (id) {
+            let t = this;
+            common.AjaxGet(t.history.clear(id), function (data){
+                t.history.data = data.data;
+            });
+        },
+
+        open: function (fid) {
+            let t = this;
+            t.getHistory(fid);
+            switch (fid) {
+                // 获取网站的T, D, K, 图标
+                case FidWebsiteTDKI :
+                    $("#FidWebsiteTDKIModal").modal("show");
+                    break;
+                // ip信息查询
+                case FidIp :
+                    $("#FidIpModal").modal("show");
+                    break;
+                // 查询dns
+                case FidNsLookUp :
+                    $("#FidNsLookUpModal").modal("show");
+                    break;
+                // Whois查询
+                case FidWhois :
+                    $("#FidWhoisModal").modal("show");
+                    break;
+                // 查询备案
+                case FidICP :
+                    $("#FidICPModal").modal("show");
+                    break;
+                // 在线ping
+                case FidPing :
+                    $("#FidPingModal").modal("show");
+                    break;
+                // 获取证书
+                case FidSSL :
+                    $("#FidSSLModal").modal("show");
+                    break;
+                // 网站信息获取
+                case FidWebsiteInfo :
+                    $("#FidWebsiteInfoModal").modal("show");
+                    break;
+            }
+        },
+
+        submitFidNsLookUp: function () {
+            let t = this;
+            if (t.objFidNsLookUp.host === "") {
+                common.ToastShow("请输入Host！");
+                return
+            }
+            $("#FidNsLookUpRse").hide();
+            $("#FidNsLookUpLoading").show();
+            common.AjaxGet(t.objFidNsLookUp.api(), function (data){
+                t.objFidNsLookUp.rse = data.data;
+                $("#FidNsLookUpLoading").hide();
+                $("#FidNsLookUpRse").show();
+                t.setHistory(t.objFidNsLookUp.id, t.objFidNsLookUp.host);
+                t.getHistory(t.objFidNsLookUp.id);
+            });
+        },
+
+        gotoFidNsLookUp: function (value) {
+            let t = this;
+            t.objFidNsLookUp.host = value;
+            t.submitFidNsLookUp();
+        },
+
+        clearFidNsLookUpHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidNsLookUp.id);
+            t.getHistory(t.objFidNsLookUp.id);
+        },
+
+        submitFidWhois: function () {
+            let t = this;
+            if (t.objFidWhois.host === "") {
+                common.ToastShow("请输入Host！");
+                return
+            }
+            common.AjaxGet(t.objFidWhois.api(), function (data){
+                t.objFidWhois.rse = data.data;
+                t.setHistory(t.objFidWhois.id, t.objFidWhois.host);
+                t.getHistory(t.objFidWhois.id);
+            });
+        },
+
+        gotoFidWhois: function (value) {
+            let t = this;
+            t.objFidWhois.host = value;
+            t.submitFidWhois();
+        },
+
+        clearFidWhoisHistory: function () {
+            let t = this;
+            t.clearHistory(t.objFidWhois.id);
+            t.getHistory(t.objFidWhois.id);
+        },
+
     },
     computed: {
     },
