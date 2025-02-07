@@ -48,7 +48,7 @@ body {
 }
 
 .sidebar .nav-link.active {
-    background-color: #9c9c9c9c;
+    background-color: #f0f0f0;
 }
 
 .sidebar span {
@@ -58,7 +58,7 @@ body {
 
 .sidebar .active {
     padding: 8px 24px 8px 24px;
-    background-color: #9c9c9c9c;
+    background-color: #f0f0f0;
     border-radius: 4px;
     margin-left: 4px;
     margin-right: 4px;

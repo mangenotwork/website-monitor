@@ -1,5 +1,6 @@
 const { createApp, ref } = Vue;
 const common = new Utils;
+
 const app = createApp({
     data() {
         return {
@@ -204,6 +205,7 @@ const app = createApp({
             t.getMonitorList();
             t.getAlertList();
         }, 10000);
+
     },
     destroyed:function () {
         let t = this;
@@ -718,10 +720,44 @@ const app = createApp({
             t.getHistory(t.objFidWhois.id);
         },
 
+        initTippy: function () {
+            tippy('.websiteInfoBtn',{
+                content: "查看网站信息",
+            });
+            tippy('.websiteAlertBtn',{
+                content: "打开报警信息",
+            });
+            tippy('.gotoWebsiteBtn',{
+                content: "新页签打开该网站",
+            });
+            tippy('.editWebsiteConfBtn',{
+                content: "修改网站监测配置",
+            });
+            tippy('.websiteUrlBtn',{
+                content: "查看网站扫描的Url",
+            });
+            tippy('.uriPointBtn',{
+                content: "设置网站监测点(Url)",
+            });
+            tippy('.logShowBtn',{
+                content: "查看监测日志",
+            });
+            tippy('.openChartBtn',{
+                content: "查看监测图",
+            });
+            tippy('.websiteOpenBtn',{
+                content: "删除该网站监测",
+            });
+        },
+
     },
     computed: {
     },
-    mounted:function(){
+    mounted(){
+        this.initTippy()
+    },
+    updated() {
+        this.initTippy()
     },
 });
 app.mount('#app');
