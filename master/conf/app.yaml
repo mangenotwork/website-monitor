@@ -1,7 +1,6 @@
 # app相关基础信息
 app:
   name: "Website Monitor"
-  runType: "dev"
 
 # http服务
 httpServer:

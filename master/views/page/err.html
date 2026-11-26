@@ -1,8 +1,12 @@
 {[ template "__start__.html" . ]}
 <body>
-    <main class="form-signin w-100 m-auto">
-        <h2 class="h3 mb-3 fw-normal">错误: {[ .err ]}</h2>
-        <a href="{[ .returnUrl ]}">返回主页</a>
-    </main>
+<div class="error-page">
+    <div class="error-card">
+        <div class="error-code">!</div>
+        <h1>操作未完成</h1>
+        <p>{[ .err ]}</p>
+        <a class="btn primary" href="{[ if .returnUrl ]}{[ .returnUrl ]}{[ else ]}/{[ end ]}">返回</a>
+    </div>
+</div>
 </body>
 {[ template "__end__.html" . ]}

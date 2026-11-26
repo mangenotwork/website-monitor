@@ -2,53 +2,115 @@
 <body>
 <div id="app">
     {[ template "__header__.html" . ]}
-    <div class="container-fluid">
-        <div class="row">
-            {[ template "__menu__.html" . ]}
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                Monitor List Info
-                <div style="margin-top: 24px;padding: 0px;">
-                    <div class="box" style="height: calc(100vh - 160px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
-                        <table class="table table-hover">
-                            <thead style="z-index: 99;">
-                            <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">状态</th>
-                                <th scope="col">连接</th>
-                                <th scope="col">公网IP</th>
-                                <th scope="col">公网属地</th>
-                                <th scope="col">宿主系统信息</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <template v-for="item in monitor.list">
-                                <tr>
-                                    <td><span><b>{{ item.name }}</b></span></td>
-                                    <td>
-                                        <template v-if="item.online===true">
-                                            <span class="badge text-bg-success">执行监测中...</span>
-                                        </template>
-                                        <template v-if="item.online===false">
-                                            <span class="badge text-bg-danger">离线! </span>
-                                        </template>
-                                    </td>
-                                    <td><span>{{ item.publicIP }}</span></td>
-                                    <td><span>{{ item.publicIPAddr }}</span></td>
-                                    <td><span>{{ item.addr }}</span></td>
-                                    <td><span>{{ item.osInfo }}</span></td>
-                                </tr>
-                            </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
-                {[ template "add_host_modal.html" . ]}
-                {[ template "mail_set_modal.html" . ]}
-                {[ template "toast.html" . ]}
-            </main>
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>探针</h1>
+                <p><b>{{ online }}</b> 个在线 · 共 {{ total }} 个 · 心跳间隔 5s</p>
+            </div>
+            <div class="page-actions">
+                <button type="button" class="btn icon ghost" @click="refresh" title="刷新">
+                    <svg class="icon"><use href="#i-refresh"/></svg>
+                </button>
+                <a class="btn primary" href="#installPanel">
+                    <svg class="icon sm"><use href="#i-plus"/></svg>接入探针
+                </a>
+            </div>
         </div>
-    </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title">节点<span class="count">{{ total }}</span></div>
+                <span class="panel-link" @click="refresh">
+                    <svg class="icon sm"><use href="#i-refresh"/></svg>刷新状态
+                </span>
+            </div>
+            <div class="table-wrap">
+                <table class="tbl">
+                    <thead>
+                    <tr>
+                        <th style="width:180px">节点</th>
+                        <th style="width:110px">状态</th>
+                        <th style="width:140px">公网 IP</th>
+                        <th style="width:170px">属地</th>
+                        <th>系统</th>
+                        <th style="width:120px">最近心跳</th>
+                        <th style="width:56px"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in monitor.list" :key="item.key">
+                        <td>
+                            <div class="host-cell">
+                                <div class="host-line"><span class="host">{{ hostName(item) }}</span></div>
+                                <div class="sub">{{ item.name || item.key }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span v-if="item.online" class="status ok"><i class="dot ok"></i>在线</span>
+                            <span v-else class="status off"><i class="dot"></i>离线</span>
+                        </td>
+                        <td class="num">{{ item.publicIP || item.IP || '—' }}</td>
+                        <td class="muted">{{ addrLine(item) }}</td>
+                        <td>
+                            <div>{{ osLine(item) }}</div>
+                            <div class="sub" v-if="item.osInfo && item.osInfo.interfaceInfo">
+                                {{ item.osInfo.interfaceInfo.split('\n')[0] }}
+                            </div>
+                        </td>
+                        <td class="num muted">{{ lastSeen(item) }}</td>
+                        <td>
+                            <div class="cell-actions">
+                                <button type="button" class="mini always" title="复制 IP"
+                                        @click="copy(item.publicIP || item.IP)">
+                                    <svg class="icon sm"><use href="#i-copy"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-if="monitor.list.length === 0">
+                        <td colspan="7" style="cursor:default">
+                            <div class="empty">
+                                <div class="ico"><svg class="icon"><use href="#i-server"/></svg></div>
+                                <h4>还没有探针接入</h4>
+                                <p>按照下方步骤部署 monitor，启动后会自动注册</p>
+                                <a class="btn secondary sm" href="#installPanel">查看接入方式</a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel" id="installPanel" style="margin-top:16px">
+            <div class="panel-head">
+                <div class="panel-title">接入新探针</div>
+                <span class="tag neutral">2 步</span>
+            </div>
+            <div class="panel-body">
+                <div class="hint" style="margin:0 0 10px">
+                    在目标机器修改 <span class="num">monitor/conf/app.yaml</span>，把 master 与 masterHTTP 指向本机地址，然后启动探针。
+                </div>
+                <div class="editor" v-pre style="height:auto;min-height:0;padding:10px 12px">master: 127.0.0.1:18889<br>masterHTTP: http://127.0.0.1:18888<br>clientName: node2<br>connCode: qwert<br>connSecret: abc123!@</div>
+                <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center">
+                    <button type="button" class="btn secondary"
+                            @click="copy('master: 127.0.0.1:18889\nmasterHTTP: http://127.0.0.1:18888\nclientName: node2')">
+                        <svg class="icon sm"><use href="#i-copy"/></svg>复制配置模板
+                    </button>
+                    <span class="tag neutral" style="font-family:var(--mono)">./monitor -conf ./conf/app.yaml</span>
+                </div>
+                <div class="note" style="margin-top:12px">
+                    <svg class="icon sm"><use href="#i-alert"/></svg>
+                    <span>clientName 最多 7 个字符，多节点部署时需保持唯一；连接码与密钥需与 master 的 app.yaml 一致。</span>
+                </div>
+            </div>
+        </div>
+
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "toast.html" . ]}
+    </main>
 </div>
 </body>
 {[ template "__js__.html" . ]}

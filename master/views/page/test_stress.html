@@ -2,20 +2,32 @@
 <body>
 <div id="app">
     {[ template "__header__.html" . ]}
-    <div class="container-fluid">
-        <div class="row">
-            {[ template "__menu__.html" . ]}
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                test stress TODO...
-                {[ template "add_host_modal.html" . ]}
-                {[ template "mail_set_modal.html" . ]}
-                {[ template "toast.html" . ]}
-            </main>
+
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>压力测试</h1>
+                <p>由多个探针并发发起请求，观察目标站点承载能力</p>
+            </div>
         </div>
-    </div>
+
+        <div class="placeholder-box">
+            <div class="placeholder-inner">
+                <div class="ico"><svg class="icon lg"><use href="#i-activity"/></svg></div>
+                <h2>压力测试正在开发中</h2>
+                <p>计划支持并发数、持续时间、RPS 曲线与多探针分发。当前请勿在生产环境进行压测。</p>
+                <a class="btn secondary" href="/sites">查看站点</a>
+            </div>
+        </div>
+
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "toast.html" . ]}
+    </main>
 </div>
 </body>
 {[ template "__js__.html" . ]}
 <script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
-<script src="/static/js/testStress.js?v={[ .TimeStamp ]}"></script>
+<script>
+    Vue.createApp({ data() { return { mail: Mail }; } }).mount('#app');
+</script>
 {[ template "__end__.html" . ]}

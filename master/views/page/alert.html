@@ -2,66 +2,99 @@
 <body>
 <div id="app">
     {[ template "__header__.html" . ]}
-    <div class="container-fluid">
-        <div class="row">
-            {[ template "__menu__.html" . ]}
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                Alert List Info
-                <div style="margin-top: 24px;padding: 0px;">
-                    <div class="box" style="height: calc(100vh - 160px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
-                        <table class="table table-hover">
-                            <thead style="z-index: 99;">
-                            <tr>
-                                <th scope="col">Date</th>
-                                <th scope="col">Host</th>
-                                <th scope="col">Url</th>
-                                <th scope="col">Url Code</th>
-                                <th scope="col">Url Ms</th>
-                                <th scope="col">Url Type</th>
-                                <th scope="col">Msg</th>
-                                <th scope="col">网络环境</th>
-                                <th scope="col">监测器</th>
-                                <th scope="col">状态</th>
-                                <th scope="col">操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <template v-for="item in alert.list">
-                                <tr style="font-size: 11px;">
-                                    <td>{{ item.date }}</td>
-                                    <td>{{ item.host }}</td>
-                                    <td>{{ item.uri }}</td>
-                                    <td>{{ item.uriCode }}</td>
-                                    <td>{{ item.uriMs }}ms</td>
-                                    <td>{{ item.uriType }}</td>
-                                    <td>{{ item.msg }}</td>
-                                    <td>对照组:{{ item.contrastUri }}, code:{{ item.contrastUriCode }}, ms:{{ item.contrastUriMs }}|
-                                        Ping:{{ item.ping }}, ms:{{ item.pingMs }}
-                                    </td>
-                                    <td>{{ item.monitorName }}| {{ item.monitorIP }}| {{ item.monitorAddr }}|{{ item.clientIP }}
-                                    </td>
-                                    <td> <template v-if="item.read==0">未读</template><template v-else>已读</template>
-                                    </td>
-                                    <td style="width: 500px;">
-                                        <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-                                            <a type="button" class="btn btn-outline-dark btn-sm" @click="delAlert(item.alertId)">删除</a>
-                                            <a type="button" class="btn btn-outline-dark btn-sm" @click="readMark(item.alertId)">标记已读</a>
-                                            <a type="button" class="btn btn-outline-dark btn-sm" @click="gotoUrl(item.uri)">打开链接</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
-                {[ template "add_host_modal.html" . ]}
-                {[ template "mail_set_modal.html" . ]}
-                {[ template "toast.html" . ]}
-            </main>
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>报警</h1>
+                <p>共 <b>{{ counts.all }}</b> 条 · 未读 <b>{{ unread }}</b> 条 · 涉及 {{ hostCount }} 个站点</p>
+            </div>
+            <div class="page-actions">
+                <button type="button" class="btn secondary" @click="markAllRead">
+                    <svg class="icon sm"><use href="#i-check"/></svg>全部已读
+                </button>
+            </div>
         </div>
-    </div>
+
+        <div class="toolbar">
+            <div class="segmented">
+                <button type="button" :class="{on: seg === 'all'}" @click="setSeg('all')">全部<span class="count">{{ counts.all }}</span></button>
+                <button type="button" :class="{on: seg === 'unread'}" @click="setSeg('unread')">未读<span class="count">{{ counts.unread }}</span></button>
+                <button type="button" :class="{on: seg === 'timeout'}" @click="setSeg('timeout')">超时<span class="count">{{ counts.timeout }}</span></button>
+                <button type="button" :class="{on: seg === 'code'}" @click="setSeg('code')">状态码<span class="count">{{ counts.code }}</span></button>
+            </div>
+
+            <select class="input" style="width:180px" v-model="hostFilter">
+                <option value="">全部站点</option>
+                <option v-for="h in hosts" :key="h.id" :value="h.id">{{ h.host }}</option>
+            </select>
+
+            <div class="spacer"></div>
+
+            <div class="search-box" style="width:240px">
+                <svg class="icon"><use href="#i-search"/></svg>
+                <input v-model="kw" placeholder="搜索站点、URI、报警内容">
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="table-wrap scroll-y">
+                <table class="tbl">
+                    <thead>
+                    <tr>
+                        <th style="width:30px"></th>
+                        <th style="width:120px">时间</th>
+                        <th style="width:220px">站点</th>
+                        <th style="width:84px">类型</th>
+                        <th>详情</th>
+                        <th style="width:96px">耗时</th>
+                        <th style="width:96px">探针</th>
+                        <th style="width:70px"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in filtered" :key="item.alertId" @click="open(item)">
+                        <td>
+                            <i class="dot" v-if="item.read === 0" :class="typeClass(item)"></i>
+                            <i class="dot" v-else></i>
+                        </td>
+                        <td class="num muted" style="font-size:11.5px">{{ timeText(item.date) }}</td>
+                        <td>
+                            <div class="host-cell">
+                                <div class="host-line"><span class="host">{{ shortHost(item.host) }}</span></div>
+                                <div class="sub">{{ item.uriType || '—' }} · {{ item.uri }}</div>
+                            </div>
+                        </td>
+                        <td><span class="tag" :class="typeClass(item)">{{ typeText(item) }}</span></td>
+                        <td class="muted" style="font-size:12px;max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                            {{ item.msg }}
+                        </td>
+                        <td class="num">{{ item.uriMs }}<span class="muted" style="font-size:10.5px"> ms</span></td>
+                        <td class="num muted">{{ item.monitorName || '—' }}</td>
+                        <td @click.stop>
+                            <div class="cell-actions">
+                                <button type="button" class="btn xs ghost" @click="open(item)">详情</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-if="filtered.length === 0">
+                        <td colspan="8" style="cursor:default">
+                            <div class="empty">
+                                <div class="ico"><svg class="icon"><use href="#i-bell"/></svg></div>
+                                <h4>{{ alerts.list.length === 0 ? '暂无报警' : '没有符合条件的报警' }}</h4>
+                                <p>{{ alerts.list.length === 0 ? '站点运行正常，新的报警会出现在这里' : '试试切换筛选条件或清空搜索' }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "toast.html" . ]}
+        {[ template "alert_drawer.html" . ]}
+    </main>
 </div>
 </body>
 {[ template "__js__.html" . ]}

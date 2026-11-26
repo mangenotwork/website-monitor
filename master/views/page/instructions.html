@@ -2,20 +2,124 @@
 <body>
 <div id="app">
     {[ template "__header__.html" . ]}
-    <div class="container-fluid">
-        <div class="row">
-            {[ template "__menu__.html" . ]}
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                instructions TODO...
-                {[ template "add_host_modal.html" . ]}
-                {[ template "mail_set_modal.html" . ]}
-                {[ template "toast.html" . ]}
-            </main>
+
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>使用说明</h1>
+                <p>从部署到报警的完整流程</p>
+            </div>
         </div>
-    </div>
+
+        <div class="dash-grid" style="grid-template-columns:minmax(0,1fr) 280px">
+            <div class="side-stack">
+                <div class="panel" id="quickstart">
+                    <div class="panel-head"><div class="panel-title">快速开始</div><span class="tag neutral">3 步</span></div>
+                    <div class="panel-body">
+                        <div class="section-title" style="margin-top:0">1. 启动 master</div>
+                        <div class="log" v-pre>cd master<br>./master</div>
+                        <div class="hint" style="margin-top:8px">默认监听 HTTP 18888、UDP 18889，账号密码与端口在 <span class="num">conf/app.yaml</span> 中配置。</div>
+
+                        <div class="section-title">2. 创建监测</div>
+                        <div style="font-size:12.5px;color:var(--text-2);line-height:1.8">
+                            在「站点」页点击创建监测，填写站点地址、监测频率与报警阈值。创建后 master 会立即采集站点信息，并通知在线探针更新配置。
+                        </div>
+
+                        <div class="section-title">3. 部署探针</div>
+                        <div style="font-size:12.5px;color:var(--text-2);line-height:1.8">
+                            在监测节点修改 <span class="num">monitor/conf/app.yaml</span>，把 master 与 masterHTTP 指向 master 地址，然后运行：
+                        </div>
+                        <div class="log" v-pre style="margin-top:8px">./monitor -conf ./conf/app.yaml</div>
+                        <div class="hint" style="margin-top:8px">探针启动后会自动注册、拉取站点列表并开始按频率监测，无需在 master 上额外操作。</div>
+                    </div>
+                </div>
+
+                <div class="panel" id="monitor">
+                    <div class="panel-head"><div class="panel-title">监测逻辑</div></div>
+                    <div class="panel-body">
+                        <div class="kv-grid">
+                            <div class="kv"><span class="k">频率</span><span class="v">monitorRate 秒 / 轮</span></div>
+                            <div class="kv"><span class="k">网络校核</span><span class="v">Ping + 对照组</span></div>
+                            <div class="kv"><span class="k">Health</span><span class="v">站点根 URI</span></div>
+                            <div class="kv"><span class="k">Random</span><span class="v">随机采集 URI</span></div>
+                            <div class="kv"><span class="k">Point</span><span class="v">监测点轮询</span></div>
+                            <div class="kv"><span class="k">结果上报</span><span class="v">UDP → 日志文件</span></div>
+                        </div>
+                        <div class="note" style="margin-top:12px">
+                            <svg class="icon sm"><use href="#i-alert"/></svg>
+                            <span>每轮监测前先 Ping 与请求对照组：网络异常时本轮跳过，避免把探针网络问题误判成站点故障。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" id="alert">
+                    <div class="panel-head"><div class="panel-title">报警与邮件</div></div>
+                    <div class="panel-body">
+                        <div style="font-size:12.5px;color:var(--text-2);line-height:1.9">
+                            报警规则在站点设置中维护：<br>
+                            · 状态码 400 / 404 / 5xx 立即记录报警；<br>
+                            · 响应时间超过慢响应阈值时，连续 N 次才发送邮件；<br>
+                            · 证书剩余天数低于阈值时触发提醒；<br>
+                            · 死链、TDK 为空、外链变化在扫描任务中发现后记录。
+                        </div>
+                        <div class="section-title">邮件配置</div>
+                        <div style="font-size:12.5px;color:var(--text-2);line-height:1.8">
+                            左下角「邮件与通知」填写 SMTP 服务器、发件人、授权码与收件人，可先发送测试邮件确认配置。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" id="faq">
+                    <div class="panel-head"><div class="panel-title">常见问题</div></div>
+                    <div class="panel-body">
+                        <div class="section-title" style="margin-top:0">站点一直显示「等待探针」</div>
+                        <div class="hint" style="margin:0 0 12px">说明没有在线探针，或探针未拉到配置。先在「探针」页确认节点在线，再检查 master 的 UDP 18889 是否可达。</div>
+
+                        <div class="section-title">面板没有响应时间</div>
+                        <div class="hint" style="margin:0 0 12px">响应数据来自探针上报的日志。确认探针运行正常，且站点已产生 Health 类型日志后再查看站点详情。</div>
+
+                        <div class="section-title">日志存在哪里</div>
+                        <div class="hint" style="margin:0 0 12px">master 的 <span class="num">conf/app.yaml</span> 中 <span class="num">logPath</span> 指定，按 <span class="num">&lt;hostID&gt;_&lt;YYYYMMDD&gt;.log</span> 切分。</div>
+
+                        <div class="section-title">修改了阈值但报警没变化</div>
+                        <div class="hint" style="margin:0">保存监测设置后会通知探针重新拉取配置；若探针离线，配置会在其恢复后生效。</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="side-stack">
+                <div class="panel">
+                    <div class="panel-head"><div class="panel-title">目录</div></div>
+                    <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
+                        <a class="panel-link" href="#quickstart">快速开始</a>
+                        <a class="panel-link" href="#monitor">监测逻辑</a>
+                        <a class="panel-link" href="#alert">报警与邮件</a>
+                        <a class="panel-link" href="#faq">常见问题</a>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head"><div class="panel-title">版本</div></div>
+                    <div class="panel-body">
+                        <div class="kv"><span class="k">master</span><span class="v">{[ .Version ]}</span></div>
+                        <div class="kv"><span class="k">运行模式</span><span class="v">{[ .RunType ]}</span></div>
+                        <div class="kv"><span class="k">HTTP</span><span class="v">18888</span></div>
+                        <div class="kv"><span class="k">UDP</span><span class="v">18889</span></div>
+                    </div>
+                    <a class="panel-foot" href="https://github.com/mangenotwork/website-monitor" target="_blank" rel="noopener">
+                        项目仓库<svg class="icon sm"><use href="#i-external"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "toast.html" . ]}
+    </main>
 </div>
 </body>
 {[ template "__js__.html" . ]}
 <script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
-<script src="/static/js/instructions.js?v={[ .TimeStamp ]}"></script>
+<script>
+    Vue.createApp({ data() { return { mail: Mail }; } }).mount('#app');
+</script>
 {[ template "__end__.html" . ]}

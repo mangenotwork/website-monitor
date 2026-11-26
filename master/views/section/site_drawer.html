@@ -1,0 +1,254 @@
+<aside class="drawer" id="siteDrawer" role="dialog" aria-modal="true" aria-label="站点详情">
+    <div class="drawer-head">
+        <div style="min-width:0">
+            <div class="drawer-title-row">
+                <i class="dot"></i>
+                <h2>{{ site.shortHost() }}</h2>
+            </div>
+            <div class="drawer-sub" v-if="site.info && site.info.base">
+                {{ site.info.base.notes || '未填写备注' }} · 创建于 {{ site.info.base.date }} · 最近监测 {{ site.logDay ? site.fmtDay(site.logDay) : '—' }}
+            </div>
+            <div class="drawer-sub" v-else>正在加载站点信息…</div>
+        </div>
+        <div class="drawer-actions">
+            <a class="btn icon xs ghost" :href="site.host" target="_blank" rel="noopener" title="打开网站">
+                <svg class="icon sm"><use href="#i-external"/></svg>
+            </a>
+            <button type="button" class="btn xs secondary" @click="openEditWebsiteConf(site.hostId)">
+                <svg class="icon sm"><use href="#i-edit"/></svg>编辑
+            </button>
+            <button type="button" class="btn icon xs ghost danger" @click="site.del()" title="删除站点监测">
+                <svg class="icon sm"><use href="#i-trash"/></svg>
+            </button>
+            <button type="button" class="btn icon xs ghost" @click="site.close()" aria-label="关闭">
+                <svg class="icon"><use href="#i-x"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="drawer-meta" v-if="site.info && site.info.base">
+        <span>频率<b>{{ site.info.base.monitorRate }}s</b></span>
+        <span>对照组<b>{{ site.info.base.contrastUrl }}</b></span>
+        <span>Ping<b>{{ site.info.base.ping }}</b></span>
+        <span>慢响应<b>{{ site.info.alarmRule.websiteSlowResponseTime }}ms</b></span>
+        <span>证书阈值<b>{{ site.info.alarmRule.SSLCertificateExpire }} 天</b></span>
+    </div>
+
+    <div class="drawer-tabs">
+        <div class="tab" :class="{on: site.tab === 'overview'}" @click="site.switchTab('overview')">概览</div>
+        <div class="tab" :class="{on: site.tab === 'points'}" @click="site.switchTab('points')">监测点</div>
+        <div class="tab" :class="{on: site.tab === 'urls'}" @click="site.switchTab('urls')">采集 URL</div>
+        <div class="tab" :class="{on: site.tab === 'logs'}" @click="site.switchTab('logs')">日志</div>
+    </div>
+
+    <div class="drawer-body">
+        <!-- 概览 -->
+        <div class="pane" :class="{on: site.tab === 'overview'}">
+            <div class="mini-stats">
+                <div class="mini-stat">
+                    <div class="l">今日采样</div>
+                    <div class="v">{{ site.stat.count }}</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="l">平均响应</div>
+                    <div class="v">{{ site.stat.avg }}<small>ms</small></div>
+                </div>
+                <div class="mini-stat">
+                    <div class="l">P95</div>
+                    <div class="v">{{ site.stat.p95 }}<small>ms</small></div>
+                </div>
+                <div class="mini-stat">
+                    <div class="l">峰值</div>
+                    <div class="v">{{ site.stat.max }}<small>ms</small></div>
+                </div>
+            </div>
+
+            <div class="chart-box" v-if="site.chartData.length">
+                <div class="chart-head">
+                    <div class="chart-title">响应时间 · {{ site.logDay ? site.fmtDay(site.logDay) : '今日' }}</div>
+                    <div class="legend">
+                        <span><i></i>站点响应</span>
+                        <span><i style="background:#C9C9D1"></i>报警阈值</span>
+                    </div>
+                </div>
+                <div id="siteChart" class="chart"></div>
+            </div>
+            <div class="empty" v-else>
+                <div class="ico"><svg class="icon"><use href="#i-activity"/></svg></div>
+                <h4>{{ site.chartLoading ? '正在加载图表…' : '暂无监测数据' }}</h4>
+                <p>探针上报后，这里会显示 Health 类型 URI 的响应时间</p>
+            </div>
+
+            <template v-if="site.info">
+                <div class="section-title">
+                    基础信息
+                    <span class="panel-link" @click="site.refreshInfo()">
+                        <svg class="icon sm"><use href="#i-refresh"/></svg>重新采集
+                    </span>
+                </div>
+                <div class="kv-grid">
+                    <div class="kv"><span class="k">标题</span><span class="v">{{ site.titleText() }}</span></div>
+                    <div class="kv"><span class="k">服务端</span><span class="v">{{ site.serverText() }}</span></div>
+                    <div class="kv"><span class="k">A 记录</span><span class="v">{{ site.dnsText() }}</span></div>
+                    <div class="kv"><span class="k">CNAME</span><span class="v">{{ site.cnameText() }}</span></div>
+                    <div class="kv"><span class="k">证书到期</span><span class="v">{{ site.sslText() }}</span></div>
+                    <div class="kv"><span class="k">备案</span><span class="v">{{ site.ipcText() }}</span></div>
+                    <div class="kv"><span class="k">IP 属地</span>
+                        <span class="v">{{ site.info.info.IPAddr && site.info.info.IPAddr.length ? site.info.info.IPAddr[0].address : '—' }}</span>
+                    </div>
+                    <div class="kv"><span class="k">解析耗时</span>
+                        <span class="v">{{ site.info.info.DNS ? site.info.info.DNS.ms + ' ms' : '—' }}</span>
+                    </div>
+                </div>
+
+                <div class="section-title">监测策略</div>
+                <div class="kv-grid">
+                    <div class="kv"><span class="k">扫描深度</span><span class="v">{{ site.info.scanCheckUp.uriDepth }}</span></div>
+                    <div class="kv"><span class="k">扫描频率</span><span class="v">{{ site.info.scanCheckUp.scanRate }} 小时</span></div>
+                    <div class="kv"><span class="k">死链检查</span><span class="v">{{ site.info.scanCheckUp.scanBadLink ? '开启' : '关闭' }}</span></div>
+                    <div class="kv"><span class="k">TDK 检查</span><span class="v">{{ site.info.scanCheckUp.scanTDK ? '开启' : '关闭' }}</span></div>
+                    <div class="kv"><span class="k">外链变化</span><span class="v">{{ site.info.scanCheckUp.scanExtLinks ? '开启' : '关闭' }}</span></div>
+                    <div class="kv"><span class="k">连续慢报警</span><span class="v">{{ site.info.alarmRule.websiteSlowResponseCount }} 次</span></div>
+                </div>
+            </template>
+
+            <div class="empty" v-else>
+                <div class="ico"><svg class="icon"><use href="#i-refresh"/></svg></div>
+                <h4>正在加载站点信息</h4>
+                <p>首次采集可能较慢，请稍候</p>
+            </div>
+        </div>
+
+        <!-- 监测点 -->
+        <div class="pane" :class="{on: site.tab === 'points'}">
+            <div class="section-title">
+                监测点
+                <span class="count" style="font-family:var(--mono);font-size:11px;color:var(--text-3)">{{ site.points.length }}</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+                <input class="input" v-model="site.newPoint" placeholder="https://example.com/path"
+                       @keyup.enter="site.addPoint()">
+                <button type="button" class="btn primary" @click="site.addPoint()">
+                    <svg class="icon sm"><use href="#i-plus"/></svg>添加
+                </button>
+            </div>
+
+            <div class="panel" v-if="site.points.length">
+                <div class="table-wrap">
+                    <table class="tbl">
+                        <thead>
+                        <tr><th>URL</th><th style="width:56px"></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="p in site.points" :key="p">
+                            <td class="num">{{ p }}</td>
+                            <td>
+                                <div class="cell-actions">
+                                    <button type="button" class="mini always" @click="site.copy(p)" title="复制">
+                                        <svg class="icon sm"><use href="#i-copy"/></svg>
+                                    </button>
+                                    <button type="button" class="mini always" @click="site.delPoint(p)" title="删除">
+                                        <svg class="icon sm"><use href="#i-trash"/></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="empty" v-else>
+                <div class="ico"><svg class="icon"><use href="#i-server"/></svg></div>
+                <h4>{{ site.pointLoading ? '正在加载…' : '还没有监测点' }}</h4>
+                <p>添加后，探针会按监测周期轮询这些 URL</p>
+            </div>
+
+            <div class="note" style="margin-top:12px">
+                <svg class="icon sm"><use href="#i-alert"/></svg>
+                <span>监测点按轮询依次执行，每轮只测一个，避免对目标站点造成额外压力。</span>
+            </div>
+        </div>
+
+        <!-- 采集 URL -->
+        <div class="pane" :class="{on: site.tab === 'urls'}">
+            <div class="section-title">
+                采集 URL
+                <span style="display:flex;align-items:center;gap:8px">
+                    <span style="font-family:var(--mono);font-size:11px;color:var(--text-3)">{{ site.urlTotal() }}</span>
+                    <button type="button" class="btn xs secondary" @click="site.loadUrls()">
+                        <svg class="icon sm"><use href="#i-refresh"/></svg>刷新
+                    </button>
+                </span>
+            </div>
+            <div class="toolbar" v-if="site.urls">
+                <div class="search-box" style="width:100%">
+                    <svg class="icon"><use href="#i-search"/></svg>
+                    <input v-model="site.urlFilter" placeholder="过滤 URL">
+                </div>
+            </div>
+            <div class="panel" v-if="site.urls && site.filteredUrls().length">
+                <div class="table-wrap">
+                    <table class="tbl">
+                        <thead>
+                        <tr><th>URL</th><th style="width:52px"></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="u in site.filteredUrls()" :key="u">
+                            <td class="num">{{ u }}</td>
+                            <td>
+                                <div class="cell-actions">
+                                    <button type="button" class="mini always" @click="site.copy(u)" title="复制">
+                                        <svg class="icon sm"><use href="#i-copy"/></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="empty" v-else>
+                <div class="ico"><svg class="icon"><use href="#i-globe"/></svg></div>
+                <h4>{{ site.urlLoading ? '正在加载…' : '暂无采集结果' }}</h4>
+                <p>站点扫描完成后，这里会出现抓取到的 URL</p>
+            </div>
+            <div class="note" style="margin-top:12px" v-if="site.urlTotal() > 200">
+                <svg class="icon sm"><use href="#i-alert"/></svg>
+                <span>共 {{ site.urlTotal() }} 条，列表仅展示前 200 条，可用过滤框缩小范围。</span>
+            </div>
+        </div>
+
+        <!-- 日志 -->
+        <div class="pane" :class="{on: site.tab === 'logs'}">
+            <div class="section-title">
+                监测日志
+                <span style="display:flex;align-items:center;gap:8px">
+                    <select class="input" style="width:130px;height:26px;font-size:12px"
+                            v-model="site.logDay" @change="site.changeLogDay(site.logDay)">
+                        <option v-for="d in site.logDays" :key="d" :value="d">{{ site.fmtDay(d) }}</option>
+                    </select>
+                    <a class="btn xs secondary" :href="'/api/website/log/upload/' + site.hostId + '?day=' + site.logDay">
+                        <svg class="icon sm"><use href="#i-download"/></svg>下载
+                    </a>
+                </span>
+            </div>
+            <div class="log" v-if="site.logs.length">
+                <div v-for="(l, i) in site.logs" :key="i">
+                    <span class="t">{{ l.Time }}</span>
+                    <span :class="l.LogType === 'Alert' ? 'a' : (l.LogType === 'Error' ? 'w' : 'i')">{{ l.LogType }}</span>
+                    {{ l.UriType }} · {{ l.UriCode || '—' }} · {{ l.UriMs }}ms
+                    <span v-if="l.Msg">· {{ l.Msg }}</span>
+                </div>
+            </div>
+            <div class="empty" v-else>
+                <div class="ico"><svg class="icon"><use href="#i-clock"/></svg></div>
+                <h4>{{ site.logLoading ? '正在加载…' : '当天没有日志' }}</h4>
+                <p>可切换日期查看历史监测记录</p>
+            </div>
+            <div class="note" style="margin-top:12px">
+                <svg class="icon sm"><use href="#i-alert"/></svg>
+                <span>日志按天切分，默认展示最近 300 条；完整的文件可通过右上角下载。</span>
+            </div>
+        </div>
+    </div>
+</aside>

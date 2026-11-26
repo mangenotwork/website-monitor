@@ -1,0 +1,127 @@
+{[ template "__start__.html" . ]}
+<body>
+<div id="app">
+    {[ template "__header__.html" . ]}
+
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>站点</h1>
+                <p>共 <b>{{ counts.all }}</b> 个站点 · {{ counts.monitoring }} 个监测中 · {{ counts.alert }} 个报警 · {{ counts.waiting }} 个等待探针</p>
+            </div>
+            <div class="page-actions">
+                <button type="button" class="btn secondary" @click="exportCsv">
+                    <svg class="icon sm"><use href="#i-download"/></svg>导出
+                </button>
+                <button type="button" class="btn primary" data-bs-toggle="modal" data-bs-target="#addHostModal">
+                    <svg class="icon sm"><use href="#i-plus"/></svg>创建监测
+                </button>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <svg class="icon"><use href="#i-search"/></svg>
+                <input v-model="kw" placeholder="搜索域名或备注">
+            </div>
+            <div class="segmented">
+                <button type="button" :class="{on: seg === 'all'}" @click="setSeg('all')">全部<span class="count">{{ counts.all }}</span></button>
+                <button type="button" :class="{on: seg === 'monitoring'}" @click="setSeg('monitoring')">监测中<span class="count">{{ counts.monitoring }}</span></button>
+                <button type="button" :class="{on: seg === 'alert'}" @click="setSeg('alert')">报警<span class="count">{{ counts.alert }}</span></button>
+                <button type="button" :class="{on: seg === 'waiting'}" @click="setSeg('waiting')">等待<span class="count">{{ counts.waiting }}</span></button>
+            </div>
+            <div class="spacer"></div>
+            <span class="hint" v-if="kw || seg !== 'all'">筛选出 {{ filtered.length }} 条</span>
+        </div>
+
+        <div class="bulkbar" :class="{show: selectedCount > 0}">
+            <span>已选择 <b>{{ selectedCount }}</b> 个站点</span>
+            <div class="spacer"></div>
+            <button type="button" class="btn xs secondary" @click="bulkPause">暂停监测</button>
+            <button type="button" class="btn xs danger" @click="bulkDelete" :disabled="busy">删除</button>
+            <button type="button" class="btn xs ghost" @click="clearSel">取消</button>
+        </div>
+
+        <div class="panel">
+            <div class="table-wrap scroll-y">
+                <table class="tbl">
+                    <thead>
+                    <tr>
+                        <th style="width:38px">
+                            <input class="cb" type="checkbox" :checked="allSelected" @change="toggleAll" aria-label="全选">
+                        </th>
+                        <th>站点</th>
+                        <th style="width:110px">状态</th>
+                        <th style="width:72px">频率</th>
+                        <th style="width:200px">对照组</th>
+                        <th style="width:120px">Ping</th>
+                        <th style="width:90px">报警</th>
+                        <th style="width:70px"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in filtered" :key="item.hostID"
+                        :class="{'selected': selected.indexOf(item.hostID) !== -1}"
+                        @click="openSite(item)">
+                        <td @click.stop>
+                            <input class="cb" type="checkbox"
+                                   :checked="selected.indexOf(item.hostID) !== -1"
+                                   @change="toggle(item)" aria-label="选择站点">
+                        </td>
+                        <td>
+                            <div class="host-cell">
+                                <div class="host-line">
+                                    <span class="host">{{ shortHost(item.host) }}</span>
+                                    <button type="button" class="mini" @click.stop="copy(item.host)" title="复制域名">
+                                        <svg class="icon sm"><use href="#i-copy"/></svg>
+                                    </button>
+                                </div>
+                                <div class="sub">{{ item.notes || '未填写备注' }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status" :class="statusClass(item)">
+                                <i class="dot"></i>{{ statusText(item) }}
+                            </span>
+                        </td>
+                        <td class="num muted">{{ item.monitorRate }}s</td>
+                        <td class="num muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis">{{ item.contrastUrl }}</td>
+                        <td class="num muted">{{ item.ping }}</td>
+                        <td>
+                            <span v-if="item.alertCount > 0" class="tag danger">{{ item.alertCount }} 条</span>
+                            <span v-else class="muted">—</span>
+                        </td>
+                        <td @click.stop>
+                            <div class="cell-actions">
+                                <button type="button" class="btn xs ghost" @click="openSite(item)">详情</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-if="filtered.length === 0">
+                        <td colspan="8" style="cursor:default">
+                            <div class="empty">
+                                <div class="ico"><svg class="icon"><use href="#i-search"/></svg></div>
+                                <h4>{{ counts.all === 0 ? '还没有监测站点' : '没有符合条件的站点' }}</h4>
+                                <p>{{ counts.all === 0 ? '创建后探针会自动拉取配置并开始监测' : '试试清空搜索或切换筛选条件' }}</p>
+                                <button v-if="counts.all === 0" type="button" class="btn primary sm"
+                                        data-bs-toggle="modal" data-bs-target="#addHostModal">创建监测</button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {[ template "add_host_modal.html" . ]}
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "set_alert_modal.html" . ]}
+        {[ template "toast.html" . ]}
+        {[ template "site_drawer.html" . ]}
+    </main>
+</div>
+</body>
+{[ template "__js__.html" . ]}
+<script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
+<script src="/static/js/sites.js?v={[ .TimeStamp ]}"></script>
+{[ template "__end__.html" . ]}

@@ -1,56 +1,117 @@
-<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow" style="height: 56px;">
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 8a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8V3"/><path d="M7 15h10"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 8-4-16-3 8H2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h8M8 11h6"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+    <symbol id="i-chevron-r" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-chevron-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 12l5 5 5-5M5 20h14"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+</svg>
 
-    <div class="col-lg-10">
-        <nav class="navbar navbar-expand-lg" style="margin-left: 1rem;float: left;">
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #ffffff">开始</a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addHostModal"><span> {[ SVG "plus-lg" 18 18 ]} 创建监测</span></a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item" href="#"  data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark">
-                                    <span style="margin-right: 4px;position: relative;top: -2px;"></span>
-                                    <span>设置</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </div>
-
-    <div class="col-lg-2">
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark" aria-controls="offcanvasNavbarDark" style="margin-right: 24px;float: right;">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-
-    <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbarDark" aria-labelledby="offcanvasNavbarDarkLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasNavbarDarkLabel">设置</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-mark">
+            <svg viewBox="0 0 24 24"><path d="M2 14h4l3-8 4 12 3-8h6"/></svg>
         </div>
-        <div class="offcanvas-body">
-            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item">
-                    <a class="nav-link active" style="cursor: pointer;" aria-current="page" data-bs-toggle="modal" data-bs-target="#mailSetModal" >邮件设置</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">监视器连接信息(TODO...)</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">设置(TODO...)</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/api/out">退出登录</a>
-                </li>
+        <div>
+            <div class="brand-name">网站监控平台</div>
+        </div>
+    </div>
+
+    {[ template "__menu__.html" . ]}
+
+    <div class="side-foot">
+        <a class="nav-item {[ if eq .nav "instructions" ]}on{[ end ]}" href="/instructions">
+            <svg class="icon"><use href="#i-book"/></svg><span>使用说明</span>
+        </a>
+        <a class="nav-item" data-bs-toggle="modal" data-bs-target="#mailSetModal" style="cursor:pointer">
+            <svg class="icon"><use href="#i-settings"/></svg><span>邮件与通知</span>
+        </a>
+        <a class="nav-item" href="https://github.com/mangenotwork/website-monitor" style="cursor:pointer">
+            <span>{[ .Title ]} {[ .Version ]}</span>
+        </a>
+    </div>
+</aside>
+
+<header class="topbar">
+    <div class="crumb">
+        <span>{[ if or (eq .nav "home") (eq .nav "sites") (eq .nav "alert") ]}监测{[ else if or (eq .nav "requester") (eq .nav "api-test") (eq .nav "stress-test") (eq .nav "penetration-test") ]}调试{[ else if or (eq .nav "tool") (eq .nav "monitor") ]}工具{[ else ]}系统{[ end ]}</span>
+        <svg class="icon"><use href="#i-chevron-r"/></svg>
+        <strong>{[ if eq .nav "home" ]}面板{[ else if eq .nav "sites" ]}站点{[ else if eq .nav "monitor" ]}探针{[ else if eq .nav "alert" ]}报警{[ else if eq .nav "requester" ]}请求器{[ else if eq .nav "tool" ]}在线工具{[ else if eq .nav "api-test" ]}接口测试{[ else if eq .nav "stress-test" ]}压力测试{[ else if eq .nav "penetration-test" ]}渗透测试{[ else if eq .nav "operation" ]}运维{[ else if eq .nav "instructions" ]}使用说明{[ else ]}页面{[ end ]}</strong>
+    </div>
+
+    <form class="top-search" action="/sites" method="get" role="search">
+        <svg class="icon sm"><use href="#i-search"/></svg>
+        <input type="text" name="kw" placeholder="搜索站点、备注" autocomplete="off">
+        <kbd>/</kbd>
+    </form>
+
+    <div class="top-right">
+        <a class="chip" href="/monitor"><i class="dot accent"></i><span id="topProbeText">探针管理</span></a>
+        <div class="accent-switch" title="强调色">
+            <button type="button" data-accent="indigo" onclick="UI.setAccent('indigo')" title="靛蓝"><i style="background:#4F46E5"></i></button>
+            <button type="button" data-accent="teal" onclick="UI.setAccent('teal')" title="青绿"><i style="background:#0F766E"></i></button>
+            <button type="button" data-accent="graphite" onclick="UI.setAccent('graphite')" title="石墨"><i style="background:#27272A"></i></button>
+        </div>
+        <button type="button" class="btn icon ghost" id="densityBtn" onclick="UI.toggleDensity()" title="当前：舒适 · 点击切换为紧凑" aria-pressed="false">
+            <svg class="icon"><use href="#i-list"/></svg>
+        </button>
+        <a class="btn icon ghost" href="/alert" title="报警" style="position:relative">
+            <svg class="icon"><use href="#i-bell"/></svg>
+            <i class="dot danger" id="topAlertDot" style="display:none;position:absolute;top:5px;right:6px;box-shadow:0 0 0 2px #fff"></i>
+        </a>
+        <div class="top-divider"></div>
+        <div class="dropdown">
+            <button class="btn icon ghost" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="账号">
+                <span class="avatar">M</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><span class="dropdown-item-text" style="font-size:11px;color:var(--text-3);padding:6px 9px">admin</span></li>
+                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#mailSetModal" href="javascript:">
+                    <svg class="icon sm"><use href="#i-settings"/></svg>邮件设置</a></li>
+                <li><a class="dropdown-item" href="/instructions">
+                    <svg class="icon sm"><use href="#i-book"/></svg>使用说明</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item danger" href="/api/out">
+                    <svg class="icon sm"><use href="#i-external"/></svg>退出登录</a></li>
             </ul>
         </div>
     </div>
-
 </header>
+
+<div class="mask" id="uiMask" onclick="UI.closeDrawers()"></div>
+
+<div class="ui-confirm-mask" id="uiConfirmMask" onclick="if(event.target===this)UI.closeConfirm()">
+    <div class="ui-confirm-card" role="dialog" aria-modal="true" aria-labelledby="uiConfirmTitle">
+        <h3 id="uiConfirmTitle">确认操作</h3>
+        <p id="uiConfirmDesc"></p>
+        <div class="ui-confirm-actions">
+            <button type="button" class="btn secondary" onclick="UI.closeConfirm()">取消</button>
+            <button type="button" class="btn primary" id="uiConfirmOk">确认</button>
+        </div>
+    </div>
+</div>
+

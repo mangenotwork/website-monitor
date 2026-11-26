@@ -1,7 +1,9 @@
 <script>
-    $( function () {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof bootstrap === 'undefined') return;
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            bootstrap.Tooltip.getOrCreateInstance(el);
+        });
     });
 </script>
 </html>

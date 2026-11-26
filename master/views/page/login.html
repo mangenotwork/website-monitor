@@ -1,19 +1,30 @@
 {[ template "__start__.html" . ]}
-<body class="body-signin">
-    <main class="form-signin w-100 m-auto">
-        <h3 class="h3 mb-3 fw-normal">{[ .Title ]}</h3>
-        <form action="/login" method="post">
-            {[ .csrf ]}
-            <div class="form-floating">
-                <input type="text" class="form-control" id="user" name="user" placeholder="name">
-                <label for="user">账号</label>
-            </div>
-            <div class="form-floating">
-                <input type="password" class="form-control" id="password" name="password" placeholder="password">
-                <label for="password">密码</label>
-            </div>
-            <button class="w-100 btn btn-lg btn-dark" type="submit">登录</button>
-        </form>
-    </main>
+<body class="login-page">
+<div class="login-card">
+    <div class="login-brand">
+        <div class="brand-mark">
+            <svg viewBox="0 0 24 24"><path d="M2 14h4l3-8 4 12 3-8h6"/></svg>
+        </div>
+        <div>
+            <div class="login-title">{[ .Title ]}</div>
+            <div class="login-sub">网站监测与诊断平台</div>
+        </div>
+    </div>
+
+    <form class="login-box" action="/login" method="post">
+        {[ .csrf ]}
+        <div class="field">
+            <label for="user">账号</label>
+            <input class="input" type="text" id="user" name="user" autocomplete="username" autofocus>
+        </div>
+        <div class="field">
+            <label for="password">密码</label>
+            <input class="input" type="password" id="password" name="password" autocomplete="current-password">
+        </div>
+        <button class="btn primary" type="submit">登录</button>
+    </form>
+
+    <div class="login-foot">{[ .Version ]} · 仅限授权使用</div>
+</div>
 </body>
 {[ template "__end__.html" . ]}

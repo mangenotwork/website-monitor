@@ -41,10 +41,10 @@ func Login(c *gin.Context) {
 
 	}
 
-	c.HTML(200, "err.html", gin.H{
-		"Title": conf.Conf.Default.App.Name,
-		"err":   "账号或密码错误",
-	})
+	c.HTML(200, "err.html", ginH(gin.H{
+		"err":       "账号或密码错误",
+		"returnUrl": "/",
+	}))
 
 	return
 }

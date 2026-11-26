@@ -2,419 +2,274 @@
 <body>
 <div id="app">
     {[ template "__header__.html" . ]}
-    <div class="container-fluid">
-        <div class="row">
-            {[ template "__menu__.html" . ]}
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
-                <div class="row box" style="height: calc(100vh - 100px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 4px;width: 98%;margin-left: 1%;">
-                    <div class="col-2" style="border-right: 1px solid #A9A9A9;padding-top: 12px;">
-                        <div>
-                            <div class="input-group input-group-sm mb-3">
-                                <input type="text" class="form-control" placeholder="搜索" aria-describedby="button-addon2">
-                                <button class="btn btn-outline-secondary" type="button" id="button-addon2">{[ SVG "search" 16 16 ]}</button>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="新建请求" @click="" style="font-size: 9px;">{[ SVG "lightning" 12 12 ]} </a>
-                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="新建目录" @click="" style="font-size: 9px;">{[ SVG "plus-lg" 12 12 ]} </a>
-                                <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="清空历史" @click="" style="font-size: 9px;">{[ SVG "trash-fill" 12 12 ]} </a>
-                            </div>
-                        </div>
-                        <hr>
-                        <span style="font-size: 9px;">历史</span>
-                        <div style="height: 240px;overflow: auto;">
-                            <ul style="font-size: 9px;">
-                                <template v-for="item in history.list">
-                                    <li><a class="" href="#">[{{ item.method }}] {{ item.name }}</a> <span @click="deleteHistory(item.id)" style="float: right;margin-right: 4px;cursor: pointer;">{[ SVG "trash-fill" 12 12 ]}</span></li>
-                                </template>
-                            </ul>
-                        </div>
-                        <hr>
-                        <span style="font-size: 9px;">目录</span>
-                        <div style="height: 240px;overflow: auto;">
-                            <nav class="small" id="toc">
-                                <ul class="list-unstyled">
-                                    <li class="my-2">
-                                        <button class="btn btn-sm d-inline-flex align-items-center border-0 collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#contents-collapse" aria-controls="contents-collapse">接口1 </button>
-                                        <span @click="openDirModal()" style="float: right;cursor: pointer;margin-top: 4px;">{[ SVG "gear-fill" 16 16 ]}</span>
-                                        <ul class="list-unstyled ps-3 collapse" id="contents-collapse" style="">
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#typography">[GET] Typography </a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#images">[GET] Images </a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="my-2">
-                                        <button class="btn btn-sm d-inline-flex align-items-center border-0 collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#forms-collapse" aria-controls="forms-collapse">Forms</button>
-                                        <span @click="openDirModal()" style="float: right;cursor: pointer;margin-top: 4px;">{[ SVG "gear-fill" 16 16 ]}</span>
-                                        <ul class="list-unstyled ps-3 collapse" id="forms-collapse" style="">
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">[GET] Overview</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#disabled-forms">[GET] Disabled forms</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="my-2">
-                                        <button class="btn btn-sm d-inline-flex align-items-center border-0 collapsed" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#components-collapse" aria-controls="components-collapse">Components</button>
-                                        <span @click="openDirModal()" style="float: right;cursor: pointer;margin-top: 4px;">{[ SVG "gear-fill" 16 16 ]}</span>
-                                        <ul class="list-unstyled ps-3 collapse" id="components-collapse" style="">
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#accordion">[GET] Accordion</a></li>
-                                            <li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#alerts">[GET] Alerts</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </nav>
-
-                        </div>
-                    </div>
-                    <div class="col-10" style="padding: 12px;padding-top: 2px;">
-                        <div style="margin-bottom: 8px;">
-                            <ul class="nav nav-tabs gdtiao" style="width: 100%;height:54px;flex-direction: row;flex-wrap: nowrap;overflow-x: scroll;font-size: 11px;">
-                                <template v-for="item in nowReqList.list">
-                                    <li class="nav-item">
-                                        <template v-if="item.isNow == true">
-                                            <a class="nav-link active" aria-current="page" href="#" style="width: 200px;">[GET] {{ item.name }} <span @click="closeTab(item.id)" style="float: right;cursor: pointer;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
-                                        </template>
-                                        <template v-else>
-                                            <a class="nav-link" @click="openTab(item.id)" style="width: 200px;">[GET] {{ item.name }} <span @click="closeTab(item.id)" style="float: right;cursor: pointer;">{[ SVG "x-square-fill" 16 16 ]}</span></a>
-                                        </template>
-                                    </li>
-                                </template>
-                            </ul>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <input class="form-control form-control-sm" v-model="param.name" type="text" placeholder="接口名称" >
-                            </div>
-                            <div class="col-8">
-                                <div class="btn-group btn-group-sm" role="group" style="font-size: 11px;">
-                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="createTab()">{[ SVG "lightning" 14 14 ]} 新建请求</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openGlobalParamModal()">{[ SVG "text-left" 14 14 ]} 全局参数</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openCookieManageModal()">{[ SVG "window" 14 14 ]} Cookie管理</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openApiNoteModal()">{[ SVG "pass" 14 14 ]} 接口说明</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openCodeModal()">{[ SVG "braces" 14 14 ]} 生成代码</a>
-                                    <a type="button" class="btn btn-outline-dark btn-sm" @click="openGotoDirModal()">{[ SVG "folder-plus" 14 14 ]} 保存到目录</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row" style="margin-top: 12px;">
-                            <div class="col-8">
-                                <div class="input-group mb-3">
-                                    <select class="form-select" v-model="param.method" style="width: 20%;border-color: #343a40;">
-                                        <option value="GET">GET</option>
-                                        <option value="POST">POST</option>
-                                        <option value="PUT">PUT</option>
-                                        <option value="DELETE">DELETE</option>
-                                        <option value="OPTIONS">OPTIONS</option>
-                                        <option value="HEAD">HEAD</option>
-                                    </select>
-                                    <input type="text" class="form-control" v-model="param.url" style="width: 80%;border-color: #343a40;">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <button type="button" class="btn btn-dark" @click="execute()">发送</button>
-                                <button type="button" class="btn btn-dark" style="margin-left: 6px;">指定发送</button>
-                            </div>
-                        </div>
-                        <div style="border-bottom: 1px solid #A9A9A9;font-size: 11px;margin-top: -12px;">
-                            <ul class="nav">
-                                <li class="nav-item select_activity" id="openHeaderLi">
-                                    <a class="nav-link" @click="openHeaderTable()" style="cursor: pointer;">Header</a>
-                                </li>
-                                <li class="nav-item" id="openQueryLi">
-                                    <a class="nav-link" @click="openQueryTable()" style="cursor: pointer;">Query</a>
-                                </li>
-                                <li class="nav-item" id="openBodyLi">
-                                    <a class="nav-link" @click="openBodyTable()" style="cursor: pointer;">Body</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div style="height: 180px;overflow: auto;">
-                            <table class="table table-hover table-bordered" id="setHeaderTable">
-                                <tr>
-                                    <td style="width: 5%;">
-                                        <input class="form-check-input" type="checkbox" checked="checked">
-                                    </td>
-                                    <td style="width: 15%;">
-                                        <input class="form-control form-control-sm" type="text" placeholder="Key" style="font-size: 11px;">
-                                    </td>
-                                    <td style="width: 25%">
-                                        <input class="form-control form-control-sm" type="text" placeholder="Value" style="font-size: 11px;">
-                                    </td>
-                                    <td style="width: 15%;">
-                                        <input class="form-control form-control-sm" type="text" placeholder="描述" style="font-size: 11px;">
-                                    </td>
-                                    <td style="width: 10%;">
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="增加行" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除当前行" @click="">{[ SVG "trash-fill" 14 14 ]}</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <table class="table table-hover table-bordered" id="setQueryTable" style="display:none;">
-                                <tr>
-                                    <td style="width: 5%;">
-                                        <input class="form-check-input" type="checkbox" checked="checked">
-                                    </td>
-                                    <td style="width: 15%;">
-                                        <input class="form-control form-control-sm" type="text" placeholder="Key" style="font-size: 11px;">
-                                    </td>
-                                    <td style="width: 25%">
-                                        <input class="form-control form-control-sm" type="text" placeholder="Value" style="font-size: 11px;">
-                                    </td>
-                                    <td style="width: 10%;">
-                                        <select class="form-select form-select-sm" style="font-size: 11px;">
-                                            <option selected>类型</option>
-                                            <option value="String">String</option>
-                                            <option value="Number">Number</option>
-                                            <option value="Integer">Integer</option>
-                                            <option value="Float">Float</option>
-                                            <option value="Double">Double</option>
-                                            <option value="Bool">Bool</option>
-                                            <option value="Array">Array</option>
-                                            <option value="Object">Object</option>
-                                        </select>
-                                    </td>
-                                    <td style="width: 10%;">
-                                        <select class="form-select form-select-sm" style="font-size: 11px;">
-                                            <option selected>必填</option>
-                                            <option value="0">必填</option>
-                                            <option value="1">非必填</option>
-                                        </select>
-                                    </td>
-                                    <td style="width: 15%;">
-                                        <input class="form-control form-control-sm" type="text" placeholder="描述" style="font-size: 11px;">
-                                    </td>
-                                    <td style="width: 10%;">
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="增加行" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
-                                            <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除当前行" @click="">{[ SVG "trash-fill" 14 14 ]}</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <div id="setBodyTable" style="display:none;">
-                                <div style="width: 100%; margin-top: 4px; margin-bottom: 8px;">
-                                    <template v-if="bodyType=='json'">
-                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('json')">application/json</button>
-                                    </template>
-                                    <template v-else >
-                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('json')">application/json</button>
-                                    </template>
-
-                                    <template v-if="bodyType=='from-data'">
-                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('from-data')">multipart/from-data</button>
-                                    </template>
-                                    <template v-else >
-                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('from-data')">multipart/from-data</button>
-                                    </template>
-
-                                    <template v-if="bodyType=='x-www-form-urlencoded'">
-                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('x-www-form-urlencoded')">application/x-www-form-urlencoded</button>
-                                    </template>
-                                    <template v-else >
-                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('x-www-form-urlencoded')">application/x-www-form-urlencoded</button>
-                                    </template>
-
-                                    <template v-if="bodyType=='xml'">
-                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('xml')">application/xml</button>
-                                    </template>
-                                    <template v-else >
-                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('xml')">application/xml</button>
-                                    </template>
-
-                                    <template v-if="bodyType=='plain'">
-                                        <button type="button" class="btn btn-sm btn-dark" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('plain')">text/plain</button>
-                                    </template>
-                                    <template v-else >
-                                        <button type="button" class="btn btn-sm btn-light" style="font-size: 9px;margin-right: 2px;" @click="openBodyMain('plain')">text/plain</button>
-                                    </template>
-                                </div>
-                                <div id="bodyJson">
-                                    <textarea class="form-control" rows="5"></textarea>
-                                </div>
-                                <div id="bodyFromData" style="display:none;">
-                                    <table class="table table-hover table-bordered">
-                                        <tr>
-                                            <td style="width: 5%;">
-                                                <input class="form-check-input" type="checkbox" checked="checked">
-                                            </td>
-                                            <td style="width: 15%;">
-                                                <input class="form-control form-control-sm" type="text" placeholder="Key" style="font-size: 11px;">
-                                            </td>
-                                            <td style="width: 25%">
-                                                <div class="input-group">
-                                                    <select class="form-select" style="width: 30%;font-size: 11px;">
-                                                        <option value="text">text</option>
-                                                        <option value="file">file</option>
-                                                    </select>
-                                                    <input type="text" class="form-control" style="width: 70%;font-size: 11px;">
-                                                </div>
-                                            </td>
-                                            <td style="width: 10%;">
-                                                <select class="form-select form-select-sm" style="font-size: 11px;">
-                                                    <option selected>类型</option>
-                                                    <option value="String">String</option>
-                                                    <option value="Number">Number</option>
-                                                    <option value="Integer">Integer</option>
-                                                    <option value="Float">Float</option>
-                                                    <option value="Double">Double</option>
-                                                    <option value="Bool">Bool</option>
-                                                    <option value="Array">Array</option>
-                                                    <option value="Object">Object</option>
-                                                </select>
-                                            </td>
-                                            <td style="width: 10%;">
-                                                <select class="form-select form-select-sm" style="font-size: 11px;">
-                                                    <option selected>必填</option>
-                                                    <option value="0">必填</option>
-                                                    <option value="1">非必填</option>
-                                                </select>
-                                            </td>
-                                            <td style="width: 15%;">
-                                                <input class="form-control form-control-sm" type="text" placeholder="描述" style="font-size: 11px;">
-                                            </td>
-                                            <td style="width: 10%;">
-                                                <div class="btn-group btn-group-sm" role="group">
-                                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="增加行" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
-                                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除当前行" @click="">{[ SVG "trash-fill" 14 14 ]}</a></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div id="bodyXwwwFrom" style="display:none;">
-                                    <table class="table table-hover table-bordered">
-                                        <tr>
-                                            <td style="width: 5%;">
-                                                <input class="form-check-input" type="checkbox" checked="checked">
-                                            </td>
-                                            <td style="width: 15%;">
-                                                <input class="form-control form-control-sm" type="text" placeholder="Key" style="font-size: 11px;">
-                                            </td>
-                                            <td style="width: 25%">
-                                                <input class="form-control form-control-sm" type="text" placeholder="Value" style="font-size: 11px;">
-                                            </td>
-                                            <td style="width: 10%;">
-                                                <select class="form-select form-select-sm" style="font-size: 11px;">
-                                                    <option selected>类型</option>
-                                                    <option value="String">String</option>
-                                                    <option value="Number">Number</option>
-                                                    <option value="Integer">Integer</option>
-                                                    <option value="Float">Float</option>
-                                                    <option value="Double">Double</option>
-                                                    <option value="Bool">Bool</option>
-                                                    <option value="Array">Array</option>
-                                                    <option value="Object">Object</option>
-                                                </select>
-                                            </td>
-                                            <td style="width: 10%;">
-                                                <select class="form-select form-select-sm" style="font-size: 11px;">
-                                                    <option selected>必填</option>
-                                                    <option value="0">必填</option>
-                                                    <option value="1">非必填</option>
-                                                </select>
-                                            </td>
-                                            <td style="width: 15%;">
-                                                <input class="form-control form-control-sm" type="text" placeholder="描述" style="font-size: 11px;">
-                                            </td>
-                                            <td style="width: 10%;">
-                                                <div class="btn-group btn-group-sm" role="group">
-                                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="增加行" @click="">{[ SVG "plus-lg" 14 14 ]}</a>
-                                                    <a type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-title="删除当前行" @click="">{[ SVG "trash-fill" 14 14 ]}</a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div id="bodyXml" style="display:none;">
-                                    <textarea class="form-control" rows="5"></textarea>
-                                </div>
-                                <div id="bodyText" style="display:none;">
-                                    <textarea class="form-control" rows="5"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div style="font-size: 11px;margin-top: -12px;">
-                            <ul class="nav">
-                                <li class="nav-item select_activity" id="openRse">
-                                    <a class="nav-link" @click="openRseDiv()" style="cursor: pointer;">响应结果</a>
-                                </li>
-                                <li class="nav-item" id="openRseRpHeader">
-                                    <a class="nav-link" @click="openRseRpHeaderDiv()" style="cursor: pointer;">请求头</a>
-                                </li>
-                                <li class="nav-item" id="openRseHeader">
-                                    <a class="nav-link" @click="openRseHeaderDiv()" style="cursor: pointer;">响应头</a>
-                                </li>
-                                <li class="nav-item" id="openRseCookie">
-                                    <a class="nav-link" @click="openRseCookieDiv()" style="cursor: pointer;">Cookie</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <p style="font-size: 11px;margin: 4px;" > >>> <span style="color: red;">响应状态码: {{ resp.respCode }};</span>
-                            响应时间: {{ resp.respMs }}; 请求器: {{ resp.clientName }} |内网: {{ resp.clientIP }} | 公网: {{ resp.clientPublicIP }} | </p>
-                        <div style="height: 230px;overflow: auto;border: 1px solid #A9A9A9;">
-                            <div id="rseDiv">
-                                <pre style="background-color: #f3f3f3;">
-                                    {{ resp.respBody }}
-                                </pre>
-                            </div>
-                            <div id="rseRpHeader" style="display:none;">
-                                <table class="table table-hover table-bordered" style="font-size: 11px;">
-                                    <template v-for="v,k in resp.reqHeader ">
-                                        <tr><td style="width: 30%;">{{ k }}</td><td style="width: 70%;">{{ v }}</td></tr>
-                                    </template>
-                                </table>
-                            </div>
-                            <div id="rseHeader" style="display:none;">
-                                <table class="table table-hover table-bordered" style="font-size: 11px;">
-                                    <template v-for="v,k in resp.respHeader ">
-                                        <tr><td style="width: 30%;">{{ k }}</td><td style="width: 70%;">{{ v }}</td></tr>
-                                    </template>
-                                </table>
-                            </div>
-                            <div id="rseCookie" style="display: none;">
-                                <table class="table table-hover table-bordered" style="font-size: 11px;">
-                                    <tr>
-                                        <td style="width: 50px;">Name</td>
-                                        <td style="width: 100px;">Value</td>
-                                        <td style="width: 25px;">HttpOnly</td>
-                                        <td style="width: 50px;">Domain</td>
-                                        <td style="width: 50px;">RawExpires</td>
-                                        <td style="width: 25px;">Path</td>
-                                        <td style="width: 25px;">Secure</td>
-                                    </tr>
-                                    <template v-for="item in resp.respCookie ">
-                                        <tr>
-                                            <td>{{ item.Name }}</td>
-                                            <td>{{ item.Value }}</td>
-                                            <td>{{ item.HttpOnly }}</td>
-                                            <td>{{ item.Domain }}</td>
-                                            <td>{{ item.RawExpires }}</td>
-                                            <td>{{ item.Path }}</td>
-                                            <td>{{ item.Secure }}</td>
-                                        </tr>
-                                    </template>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    {[ template "add_host_modal.html" . ]}
-                    {[ template "mail_set_modal.html" . ]}
-                    {[ template "toast.html" . ]}
-                    {[ template "requester_api_note_modal.html" . ]}
-                    {[ template "requester_code_modal.html" . ]}
-                    {[ template "requester_cookie_manage_modal.html" . ]}
-                    {[ template "requester_global_param_modal.html" . ]}
-                    {[ template "requester_goto_dir_modal.html" . ]}
-                    {[ template "requester_dir_modal.html" . ]}
-                </div>
-            </main>
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>请求器</h1>
+                <p>{{ history.list.length }} 个历史请求 · 支持 Header / Query / Body 调试</p>
+            </div>
+            <div class="page-actions">
+                <button type="button" class="btn secondary" @click="openGlobalParamModal">
+                    <svg class="icon sm"><use href="#i-settings"/></svg>全局参数
+                </button>
+                <button type="button" class="btn primary" @click="createTab">
+                    <svg class="icon sm"><use href="#i-plus"/></svg>新建请求
+                </button>
+            </div>
         </div>
-    </div>
+
+        <div class="req-shell">
+            <aside class="panel req-side">
+                <div class="panel-head" style="height:38px">
+                    <div class="panel-title">历史<span class="count">{{ history.list.length }}</span></div>
+                </div>
+                <div class="panel-body">
+                    <input class="input" v-model="historyKw" placeholder="过滤历史" style="height:26px;margin-bottom:4px">
+                    <div class="req-group">最近请求</div>
+                    <div class="req-item" v-for="item in historyFiltered" :key="item.id">
+                        <span class="m" :class="{post: item.method === 'POST' || item.method === 'PUT'}">{{ item.method }}</span>
+                        <span class="n" :title="item.name">{{ item.name }}</span>
+                        <button type="button" class="mini always del" @click.stop="deleteHistory(item.id)" title="删除">
+                            <svg class="icon sm"><use href="#i-trash"/></svg>
+                        </button>
+                    </div>
+                    <div v-if="historyFiltered.length === 0" class="hint" style="padding:8px">暂无历史请求</div>
+                </div>
+                <button type="button" class="panel-foot" @click="createTab">
+                    <svg class="icon sm"><use href="#i-plus"/></svg>新建请求
+                </button>
+            </aside>
+
+            <div class="req-main">
+                <div class="panel req-panel">
+                    <div class="tabs gdtiao" style="padding-top:8px">
+                        <div class="tab" v-for="item in nowReqList.list" :key="item.id"
+                             :class="{on: item.isNow}" @click="openTab(item.id)">
+                            <span>{{ item.name }}</span>
+                            <span @click.stop="closeTab(item.id)" style="color:var(--text-3);display:inline-flex">
+                                <svg class="icon sm"><use href="#i-x"/></svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px 0">
+                        <input class="input" v-model="param.name" placeholder="接口名称" style="width:220px;height:26px">
+                        <div class="spacer"></div>
+                        <div class="dropdown">
+                            <button type="button" class="btn xs ghost" data-bs-toggle="dropdown">
+                                更多<svg class="icon sm"><use href="#i-chevron-d"/></svg>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="javascript:" @click="openCookieManageModal">
+                                    <svg class="icon sm"><use href="#i-globe"/></svg>Cookie 管理</a></li>
+                                <li><a class="dropdown-item" href="javascript:" @click="openApiNoteModal">
+                                    <svg class="icon sm"><use href="#i-book"/></svg>接口说明</a></li>
+                                <li><a class="dropdown-item" href="javascript:" @click="openCodeModal">
+                                    <svg class="icon sm"><use href="#i-layers"/></svg>生成代码</a></li>
+                                <li><a class="dropdown-item" href="javascript:" @click="openGotoDirModal">
+                                    <svg class="icon sm"><use href="#i-download"/></svg>保存到目录</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="javascript:" @click="openDirModal">
+                                    <svg class="icon sm"><use href="#i-settings"/></svg>目录管理</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="req-bar">
+                        <select class="input method" v-model="param.method">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="OPTIONS">OPTIONS</option>
+                            <option value="HEAD">HEAD</option>
+                        </select>
+                        <input type="text" class="input req-url" v-model="param.url" placeholder="https://api.example.com/v1/resource">
+                        <button type="button" class="btn primary" @click="execute">发送</button>
+                    </div>
+
+                    <div class="tabs">
+                        <div class="tab select_activity" id="openHeaderLi" @click="openHeaderTable()">Header</div>
+                        <div class="tab" id="openQueryLi" @click="openQueryTable()">Query</div>
+                        <div class="tab" id="openBodyLi" @click="openBodyTable()">Body</div>
+                    </div>
+
+                    <div class="req-body">
+                        <table class="tbl" id="setHeaderTable">
+                            <thead>
+                            <tr><th style="width:36px"></th><th style="width:180px">Key</th><th>Value</th><th style="width:180px">描述</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr style="cursor:default">
+                                <td><input class="cb" type="checkbox" checked></td>
+                                <td><input class="input" type="text" placeholder="Key"></td>
+                                <td><input class="input" type="text" placeholder="Value"></td>
+                                <td><input class="input" type="text" placeholder="描述"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="tbl" id="setQueryTable" style="display:none">
+                            <thead>
+                            <tr><th style="width:36px"></th><th style="width:170px">Key</th><th>Value</th><th style="width:120px">类型</th><th style="width:110px">必填</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr style="cursor:default">
+                                <td><input class="cb" type="checkbox" checked></td>
+                                <td><input class="input" type="text" placeholder="Key"></td>
+                                <td><input class="input" type="text" placeholder="Value"></td>
+                                <td>
+                                    <select class="input">
+                                        <option>String</option><option>Number</option><option>Bool</option><option>Array</option><option>Object</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="input"><option>必填</option><option>非必填</option></select>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <div id="setBodyTable" style="display:none">
+                            <div class="segmented" style="margin-bottom:10px">
+                                <button type="button" :class="{on: bodyType === 'json'}" @click="openBodyMain('json')">JSON</button>
+                                <button type="button" :class="{on: bodyType === 'from-data'}" @click="openBodyMain('from-data')">form-data</button>
+                                <button type="button" :class="{on: bodyType === 'x-www-form-urlencoded'}" @click="openBodyMain('x-www-form-urlencoded')">x-www-form-urlencoded</button>
+                                <button type="button" :class="{on: bodyType === 'xml'}" @click="openBodyMain('xml')">XML</button>
+                                <button type="button" :class="{on: bodyType === 'plain'}" @click="openBodyMain('plain')">Text</button>
+                            </div>
+
+                            <div id="bodyJson">
+                                <textarea class="input editor" rows="6" style="min-height:140px" placeholder="{&#10;  &quot;key&quot;: &quot;value&quot;&#10;}"></textarea>
+                            </div>
+
+                            <div id="bodyFromData" style="display:none">
+                                <table class="tbl">
+                                    <thead><tr><th style="width:36px"></th><th style="width:170px">Key</th><th>Value</th><th style="width:100px">类型</th></tr></thead>
+                                    <tbody>
+                                    <tr style="cursor:default">
+                                        <td><input class="cb" type="checkbox" checked></td>
+                                        <td><input class="input" type="text" placeholder="Key"></td>
+                                        <td>
+                                            <div style="display:flex;gap:6px">
+                                                <select class="input" style="width:80px;flex:0 0 80px"><option>text</option><option>file</option></select>
+                                                <input class="input" type="text" placeholder="Value">
+                                            </div>
+                                        </td>
+                                        <td><select class="input"><option>String</option><option>Number</option></select></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="bodyXwwwFrom" style="display:none">
+                                <table class="tbl">
+                                    <thead><tr><th style="width:36px"></th><th style="width:170px">Key</th><th>Value</th><th style="width:100px">类型</th></tr></thead>
+                                    <tbody>
+                                    <tr style="cursor:default">
+                                        <td><input class="cb" type="checkbox" checked></td>
+                                        <td><input class="input" type="text" placeholder="Key"></td>
+                                        <td><input class="input" type="text" placeholder="Value"></td>
+                                        <td><select class="input"><option>String</option><option>Number</option></select></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="bodyXml" style="display:none">
+                                <textarea class="input editor" rows="6" style="min-height:140px" placeholder="<root></root>"></textarea>
+                            </div>
+                            <div id="bodyText" style="display:none">
+                                <textarea class="input editor" rows="6" style="min-height:140px" placeholder="text/plain"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel req-panel">
+                    <div class="resp-bar">
+                        <span class="code">{{ resp.respCode || '—' }}</span>
+                        <span>{{ resp.respTime || '—' }}</span>
+                        <span class="muted">{{ resp.clientName || '' }}</span>
+                        <div class="spacer"></div>
+                        <span class="hint" v-if="resp.clientIP">内网 {{ resp.clientIP }}</span>
+                        <span class="hint" v-if="resp.clientPublicIP">公网 {{ resp.clientPublicIP }}</span>
+                        <button type="button" class="btn xs ghost" @click="copyResp" v-if="resp.respBody">
+                            <svg class="icon sm"><use href="#i-copy"/></svg>复制
+                        </button>
+                    </div>
+
+                    <div class="tabs">
+                        <div class="tab select_activity" id="openRse" @click="openRseDiv()">响应结果</div>
+                        <div class="tab" id="openRseRpHeader" @click="openRseRpHeaderDiv()">请求头</div>
+                        <div class="tab" id="openRseHeader" @click="openRseHeaderDiv()">响应头</div>
+                        <div class="tab" id="openRseCookie" @click="openRseCookieDiv()">Cookie</div>
+                    </div>
+
+                    <div style="flex:1;overflow:auto;min-height:0">
+                        <div id="rseDiv">
+                            <pre class="json" v-if="resp.respBody">{{ resp.respBody }}</pre>
+                            <div class="empty" v-else>
+                                <div class="ico"><svg class="icon"><use href="#i-send"/></svg></div>
+                                <h4>还没有响应</h4>
+                                <p>填写 URL 后点击发送，响应会显示在这里</p>
+                            </div>
+                        </div>
+
+                        <div id="rseRpHeader" style="display:none">
+                            <table class="tbl">
+                                <tbody>
+                                <tr style="cursor:default" v-for="(v, k) in resp.reqHeader" :key="'req-' + k">
+                                    <td class="muted" style="width:220px">{{ k }}</td>
+                                    <td class="num">{{ v }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="rseHeader" style="display:none">
+                            <table class="tbl">
+                                <tbody>
+                                <tr style="cursor:default" v-for="(v, k) in resp.respHeader" :key="'resp-' + k">
+                                    <td class="muted" style="width:220px">{{ k }}</td>
+                                    <td class="num">{{ v }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="rseCookie" style="display:none">
+                            <table class="tbl">
+                                <thead>
+                                <tr><th>Name</th><th>Value</th><th style="width:70px">HttpOnly</th><th style="width:140px">Domain</th><th style="width:70px">Path</th><th style="width:60px">Secure</th></tr>
+                                </thead>
+                                <tbody>
+                                <tr style="cursor:default" v-for="(item, i) in resp.respCookie" :key="'cookie-' + i">
+                                    <td class="num">{{ item.Name }}</td>
+                                    <td class="num">{{ item.Value }}</td>
+                                    <td>{{ item.HttpOnly }}</td>
+                                    <td class="num">{{ item.Domain }}</td>
+                                    <td>{{ item.Path }}</td>
+                                    <td>{{ item.Secure }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "toast.html" . ]}
+        {[ template "requester_api_note_modal.html" . ]}
+        {[ template "requester_code_modal.html" . ]}
+        {[ template "requester_cookie_manage_modal.html" . ]}
+        {[ template "requester_global_param_modal.html" . ]}
+        {[ template "requester_goto_dir_modal.html" . ]}
+        {[ template "requester_dir_modal.html" . ]}
+    </main>
 </div>
 </body>
 {[ template "__js__.html" . ]}

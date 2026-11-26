@@ -1,12 +1,4 @@
-<div class="toast-container position-fixed p-3 top-50 start-50 translate-middle">
-    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong class="me-auto">提示</strong>
-            <small></small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            <span id="liveToastMsg"></span>
-        </div>
-    </div>
+<div class="ui-toast" id="liveToast" role="status" aria-live="polite">
+    <svg class="icon sm"><use href="#i-check"/></svg>
+    <span id="liveToastMsg"></span>
 </div>

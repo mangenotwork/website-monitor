@@ -14,7 +14,22 @@ import (
 func ginH(h gin.H) gin.H {
 	h["Title"] = conf.Conf.Default.App.Name
 	h["TimeStamp"] = constname.TimeStamp
+	h["Version"] = appVersion()
+	h["RunType"] = appRunType()
 	return h
+}
+
+// appVersion 写死版本号，每次大版本更新改此处
+func appVersion() string {
+	return "v0.0.3"
+}
+
+// appRunType 读取 app.yaml 中 app.runType
+func appRunType() string {
+	if conf.Conf.Default.App != nil && conf.Conf.Default.App.RunType != "" {
+		return conf.Conf.Default.App.RunType
+	}
+	return "dev"
 }
 
 func NotFond(c *gin.Context) {
@@ -79,6 +94,17 @@ func MonitorPage(c *gin.Context) {
 		"monitor.html",
 		ginH(gin.H{
 			"nav": "monitor",
+		}),
+	)
+	return
+}
+
+func SitesPage(c *gin.Context) {
+	c.HTML(
+		http.StatusOK,
+		"sites.html",
+		ginH(gin.H{
+			"nav": "sites",
 		}),
 	)
 	return

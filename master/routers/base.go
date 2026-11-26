@@ -50,6 +50,7 @@ func Page() {
 	pg := Router.Group("")
 	pg.Use(AuthPG())
 	pg.GET("/home", handler.HomePage)
+	pg.GET("/sites", handler.SitesPage)
 	pg.GET("/monitor", handler.MonitorPage)
 	pg.GET("/alert", handler.AlertPage)
 	pg.GET("/tool", handler.ToolPage)

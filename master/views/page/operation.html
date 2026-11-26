@@ -2,20 +2,32 @@
 <body>
 <div id="app">
     {[ template "__header__.html" . ]}
-    <div class="container-fluid">
-        <div class="row">
-            {[ template "__menu__.html" . ]}
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                operation TODO...
-                {[ template "add_host_modal.html" . ]}
-                {[ template "mail_set_modal.html" . ]}
-                {[ template "toast.html" . ]}
-            </main>
+
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>运维</h1>
+                <p>平台运行状态、数据与日志维护</p>
+            </div>
         </div>
-    </div>
+
+        <div class="placeholder-box">
+            <div class="placeholder-inner">
+                <div class="ico"><svg class="icon lg"><use href="#i-settings"/></svg></div>
+                <h2>运维面板正在开发中</h2>
+                <p>后续会提供日志保留天数、数据备份、探针升级与平台自检等能力。</p>
+                <a class="btn secondary" href="/home">返回面板</a>
+            </div>
+        </div>
+
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "toast.html" . ]}
+    </main>
 </div>
 </body>
 {[ template "__js__.html" . ]}
 <script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
-<script src="/static/js/operation.js?v={[ .TimeStamp ]}"></script>
+<script>
+    Vue.createApp({ data() { return { mail: Mail }; } }).mount('#app');
+</script>
 {[ template "__end__.html" . ]}

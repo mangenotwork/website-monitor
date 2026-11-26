@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-accent="indigo" data-density="cozy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Website Monitor · UI 改版设计稿 v1</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg-app:#F6F6F7;--bg-surface:#FFFFFF;--bg-subtle:#FAFAFA;--bg-hover:#F4F4F5;--bg-active:#EFEFF1;
+  --border:#E7E7EA;--border-strong:#D6D6DB;
+  --text:#18181B;--text-2:#5B5B66;--text-3:#93939E;
+  --accent:#4F46E5;--accent-hover:#4338CA;--accent-soft:#EEF0FF;--accent-border:#C7CBFA;
+  --ok:#15803D;--ok-soft:#ECFDF3;--warn:#B45309;--warn-soft:#FFFBEB;--danger:#C02626;--danger-soft:#FEF2F2;
+  --radius:8px;--radius-lg:10px;--shadow-pop:0 12px 32px rgba(24,24,27,.14),0 2px 6px rgba(24,24,27,.06);
+  --row-h:44px;--fs:13px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+html[data-accent="teal"]{--accent:#0F766E;--accent-hover:#115E59;--accent-soft:#F0FDFA;--accent-border:#99F6E4}
+html[data-accent="graphite"]{--accent:#27272A;--accent-hover:#000000;--accent-soft:#F4F4F5;--accent-border:#D4D4D8}
+html[data-density="compact"]{--row-h:36px;--fs:12.5px}
+html,body{height:100%}
+body{margin:0;background:var(--bg-app);color:var(--text);font-family:var(--font);font-size:var(--fs);line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,p{margin:0}
+em{font-style:normal}
+.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;display:inline-block;vertical-align:middle}
+.icon.sm{width:14px;height:14px}.icon.lg{width:18px;height:18px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.app{display:flex;min-height:100vh}
+
+/* sidebar */
+.sidebar{width:216px;flex:0 0 216px;height:100vh;position:sticky;top:0;display:flex;flex-direction:column;background:var(--bg-surface);border-right:1px solid var(--border);z-index:30}
+.brand{height:52px;display:flex;align-items:center;gap:9px;padding:0 14px;border-bottom:1px solid var(--border);flex:0 0 auto}
+.brand-mark{width:24px;height:24px;border-radius:6px;background:var(--accent);display:grid;place-items:center;flex:0 0 auto}
+.brand-mark svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.brand-name{font-size:12.5px;font-weight:500;letter-spacing:-.01em;white-space:nowrap}
+.brand-ver{font-family:var(--mono);font-size:10px;color:var(--text-3);margin-top:1px}
+.nav{flex:1;overflow:auto;padding:12px 8px}
+.nav-group{margin-bottom:15px}
+.nav-label{font-size:10.5px;color:var(--text-3);padding:0 10px;margin-bottom:4px;letter-spacing:.04em}
+.nav-item{position:relative;display:flex;align-items:center;gap:9px;height:32px;padding:0 10px;border-radius:6px;color:var(--text-2);cursor:pointer;user-select:none}
+.nav-item:hover{background:var(--bg-subtle);color:var(--text)}
+.nav-item.on{background:var(--bg-active);color:var(--text);font-weight:500}
+.nav-item.on .icon{color:var(--accent)}
+.nav-item.on::before{content:"";position:absolute;left:-8px;top:8px;bottom:8px;width:2px;background:var(--accent);border-radius:0 2px 2px 0}
+.nav-count{margin-left:auto;font-family:var(--mono);font-size:10.5px;line-height:16px;padding:0 5px;border-radius:4px;background:var(--bg-hover);color:var(--text-3)}
+.nav-count.danger{background:var(--danger-soft);color:var(--danger)}
+.nav-soon{margin-left:auto;font-size:10px;color:var(--text-3);border:1px solid var(--border);border-radius:4px;padding:0 4px;line-height:15px}
+.side-foot{flex:0 0 auto;padding:8px 8px 10px;border-top:1px solid var(--border)}
+.side-user{display:flex;align-items:center;gap:8px;padding:8px 10px;margin-top:4px;border-radius:6px}
+.side-user:hover{background:var(--bg-subtle)}
+.side-user-t{min-width:0;flex:1}
+.side-user-t span{display:block;font-size:12px;font-weight:500}
+.side-user-t em{display:block;font-size:10.5px;color:var(--text-3)}
+.side-user .icon{color:var(--text-3)}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:11px;font-weight:500;flex:0 0 auto}
+
+/* topbar */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:50px;flex:0 0 auto;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:0 22px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.crumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-3);white-space:nowrap}
+.crumb .icon{width:12px;height:12px;color:var(--border-strong)}
+.crumb strong{color:var(--text);font-weight:500;font-size:13px}
+.top-search{display:flex;align-items:center;gap:7px;width:300px;height:30px;padding:0 8px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:6px;color:var(--text-3)}
+.top-search:focus-within{background:var(--bg-surface);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.top-search input{flex:1;min-width:0;border:0;background:transparent;outline:none;font-size:12.5px}
+.top-search input::placeholder{color:var(--text-3)}
+.top-search kbd{font-family:var(--mono);font-size:10px;line-height:16px;padding:0 4px;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;color:var(--text-3);background:var(--bg-surface)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);font-size:11.5px;color:var(--text-2);white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);display:inline-block;flex:0 0 6px}
+.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.danger{background:var(--danger)}.dot.accent{background:var(--accent)}
+.accent-switch{display:flex;align-items:center;gap:3px;padding:2px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);margin:0 2px}
+.accent-switch button{width:16px;height:16px;border-radius:50%;border:2px solid transparent;display:grid;place-items:center}
+.accent-switch button.on{border-color:var(--bg-app);box-shadow:0 0 0 1px var(--border-strong)}
+.accent-switch i{width:10px;height:10px;border-radius:50%;display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;padding:0 11px;border-radius:6px;font-size:12.5px;font-weight:500;border:1px solid transparent;white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
+.btn:focus-visible{outline:2px solid var(--accent-border);outline-offset:2px}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hover)}
+.btn.secondary{background:var(--bg-surface);border-color:var(--border-strong);color:var(--text)}
+.btn.secondary:hover{background:var(--bg-subtle)}
+.btn.ghost{color:var(--text-2)}
+.btn.ghost:hover{background:var(--bg-hover);color:var(--text)}
+.btn.danger{color:var(--danger)}
+.btn.danger:hover{background:var(--danger-soft)}
+.btn.xs{height:26px;padding:0 8px;font-size:12px}
+.btn.icon{width:30px;padding:0}
+.btn.icon.xs{width:26px}
+.top-divider{width:1px;height:18px;background:var(--border);margin:0 4px}
+.design-tag{font-size:10.5px;font-family:var(--mono);color:var(--warn);background:var(--warn-soft);border:1px solid #F3DFB6;border-radius:4px;padding:1px 5px;white-space:nowrap}
+
+/* viewport */
+.viewport{flex:1;padding:22px 26px 40px;max-width:1500px;width:100%}
+.screen{display:none}
+.screen.on{display:block}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.page-head h1{font-size:20px;font-weight:500;letter-spacing:-.01em}
+.page-head p{font-size:12.5px;color:var(--text-2);margin-top:4px}
+.page-head p b{font-family:var(--mono);font-weight:500;color:var(--text)}
+.page-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden}
+.stat{padding:13px 18px;border-left:1px solid var(--border);min-width:0}
+.stat:first-child{border-left:0}
+.stat-label{font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:5px}
+.stat-value{font-size:21px;font-weight:500;letter-spacing:-.01em;margin:5px 0 1px;font-variant-numeric:tabular-nums}
+.stat-value .unit{font-size:12px;color:var(--text-3);font-weight:400;margin-left:1px}
+.stat-sub{font-size:11.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--ok)}.down{color:var(--danger)}
+
+/* panel & table */
+.panel{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;min-width:0}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;height:42px;padding:0 14px;border-bottom:1px solid var(--border)}
+.panel-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500}
+.panel-title .count{font-family:var(--mono);font-size:11px;color:var(--text-3);font-weight:400}
+.panel-link{font-size:12px;color:var(--text-2);display:inline-flex;align-items:center;gap:3px}
+.panel-link:hover{color:var(--accent)}
+.panel-body{padding:14px}
+.panel-body.flush{padding:0}
+.table-wrap{overflow:auto}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:var(--fs)}
+.tbl th{position:sticky;top:0;z-index:1;background:var(--bg-surface);text-align:left;font-weight:500;font-size:11.5px;color:var(--text-3);height:34px;padding:0 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{height:var(--row-h);padding:0 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover td{background:var(--bg-subtle)}
+.tbl .num{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .muted{color:var(--text-3)}
+.tbl .right{text-align:right}
+.host-cell{display:flex;flex-direction:column;gap:1px;min-width:0}
+.host-line{display:flex;align-items:center;gap:5px;min-width:0}
+.host{font-family:var(--mono);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:11.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini{width:20px;height:20px;border-radius:4px;display:grid;place-items:center;color:var(--text-3);opacity:0;flex:0 0 auto}
+tr:hover .mini{opacity:1}
+.mini:hover{background:var(--bg-hover);color:var(--text)}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;white-space:nowrap}
+.status .dot.ok{background:var(--ok)}
+.status.alert{color:var(--danger)}.status.alert .dot{background:var(--danger)}
+.status.wait{color:var(--warn)}.status.wait .dot{background:var(--warn)}
+.status.off{color:var(--text-3)}.status.off .dot{background:var(--text-3)}
+.resp{display:flex;align-items:center;gap:8px}
+.spark{width:52px;height:16px;flex:0 0 52px;color:#C9C9D1}
+.spark.bad{color:#E0A0A0}
+.tag{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:4px;font-size:11.5px;font-weight:500;white-space:nowrap}
+.tag.danger{background:var(--danger-soft);color:var(--danger)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.neutral{background:var(--bg-hover);color:var(--text-2)}
+.tag.info{background:var(--accent-soft);color:var(--accent)}
+.cell-actions{display:flex;align-items:center;justify-content:flex-end;gap:2px}
+.warn-text{color:var(--warn)}
+.danger-text{color:var(--danger)}
+input.cb{width:14px;height:14px;accent-color:var(--accent);margin:0;cursor:pointer;vertical-align:-2px}
+
+/* dashboard */
+.dash-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.side-stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.alert-item{display:flex;gap:9px;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer}
+.alert-item:last-child{border-bottom:0}
+.alert-item:hover{background:var(--bg-subtle)}
+.sev{width:5px;height:5px;border-radius:50%;margin-top:6px;flex:0 0 5px;background:var(--danger)}
+.sev.warn{background:var(--warn)}.sev.ok{background:var(--ok)}.sev.info{background:var(--accent)}
+.alert-main{min-width:0;flex:1}
+.alert-line{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.alert-host{font-family:var(--mono);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alert-time{font-family:var(--mono);font-size:10.5px;color:var(--text-3);flex:0 0 auto}
+.alert-msg{font-size:11.5px;color:var(--text-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.panel-foot{height:34px;display:flex;align-items:center;justify-content:center;gap:4px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);cursor:pointer}
+.panel-foot:hover{background:var(--bg-subtle);color:var(--text)}
+.probe{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.probe:last-child{border-bottom:0}
+.probe-icon{width:26px;height:26px;border-radius:6px;background:var(--bg-subtle);border:1px solid var(--border);display:grid;place-items:center;color:var(--text-2);flex:0 0 auto}
+.probe-main{min-width:0;flex:1}
+.probe-name{font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:6px}
+.probe-meta{font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* toolbar */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search-box{position:relative;width:250px}
+.search-box .icon{position:absolute;left:8px;top:8px;color:var(--text-3);width:14px;height:14px}
+.search-box input{width:100%;height:30px;padding:0 9px 0 28px;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-surface);font-size:12.5px;outline:none}
+.search-box input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.segmented{display:inline-flex;align-items:center;gap:2px;padding:2px;background:#F1F1F3;border:1px solid var(--border);border-radius:7px}
+.segmented button{height:24px;padding:0 9px;border-radius:5px;font-size:12px;color:var(--text-2);white-space:nowrap}
+.segmented button:hover{color:var(--text)}
+.segmented button.on{background:var(--bg-surface);color:var(--text);font-weight:500;border:1px solid var(--border);box-shadow:0 1px 2px rgba(24,24,27,.06)}
+.segmented .count{font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin-left:4px}
+.spacer{flex:1}
+.input{width:100%;height:30px;padding:0 9px;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-surface);font-size:12.5px;outline:none}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.input::placeholder{color:var(--text-3)}
+select.input{appearance:none;padding-right:26px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2393939E' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+textarea.input{height:auto;padding:8px 9px;line-height:1.65;resize:vertical}
+.field label{display:block;font-size:12px;color:var(--text-2);margin-bottom:5px}
+.hint{font-size:11.5px;color:var(--text-3);margin-top:4px}
+.bulkbar{display:none;align-items:center;gap:10px;margin-bottom:12px;padding:7px 12px;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:7px;font-size:12.5px;color:var(--text-2)}
+.bulkbar.show{display:flex}
+.bulkbar b{font-family:var(--mono);color:var(--text)}
+.scroll-y{max-height:calc(100vh - 245px);overflow:auto}
+
+/* tools */
+.tool-shell{display:grid;grid-template-columns:222px minmax(0,1fr);gap:16px;align-items:start}
+.tool-nav{padding:8px}
+.tool-group-label{font-size:10.5px;color:var(--text-3);padding:7px 8px 4px;letter-spacing:.04em}
+.tool-link{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:5px;font-size:12.5px;color:var(--text-2);cursor:pointer}
+.tool-link:hover{background:var(--bg-subtle);color:var(--text)}
+.tool-link.on{background:var(--bg-active);color:var(--text);font-weight:500}
+.tool-link.on .icon{color:var(--accent)}
+.tool-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--border)}
+.tool-title{font-size:14px;font-weight:500}
+.tool-desc{font-size:12px;color:var(--text-3);margin-top:2px}
+.query-row{display:flex;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.query-row .input{flex:1}
+.result-meta{display:flex;align-items:center;gap:14px;padding:11px 18px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-2);flex-wrap:wrap}
+.result-meta b{font-family:var(--mono);font-weight:500;color:var(--text);font-size:12px}
+.hist{display:flex;align-items:center;gap:6px;padding:11px 18px;border-top:1px solid var(--border);flex-wrap:wrap}
+.hist-label{font-size:11px;color:var(--text-3);margin-right:2px}
+.hist-chip{font-family:var(--mono);font-size:11px;color:var(--text-2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer;background:var(--bg-surface)}
+.hist-chip:hover{border-color:var(--border-strong);color:var(--text)}
+
+/* requester */
+.req-shell{display:grid;grid-template-columns:216px minmax(0,1fr);gap:16px;height:calc(100vh - 148px);min-height:560px}
+.req-side{display:flex;flex-direction:column;min-height:0}
+.req-side .panel-body{flex:1;overflow:auto;padding:6px}
+.req-group{font-size:10.5px;color:var(--text-3);padding:8px 8px 4px}
+.req-item{display:flex;align-items:center;gap:7px;height:30px;padding:0 8px;border-radius:5px;font-size:12px;cursor:pointer}
+.req-item:hover{background:var(--bg-subtle)}
+.req-item.on{background:var(--bg-active)}
+.req-item .m{font-family:var(--mono);font-size:9.5px;font-weight:500;width:30px;flex:0 0 30px;text-align:center;border-radius:3px;padding:1px 0;background:var(--bg-hover);color:var(--text-2)}
+.req-item .m.post{background:var(--warn-soft);color:var(--warn)}
+.req-item .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.req-main{display:flex;flex-direction:column;gap:16px;min-height:0}
+.req-panel{display:flex;flex-direction:column;min-height:0;flex:1}
+.req-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--border)}
+.method{width:92px;flex:0 0 92px}
+.req-url{flex:1;font-family:var(--mono);font-size:12px}
+.tabs{display:flex;gap:18px;padding:0 14px;border-bottom:1px solid var(--border);flex:0 0 auto;overflow:auto}
+.tab{height:34px;display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--text-2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--text);border-bottom-color:var(--accent)}
+.tab em{font-family:var(--mono);font-size:10.5px;color:var(--text-3)}
+.req-body{padding:12px 14px;flex:1;overflow:auto;min-height:0}
+.editor{height:100%;min-height:120px;padding:10px 12px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:6px;font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre;overflow:auto;color:var(--text)}
+.resp-bar{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-2);flex:0 0 auto}
+.resp-bar .code{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ok)}
+.json{margin:0;padding:12px 14px;font-family:var(--mono);font-size:12px;line-height:1.75;overflow:auto;flex:1;min-height:0;background:var(--bg-surface);color:var(--text)}
+.json .k{color:#1D4ED8}.json .s{color:#15803D}.json .n{color:#B45309}.json .p{color:var(--text-3)}
+
+/* drawer / modal / toast */
+.mask{position:fixed;inset:0;background:rgba(24,24,27,.28);opacity:0;pointer-events:none;transition:opacity .18s;z-index:50}
+.mask.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:720px;max-width:94vw;background:var(--bg-surface);border-left:1px solid var(--border);box-shadow:var(--shadow-pop);transform:translateX(100%);transition:transform .22s cubic-bezier(.2,.8,.2,1);z-index:60;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.drawer.sm{width:560px}
+.drawer-head{display:flex;align-items:flex-start;gap:10px;padding:15px 20px;border-bottom:1px solid var(--border);flex:0 0 auto}
+.drawer-title-row{display:flex;align-items:center;gap:8px}
+.drawer-head h2{font-size:15px;font-weight:500;font-family:var(--mono)}
+.drawer-sub{font-size:11.5px;color:var(--text-3);margin-top:3px}
+.drawer-actions{margin-left:auto;display:flex;align-items:center;gap:4px}
+.drawer-meta{display:flex;flex-wrap:wrap;gap:18px;padding:9px 20px;background:var(--bg-subtle);border-bottom:1px solid var(--border);font-size:11.5px;color:var(--text-2);flex:0 0 auto}
+.drawer-meta b{font-family:var(--mono);font-weight:500;color:var(--text);margin-left:3px}
+.drawer-tabs{display:flex;gap:20px;padding:0 20px;border-bottom:1px solid var(--border);flex:0 0 auto;overflow:auto}
+.drawer-body{flex:1;overflow:auto;padding:18px 20px 30px;min-height:0}
+.pane{display:none}
+.pane.on{display:block}
+.mini-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px}
+.mini-stat{padding:9px 12px;border-left:1px solid var(--border);min-width:0}
+.mini-stat:first-child{border-left:0}
+.mini-stat .l{font-size:11px;color:var(--text-3);white-space:nowrap}
+.mini-stat .v{font-size:15px;font-weight:500;margin-top:2px;font-variant-numeric:tabular-nums}
+.mini-stat .v small{font-size:10.5px;font-weight:400;color:var(--text-3);margin-left:1px}
+.chart-box{border:1px solid var(--border);border-radius:8px;padding:12px 14px 8px;margin-bottom:18px}
+.chart-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.chart-title{font-size:12.5px;font-weight:500}
+.legend{display:flex;align-items:center;gap:12px;font-size:10.5px;color:var(--text-3)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:14px;height:2px;background:var(--accent);display:inline-block;border-radius:1px}
+.legend .gray i{background:#C9C9D1}
+.legend .dash i{background:repeating-linear-gradient(90deg,#C9C9D1 0 3px,transparent 3px 6px)}
+.chart{width:100%;height:150px;display:block}
+.chart-x{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--text-3);margin-top:3px}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.kv .k{color:var(--text-3);flex:0 0 auto}
+.kv .v{font-family:var(--mono);font-size:11.5px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.section-title{font-size:12px;font-weight:500;color:var(--text-2);margin:18px 0 8px;display:flex;align-items:center;justify-content:space-between}
+.section-title:first-child{margin-top:0}
+.log{font-family:var(--mono);font-size:11.5px;line-height:1.9;background:var(--bg-subtle);border:1px solid var(--border);border-radius:6px;padding:10px 12px;overflow:auto}
+.log .t{color:var(--text-3)}
+.log .a{color:var(--danger)}
+.log .i{color:var(--ok)}
+.log .w{color:var(--warn)}
+.note{display:flex;gap:8px;padding:10px 12px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:7px;font-size:11.5px;color:var(--text-2);line-height:1.6}
+.note .icon{color:var(--text-3);margin-top:1px}
+.modal-mask{position:fixed;inset:0;background:rgba(24,24,27,.35);display:flex;align-items:flex-start;justify-content:center;padding:8vh 16px 24px;z-index:80;opacity:0;pointer-events:none;transition:opacity .18s}
+.modal-mask.open{opacity:1;pointer-events:auto}
+.modal{width:640px;max-width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-pop);max-height:84vh;display:flex;flex-direction:column;transform:translateY(6px);transition:transform .18s}
+.modal-mask.open .modal{transform:none}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.modal-head h2{font-size:15px;font-weight:500}
+.modal-head p{font-size:12px;color:var(--text-3);margin-top:2px}
+.modal-body{padding:18px 20px;overflow:auto}
+.modal-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--border)}
+.form-section{margin-bottom:18px}
+.form-section .st{font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.adv-head{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text-2);cursor:pointer;padding:2px 0;user-select:none}
+.adv-head:hover{color:var(--text)}
+.adv-head .adv-chev{transition:transform .15s;color:var(--text-3)}
+.adv-head.open .adv-chev{transform:rotate(90deg)}
+.adv-body{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.adv-body.open{display:block}
+.checkline{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);margin-top:9px}
+.check-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:11px}
+.check-row label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);cursor:pointer}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+.toast{position:fixed;right:22px;bottom:22px;display:flex;align-items:center;gap:8px;background:var(--text);color:#fff;font-size:12.5px;padding:9px 14px;border-radius:7px;box-shadow:var(--shadow-pop);z-index:100;opacity:0;transform:translateY(6px);transition:.18s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+.toast .icon{color:#6EE7B7}
+
+/* kit */
+.kit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.swatches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.sw{border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.sw .c{height:44px}
+.sw .m{padding:5px 8px;font-family:var(--mono);font-size:10px;color:var(--text-2);display:flex;flex-direction:column;gap:1px}
+.sw .m em{color:var(--text-3)}
+.type-row{display:flex;align-items:baseline;gap:12px;padding:6px 0;border-bottom:1px solid var(--border)}
+.type-row .tag2{width:118px;flex:0 0 118px;font-family:var(--mono);font-size:10.5px;color:var(--text-3)}
+.type-row .demo{flex:1;min-width:0}
+.type-row .note2{font-size:11px;color:var(--text-3);flex:0 0 auto}
+.comp-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0}
+.empty{text-align:center;padding:34px 16px}
+.empty .ico{width:36px;height:36px;border-radius:50%;background:var(--bg-subtle);border:1px solid var(--border);display:grid;place-items:center;margin:0 auto 10px;color:var(--text-3)}
+.empty h4{font-size:13px;font-weight:500;margin:0 0 3px}
+.empty p{font-size:11.5px;color:var(--text-3);margin:0 0 12px}
+.spacing span{display:inline-block;background:var(--accent-soft);border:1px solid var(--accent-border);height:8px;vertical-align:middle;margin-right:6px}
+
+@media (max-width:1180px){
+  .dash-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat:nth-child(3){border-left:0;border-top:1px solid var(--border)}
+  .stat:nth-child(4){border-top:1px solid var(--border)}
+  .kit-grid{grid-template-columns:1fr}
+}
+@media (max-width:1024px){
+  .sidebar{width:64px;flex-basis:64px}
+  .nav-label,.nav-item span,.brand-name,.brand-ver,.side-user-t,.nav-soon{display:none}
+  .nav-item{justify-content:center;padding:0}
+  .nav-count{position:absolute;top:2px;right:4px;font-size:9px;padding:0 3px}
+  .tool-shell,.req-shell{grid-template-columns:1fr}
+  .req-side{display:none}
+  .top-search{width:200px}
+  .design-tag{display:none}
+}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 8a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8V3"/><path d="M7 15h10"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 8-4-16-3 8H2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h8M8 11h6"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+  <symbol id="i-chevron-r" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-chevron-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 12l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+</svg>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M2 14h4l3-8 4 12 3-8h6"/></svg></div>
+      <div>
+        <div class="brand-name">Website Monitor</div>
+        <div class="brand-ver">v0.0.3 · dev</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group">
+        <div class="nav-label">监测</div>
+        <a class="nav-item on" data-screen="dashboard"><svg class="icon"><use href="#i-grid"/></svg><span>面板</span></a>
+        <a class="nav-item" data-screen="sites"><svg class="icon"><use href="#i-globe"/></svg><span>站点</span><em class="nav-count">12</em></a>
+        <a class="nav-item" data-screen="alerts"><svg class="icon"><use href="#i-bell"/></svg><span>报警</span><em class="nav-count danger">2</em></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">调试</div>
+        <a class="nav-item" data-screen="requester"><svg class="icon"><use href="#i-send"/></svg><span>请求器</span></a>
+        <a class="nav-item" data-soon="接口测试"><svg class="icon"><use href="#i-flask"/></svg><span>接口测试</span><em class="nav-soon">待建</em></a>
+        <a class="nav-item" data-soon="压力测试"><svg class="icon"><use href="#i-activity"/></svg><span>压力测试</span><em class="nav-soon">待建</em></a>
+        <a class="nav-item" data-soon="渗透测试"><svg class="icon"><use href="#i-shield"/></svg><span>渗透测试</span><em class="nav-soon">待建</em></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">工具</div>
+        <a class="nav-item" data-screen="tools"><svg class="icon"><use href="#i-zap"/></svg><span>在线工具</span></a>
+        <a class="nav-item" data-screen="probes"><svg class="icon"><use href="#i-server"/></svg><span>探针</span><em class="nav-count">2</em></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">系统</div>
+        <a class="nav-item" data-screen="kit"><svg class="icon"><use href="#i-layers"/></svg><span>设计规范</span></a>
+      </div>
+    </nav>
+    <div class="side-foot">
+      <a class="nav-item"><svg class="icon"><use href="#i-book"/></svg><span>使用说明</span></a>
+      <a class="nav-item" onclick="toast('设置面板将在实现阶段接入')"><svg class="icon"><use href="#i-settings"/></svg><span>设置</span></a>
+      <div class="side-user">
+        <div class="avatar">M</div>
+        <div class="side-user-t"><span>admin</span><em>已登录</em></div>
+        <svg class="icon sm"><use href="#i-chevron-r"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb"><span id="crumbRoot">监测</span><svg class="icon"><use href="#i-chevron-r"/></svg><strong id="crumb">面板</strong></div>
+      <div class="top-search">
+        <svg class="icon sm"><use href="#i-search"/></svg>
+        <input id="globalSearch" placeholder="搜索站点、报警、工具">
+        <kbd>/</kbd>
+      </div>
+      <div class="top-right">
+        <span class="chip"><i class="dot ok"></i>探针 2 在线</span>
+        <div class="accent-switch" title="强调色">
+          <button class="on" onclick="setAccent('indigo',this)" title="靛蓝"><i style="background:#4F46E5"></i></button>
+          <button onclick="setAccent('teal',this)" title="青绿"><i style="background:#0F766E"></i></button>
+          <button onclick="setAccent('graphite',this)" title="石墨"><i style="background:#27272A"></i></button>
+        </div>
+        <button class="btn icon ghost" onclick="toggleDensity()" title="切换紧凑/舒适密度"><svg class="icon"><use href="#i-list"/></svg></button>
+        <button class="btn icon ghost" onclick="go('alerts')" title="未读报警" style="position:relative"><svg class="icon"><use href="#i-bell"/></svg><i class="dot danger" style="position:absolute;top:5px;right:6px;box-shadow:0 0 0 2px #fff"></i></button>
+        <div class="top-divider"></div>
+        <span class="design-tag">设计稿 v1</span>
+        <div class="avatar">M</div>
+      </div>
+    </header>
+
+    <div class="viewport">
+
+      <!-- dashboard -->
+      <section class="screen on" id="screen-dashboard">
+        <div class="page-head">
+          <div>
+            <h1>面板</h1>
+            <p>3 个站点出现异常 · <b>2</b> 条未读报警 · 15:18 更新</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn icon ghost" onclick="toast('已刷新')" title="刷新"><svg class="icon"><use href="#i-refresh"/></svg></button>
+            <button class="btn primary" onclick="openModal()"><svg class="icon sm"><use href="#i-plus"/></svg>创建监测</button>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">监测站点</div>
+            <div class="stat-value">12</div>
+            <div class="stat-sub"><span class="up">+2</span> 本周新增</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">监测中</div>
+            <div class="stat-value">10</div>
+            <div class="stat-sub">共 12 个 · 2 个等待探针</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">24h 可用率</div>
+            <div class="stat-value">99.62<small class="unit">%</small></div>
+            <div class="stat-sub"><span class="up">+0.04%</span> 对比昨日</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">未读报警</div>
+            <div class="stat-value danger-text">2</div>
+            <div class="stat-sub">最近 15:16 · 97654.com</div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">站点<span class="count">12</span></div>
+              <a class="panel-link" onclick="go('sites')">全部站点<svg class="icon sm"><use href="#i-chevron-r"/></svg></a>
+            </div>
+            <div class="table-wrap">
+              <table class="tbl">
+                <thead><tr><th>站点</th><th style="width:110px">状态</th><th style="width:70px">频率</th><th style="width:132px">响应</th><th style="width:82px">证书</th><th style="width:84px"></th></tr></thead>
+                <tbody>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">www.97654.com</span><button class="mini" onclick="event.stopPropagation();copyText('www.97654.com')" title="复制"><svg class="icon sm"><use href="#i-copy"/></svg></button></div><div class="sub">97654-pc</div></div></td>
+                    <td><span class="status alert"><i class="dot"></i>报警 6</span></td>
+                    <td class="num muted">15s</td>
+                    <td><div class="resp"><svg class="spark bad" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,10 8,13 16,9 24,14 32,8 40,12 48,15 56,11" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">212</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num">82 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">m.97654.com</span></div><div class="sub">97654-m</div></div></td>
+                    <td><span class="status alert"><i class="dot"></i>报警 11</span></td>
+                    <td class="num muted">15s</td>
+                    <td><div class="resp"><svg class="spark bad" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,14 8,8 16,12 24,6 32,11 40,7 48,13 56,5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">1,284</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num">82 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">www.c298.cn</span></div><div class="sub">c298-pc</div></div></td>
+                    <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                    <td class="num muted">30s</td>
+                    <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,9 8,11 16,8 24,10 32,7 40,9 48,6 56,8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">168</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num">265 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">m.55126.cn</span></div><div class="sub">55126-m</div></div></td>
+                    <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                    <td class="num muted">15s</td>
+                    <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,10 8,9 16,11 24,8 32,10 40,7 48,9 56,7" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">203</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num">122 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">m.33633.cn</span></div><div class="sub">33633-m</div></div></td>
+                    <td><span class="status alert"><i class="dot"></i>报警 1</span></td>
+                    <td class="num muted">15s</td>
+                    <td><div class="resp"><svg class="spark bad" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,8 8,10 16,7 24,12 32,9 40,13 48,10 56,12" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">342</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num warn-text">12 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">www.55126.cn</span></div><div class="sub">55126-pc</div></div></td>
+                    <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                    <td class="num muted">15s</td>
+                    <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,11 8,9 16,10 24,8 32,9 40,7 48,8 56,6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">189</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num">122 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">www.8300.cn</span></div><div class="sub">8300-m</div></div></td>
+                    <td><span class="status wait"><i class="dot"></i>等待探针</span></td>
+                    <td class="num muted">30s</td>
+                    <td class="num muted">—</td>
+                    <td class="num">208 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">m.c298.cn</span></div><div class="sub">c298-m</div></div></td>
+                    <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                    <td class="num muted">30s</td>
+                    <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,10 8,8 16,11 24,9 32,7 40,10 48,8 56,9" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">174</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num">265 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">www.33633.cn</span></div><div class="sub">33633-pc</div></div></td>
+                    <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                    <td class="num muted">60s</td>
+                    <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,9 8,11 16,8 24,10 32,8 40,9 48,7 56,8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">156</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num warn-text">12 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                  <tr onclick="openSite()">
+                    <td><div class="host-cell"><div class="host-line"><span class="host">m.8300.cn</span></div><div class="sub">8300-m</div></div></td>
+                    <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                    <td class="num muted">30s</td>
+                    <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,11 8,9 16,10 24,8 32,10 40,9 48,7 56,9" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">228</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                    <td class="num">208 天</td>
+                    <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost" onclick="event.stopPropagation();toast('更多操作')"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="side-stack">
+            <div class="panel">
+              <div class="panel-head">
+                <div class="panel-title">报警<span class="count">2 未读</span></div>
+                <a class="panel-link" onclick="go('alerts')">全部<svg class="icon sm"><use href="#i-chevron-r"/></svg></a>
+              </div>
+              <div>
+                <div class="alert-item" onclick="openAlert()">
+                  <i class="sev"></i>
+                  <div class="alert-main">
+                    <div class="alert-line"><span class="alert-host">www.97654.com</span><span class="alert-time">15:16</span></div>
+                    <div class="alert-msg">请求超时：context deadline exceeded</div>
+                  </div>
+                </div>
+                <div class="alert-item" onclick="openAlert()">
+                  <i class="sev"></i>
+                  <div class="alert-main">
+                    <div class="alert-line"><span class="alert-host">m.97654.com</span><span class="alert-time">14:02</span></div>
+                    <div class="alert-msg">状态码 502 · 响应 1,284ms</div>
+                  </div>
+                </div>
+                <div class="alert-item" onclick="openAlert()">
+                  <i class="sev warn"></i>
+                  <div class="alert-main">
+                    <div class="alert-line"><span class="alert-host">m.33633.cn</span><span class="alert-time">11:47</span></div>
+                    <div class="alert-msg">证书剩余 12 天，低于阈值 14 天</div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-foot" onclick="go('alerts')">查看全部报警<svg class="icon sm"><use href="#i-chevron-r"/></svg></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <div class="panel-title">探针<span class="count">1 / 2 在线</span></div>
+                <a class="panel-link" onclick="go('probes')">管理<svg class="icon sm"><use href="#i-chevron-r"/></svg></a>
+              </div>
+              <div>
+                <div class="probe">
+                  <div class="probe-icon"><svg class="icon sm"><use href="#i-server"/></svg></div>
+                  <div class="probe-main">
+                    <div class="probe-name">node2 <i class="dot ok"></i></div>
+                    <div class="probe-meta">171.214.202.23 · 四川成都 电信</div>
+                  </div>
+                  <span class="tag neutral">Linux</span>
+                </div>
+                <div class="probe">
+                  <div class="probe-icon"><svg class="icon sm"><use href="#i-server"/></svg></div>
+                  <div class="probe-main">
+                    <div class="probe-name">node3 <i class="dot"></i></div>
+                    <div class="probe-meta">47.98.112.4 · 浙江杭州 阿里云</div>
+                  </div>
+                  <span class="tag neutral">离线 12m</span>
+                </div>
+              </div>
+              <div class="panel-foot" onclick="toast('可查看探针接入命令')">接入新探针<svg class="icon sm"><use href="#i-plus"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- sites -->
+      <section class="screen" id="screen-sites">
+        <div class="page-head">
+          <div>
+            <h1>站点</h1>
+            <p>共 <b>12</b> 个站点 · 10 个监测中 · 2 个报警 · 2 个等待探针</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn secondary" onclick="toast('导出 CSV（后续实现）')"><svg class="icon sm"><use href="#i-download"/></svg>导出</button>
+            <button class="btn primary" onclick="openModal()"><svg class="icon sm"><use href="#i-plus"/></svg>创建监测</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box"><svg class="icon"><use href="#i-search"/></svg><input placeholder="搜索域名或备注"></div>
+          <div class="segmented">
+            <button class="on">全部<span class="count">12</span></button>
+            <button>监测中<span class="count">10</span></button>
+            <button>报警<span class="count">2</span></button>
+            <button>等待<span class="count">2</span></button>
+          </div>
+          <div class="spacer"></div>
+          <button class="btn icon ghost" title="筛选"><svg class="icon"><use href="#i-filter"/></svg></button>
+        </div>
+
+        <div class="bulkbar" id="bulkbar">
+          <span>已选择 <b id="selCount">0</b> 个站点</span>
+          <div class="spacer"></div>
+          <button class="btn xs secondary">暂停监测</button>
+          <button class="btn xs danger">删除</button>
+          <button class="btn xs ghost" onclick="clearSel()">取消</button>
+        </div>
+
+        <div class="panel">
+          <div class="table-wrap scroll-y">
+            <table class="tbl" id="sitesTable">
+              <thead><tr>
+                <th style="width:38px"><input class="cb" type="checkbox" onchange="toggleAll(this)"></th>
+                <th>站点</th><th style="width:110px">状态</th><th style="width:72px">频率</th>
+                <th style="width:126px">平均响应</th><th style="width:76px">P95</th><th style="width:84px">证书</th>
+                <th style="width:96px">最近报警</th><th style="width:78px"></th>
+              </tr></thead>
+              <tbody>
+                <tr onclick="openSite()">
+                  <td onclick="event.stopPropagation()"><input class="cb" type="checkbox" onchange="onSelect()"></td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">www.97654.com</span><button class="mini" onclick="event.stopPropagation();copyText('www.97654.com')"><svg class="icon sm"><use href="#i-copy"/></svg></button></div><div class="sub">97654-pc · 蜀ICP备12004576号</div></div></td>
+                  <td><span class="status alert"><i class="dot"></i>报警 6</span></td>
+                  <td class="num muted">15s</td>
+                  <td><div class="resp"><svg class="spark bad" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,10 8,13 16,9 24,14 32,8 40,12 48,15 56,11" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">212</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                  <td class="num muted">640ms</td><td class="num">82 天</td><td><span class="tag danger">6 条</span></td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                </tr>
+                <tr onclick="openSite()">
+                  <td onclick="event.stopPropagation()"><input class="cb" type="checkbox" onchange="onSelect()"></td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">m.97654.com</span></div><div class="sub">97654-m · 移动端</div></div></td>
+                  <td><span class="status alert"><i class="dot"></i>报警 11</span></td>
+                  <td class="num muted">15s</td>
+                  <td><div class="resp"><svg class="spark bad" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,14 8,8 16,12 24,6 32,11 40,7 48,13 56,5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">1,284</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                  <td class="num muted">2,480ms</td><td class="num">82 天</td><td><span class="tag danger">11 条</span></td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                </tr>
+                <tr onclick="openSite()">
+                  <td onclick="event.stopPropagation()"><input class="cb" type="checkbox" onchange="onSelect()"></td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">www.c298.cn</span></div><div class="sub">c298-pc</div></div></td>
+                  <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                  <td class="num muted">30s</td>
+                  <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,9 8,11 16,8 24,10 32,7 40,9 48,6 56,8" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">168</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                  <td class="num muted">420ms</td><td class="num">265 天</td><td class="num muted">—</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                </tr>
+                <tr onclick="openSite()">
+                  <td onclick="event.stopPropagation()"><input class="cb" type="checkbox" onchange="onSelect()"></td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">m.55126.cn</span></div><div class="sub">55126-m</div></div></td>
+                  <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                  <td class="num muted">15s</td>
+                  <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,10 8,9 16,11 24,8 32,10 40,7 48,9 56,7" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">203</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                  <td class="num muted">510ms</td><td class="num">122 天</td><td class="num muted">—</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                </tr>
+                <tr onclick="openSite()">
+                  <td onclick="event.stopPropagation()"><input class="cb" type="checkbox" onchange="onSelect()"></td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">www.55126.cn</span></div><div class="sub">55126-pc</div></div></td>
+                  <td><span class="status"><i class="dot ok"></i>正常</span></td>
+                  <td class="num muted">15s</td>
+                  <td><div class="resp"><svg class="spark" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,11 8,9 16,10 24,8 32,9 40,7 48,8 56,6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">189</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                  <td class="num muted">460ms</td><td class="num">122 天</td><td class="num muted">—</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                </tr>
+                <tr onclick="openSite()">
+                  <td onclick="event.stopPropagation()"><input class="cb" type="checkbox" onchange="onSelect()"></td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">m.33633.cn</span></div><div class="sub">33633-m</div></div></td>
+                  <td><span class="status alert"><i class="dot"></i>报警 1</span></td>
+                  <td class="num muted">15s</td>
+                  <td><div class="resp"><svg class="spark bad" viewBox="0 0 56 18" preserveAspectRatio="none"><polyline points="0,8 8,10 16,7 24,12 32,9 40,13 48,10 56,12" fill="none" stroke="currentColor" stroke-width="1.2"/></svg><span class="num">342</span><span class="muted" style="font-size:10.5px">ms</span></div></td>
+                  <td class="num muted">880ms</td><td class="num warn-text">12 天</td><td><span class="tag warn">证书</span></td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                </tr>
+                <tr onclick="openSite()">
+                  <td onclick="event.stopPropagation()"><input class="cb" type="checkbox" onchange="onSelect()"></td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">www.8300.cn</span></div><div class="sub">8300-m</div></div></td>
+                  <td><span class="status wait"><i class="dot"></i>等待探针</span></td>
+                  <td class="num muted">30s</td>
+                  <td class="num muted">—</td><td class="num muted">—</td><td class="num">208 天</td><td class="num muted">—</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openSite()">详情</button><button class="btn icon xs ghost"><svg class="icon sm"><use href="#i-more"/></svg></button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- probes -->
+      <section class="screen" id="screen-probes">
+        <div class="page-head">
+          <div>
+            <h1>探针</h1>
+            <p><b>1</b> 个在线 · 1 个离线 · 心跳间隔 5s</p>
+          </div>
+          <div class="page-actions"><button class="btn primary" onclick="toast('展示探针接入命令')"><svg class="icon sm"><use href="#i-plus"/></svg>接入探针</button></div>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead><tr><th style="width:140px">节点</th><th style="width:100px">状态</th><th style="width:130px">公网 IP</th><th style="width:170px">属地</th><th>系统</th><th style="width:110px">最近心跳</th><th style="width:80px"></th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">node2</span></div><div class="sub">默认节点</div></div></td>
+                  <td><span class="status"><i class="dot ok"></i>在线</span></td>
+                  <td class="num">171.214.202.23</td><td>四川成都 · 电信</td><td class="muted">Linux 5.15 · 4 核 · 8G</td><td class="num muted">2s 前</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="toast('节点详情')">详情</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">node3</span></div><div class="sub">备用节点</div></div></td>
+                  <td><span class="status off"><i class="dot"></i>离线</span></td>
+                  <td class="num">47.98.112.4</td><td>浙江杭州 · 阿里云</td><td class="muted">Linux 5.15 · 2 核 · 4G</td><td class="num muted">12 分钟前</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="toast('节点详情')">详情</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <div class="panel-head"><div class="panel-title">接入新探针</div><span class="tag neutral">2 步</span></div>
+          <div class="panel-body">
+            <div class="hint" style="margin:0 0 8px">在目标机器执行以下命令，探针将自动注册并拉取监测配置。</div>
+            <div class="editor" style="min-height:0">./monitor -conf ./conf/app.yaml</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- alerts -->
+      <section class="screen" id="screen-alerts">
+        <div class="page-head">
+          <div>
+            <h1>报警</h1>
+            <p>今日 <b>4</b> 条 · 未读 <b>2</b> 条 · 涉及 2 个站点</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn secondary" onclick="toast('已全部标记为已读')"><svg class="icon sm"><use href="#i-check"/></svg>全部已读</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <div class="segmented">
+            <button class="on">全部<span class="count">4</span></button>
+            <button>未读<span class="count">2</span></button>
+            <button>超时<span class="count">1</span></button>
+            <button>状态码<span class="count">1</span></button>
+            <button>证书<span class="count">1</span></button>
+          </div>
+          <select class="input" style="width:170px"><option>全部站点</option><option>www.97654.com</option><option>m.97654.com</option></select>
+          <select class="input" style="width:130px"><option>今天</option><option>近 7 天</option><option>近 30 天</option></select>
+          <div class="spacer"></div>
+          <div class="search-box" style="width:220px"><svg class="icon"><use href="#i-search"/></svg><input placeholder="搜索报警内容"></div>
+        </div>
+        <div class="panel">
+          <div class="table-wrap scroll-y">
+            <table class="tbl">
+              <thead><tr><th style="width:30px"></th><th style="width:92px">时间</th><th style="width:210px">站点</th><th style="width:78px">类型</th><th>详情</th><th style="width:96px">耗时</th><th style="width:82px">探针</th><th style="width:72px"></th></tr></thead>
+              <tbody>
+                <tr onclick="openAlert()">
+                  <td><i class="dot danger"></i></td>
+                  <td class="num muted">15:16:42</td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">www.97654.com</span></div><div class="sub">Health · 根 URI</div></div></td>
+                  <td><span class="tag danger">超时</span></td>
+                  <td class="muted" style="font-size:12px">context deadline exceeded（30s）</td>
+                  <td class="num">4,962 ms</td><td class="num muted">node2</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openAlert()">详情</button></div></td>
+                </tr>
+                <tr onclick="openAlert()">
+                  <td><i class="dot danger"></i></td>
+                  <td class="num muted">14:02:11</td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">m.97654.com</span></div><div class="sub">Health · 根 URI</div></div></td>
+                  <td><span class="tag danger">状态码</span></td>
+                  <td class="muted" style="font-size:12px">502 Bad Gateway</td>
+                  <td class="num">1,284 ms</td><td class="num muted">node2</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openAlert()">详情</button></div></td>
+                </tr>
+                <tr onclick="openAlert()">
+                  <td><i class="dot warn"></i></td>
+                  <td class="num muted">11:47:03</td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">m.33633.cn</span></div><div class="sub">证书巡检</div></div></td>
+                  <td><span class="tag warn">证书</span></td>
+                  <td class="muted" style="font-size:12px">证书剩余 12 天，低于阈值 14 天</td>
+                  <td class="num muted">—</td><td class="num muted">master</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openAlert()">详情</button></div></td>
+                </tr>
+                <tr onclick="openAlert()">
+                  <td><i class="dot warn"></i></td>
+                  <td class="num muted">09:20:38</td>
+                  <td><div class="host-cell"><div class="host-line"><span class="host">www.97654.com</span></div><div class="sub">Random · /sitemap.xml</div></div></td>
+                  <td><span class="tag warn">慢响应</span></td>
+                  <td class="muted" style="font-size:12px">响应 3,342ms，超过阈值 3,000ms</td>
+                  <td class="num">3,342 ms</td><td class="num muted">node2</td>
+                  <td><div class="cell-actions"><button class="btn xs ghost" onclick="event.stopPropagation();openAlert()">详情</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- tools -->
+      <section class="screen" id="screen-tools">
+        <div class="page-head">
+          <div><h1>在线工具</h1><p>8 个诊断工具 · 结果内联展示，可回看历史</p></div>
+        </div>
+        <div class="tool-shell">
+          <div class="panel tool-nav">
+            <div class="tool-group-label">站点分析</div>
+            <div class="tool-link" onclick="toast('TDK 查询面板')"><svg class="icon"><use href="#i-globe"/></svg>TDK 与图标</div>
+            <div class="tool-link" onclick="toast('站点信息采集')"><svg class="icon"><use href="#i-layers"/></svg>站点信息</div>
+            <div class="tool-group-label">网络</div>
+            <div class="tool-link on"><svg class="icon"><use href="#i-server"/></svg>DNS 查询</div>
+            <div class="tool-link" onclick="toast('Ping 面板')"><svg class="icon"><use href="#i-activity"/></svg>在线 Ping</div>
+            <div class="tool-link" onclick="toast('IP 属地查询')"><svg class="icon"><use href="#i-globe"/></svg>IP 属地</div>
+            <div class="tool-group-label">域名与证书</div>
+            <div class="tool-link" onclick="toast('Whois 查询')"><svg class="icon"><use href="#i-search"/></svg>Whois</div>
+            <div class="tool-link" onclick="toast('ICP 备案查询')"><svg class="icon"><use href="#i-book"/></svg>ICP 备案</div>
+            <div class="tool-link" onclick="toast('SSL 证书查询')"><svg class="icon"><use href="#i-shield"/></svg>SSL 证书</div>
+          </div>
+
+          <div class="panel">
+            <div class="tool-head">
+              <div>
+                <div class="tool-title">DNS 查询</div>
+                <div class="tool-desc">使用本地与公共 DNS 解析域名，输出全部 A / CNAME 记录与耗时。</div>
+              </div>
+              <button class="btn ghost icon" title="清空"><svg class="icon"><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="query-row">
+              <input class="input" value="www.97654.com">
+              <select class="input" style="width:150px"><option>Local DNS</option><option>223.5.5.5</option><option>8.8.8.8</option></select>
+              <button class="btn primary" onclick="toast('查询完成 · 42ms')">查询</button>
+            </div>
+            <div class="result-meta">
+              <span><i class="dot ok"></i> 解析成功</span>
+              <span>记录 <b>4</b> 条</span>
+              <span>耗时 <b>42ms</b></span>
+              <span>CDN <b>否</b></span>
+              <div class="spacer"></div>
+              <span class="muted" style="font-family:var(--mono);font-size:11px">15:18:22</span>
+            </div>
+            <div class="table-wrap">
+              <table class="tbl">
+                <thead><tr><th style="width:110px">类型</th><th>值</th><th style="width:110px">TTL</th><th style="width:90px">状态</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="tag info">A</span></td><td class="num">47.98.112.4</td><td class="num muted">600</td><td><span class="status"><i class="dot ok"></i>可达</span></td></tr>
+                  <tr><td><span class="tag info">A</span></td><td class="num">47.98.112.5</td><td class="num muted">600</td><td><span class="status"><i class="dot ok"></i>可达</span></td></tr>
+                  <tr><td><span class="tag neutral">CNAME</span></td><td class="num">www.97654.com.w.cdngslb.com</td><td class="num muted">120</td><td><span class="status"><i class="dot ok"></i>可达</span></td></tr>
+                  <tr><td><span class="tag neutral">NS</span></td><td class="num">ns1.alidns.com</td><td class="num muted">86400</td><td class="muted">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="hist">
+              <span class="hist-label">最近查询</span>
+              <span class="hist-chip">www.33633.cn</span>
+              <span class="hist-chip">m.55126.cn</span>
+              <span class="hist-chip">www.8300.cn</span>
+              <span class="hist-chip">www.c298.cn</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- requester -->
+      <section class="screen" id="screen-requester">
+        <div class="page-head">
+          <div><h1>请求器</h1><p>5 个历史请求 · 全局 Header 已启用 2 项</p></div>
+          <div class="page-actions">
+            <button class="btn secondary" onclick="toast('全局 Header 设置')"><svg class="icon sm"><use href="#i-settings"/></svg>全局 Header</button>
+            <button class="btn primary" onclick="toast('已新建请求标签')"><svg class="icon sm"><use href="#i-plus"/></svg>新建请求</button>
+          </div>
+        </div>
+        <div class="req-shell">
+          <div class="panel req-side">
+            <div class="panel-head" style="height:38px"><div class="panel-title">历史</div><span class="tag neutral">5</span></div>
+            <div class="panel-body">
+              <div class="req-group">今天</div>
+              <div class="req-item on"><span class="m post">POST</span><span class="n">创建订单</span></div>
+              <div class="req-item"><span class="m">GET</span><span class="n">站点列表</span></div>
+              <div class="req-item"><span class="m">GET</span><span class="n">探针信息</span></div>
+              <div class="req-group">更早</div>
+              <div class="req-item"><span class="m post">POST</span><span class="n">登录接口</span></div>
+              <div class="req-item"><span class="m">GET</span><span class="n">证书查询</span></div>
+            </div>
+          </div>
+          <div class="req-main">
+            <div class="panel req-panel">
+              <div class="req-bar">
+                <select class="input method"><option>POST</option><option>GET</option><option>PUT</option><option>DELETE</option></select>
+                <input class="input req-url" value="https://api.example.com/v1/orders">
+                <button class="btn primary" onclick="toast('请求完成 · 200 OK · 213ms')">发送</button>
+                <button class="btn icon ghost" title="保存"><svg class="icon"><use href="#i-download"/></svg></button>
+              </div>
+              <div class="tabs">
+                <div class="tab">Params <em>0</em></div>
+                <div class="tab">Headers <em>3</em></div>
+                <div class="tab on">Body <em>JSON</em></div>
+                <div class="tab">Auth</div>
+              </div>
+              <div class="req-body">
+                <div class="editor">{
+  <span class="k">"siteId"</span>: <span class="s">"d8d993eda2c52cd4"</span>,
+  <span class="k">"uri"</span>: <span class="s">"https://www.97654.com"</span>,
+  <span class="k">"region"</span>: <span class="s">"cn-southwest"</span>,
+  <span class="k">"interval"</span>: <span class="n">15</span>
+}</div>
+              </div>
+            </div>
+            <div class="panel req-panel">
+              <div class="resp-bar">
+                <span class="code">200 OK</span>
+                <span>213 ms</span><span>1.24 KB</span>
+                <div class="spacer"></div>
+                <button class="btn xs ghost" onclick="copyText('{...}')"><svg class="icon sm"><use href="#i-copy"/></svg>复制</button>
+              </div>
+              <div class="tabs">
+                <div class="tab on">Body</div>
+                <div class="tab">Headers <em>12</em></div>
+                <div class="tab">Cookies <em>1</em></div>
+              </div>
+              <pre class="json">{
+  <span class="k">"code"</span>: <span class="n">0</span>,
+  <span class="k">"msg"</span>: <span class="s">"ok"</span>,
+  <span class="k">"data"</span>: {
+    <span class="k">"id"</span>: <span class="s">"ord_9f2c1a"</span>,
+    <span class="k">"status"</span>: <span class="s">"created"</span>,
+    <span class="k">"createdAt"</span>: <span class="s">"2026-11-26T15:18:22+08:00"</span>
+  }
+}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- kit -->
+      <section class="screen" id="screen-kit">
+        <div class="page-head">
+          <div><h1>设计规范</h1><p>工具型后台 · 简约 · 高信息密度 · 单一强调色</p></div>
+          <div class="page-actions">
+            <div class="segmented">
+              <button class="on" onclick="setAccent('indigo',document.querySelector('.accent-switch button'));this.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">靛蓝</button>
+              <button onclick="setAccent('teal',document.querySelectorAll('.accent-switch button')[1]);this.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">青绿</button>
+              <button onclick="setAccent('graphite',document.querySelectorAll('.accent-switch button')[2]);this.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">石墨</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:16px">
+          <div class="panel-body" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+            <div><div class="stat-label">① 结构</div><div style="font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.6">侧栏 + 顶栏 + 内容区。上下文留在页面，详情用抽屉，不打断操作。</div></div>
+            <div><div class="stat-label">② 层级</div><div style="font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.6">1px 描边与背景差分层，不使用投影；只有浮层有阴影。</div></div>
+            <div><div class="stat-label">③ 密度</div><div style="font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.6">基准 13px，行高 44px，8pt 间距。数字与 URL 一律等宽。</div></div>
+            <div><div class="stat-label">④ 色彩</div><div style="font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.6">中性灰为主，强调色只用于主操作、选中态与图表。状态用圆点。</div></div>
+          </div>
+        </div>
+
+        <div class="kit-grid">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">色彩</div><span class="tag neutral">点击右上角圆点切换强调色</span></div>
+            <div class="panel-body">
+              <div class="swatches">
+                <div class="sw"><div class="c" style="background:#F6F6F7"></div><div class="m"><span>bg-app</span><em>#F6F6F7</em></div></div>
+                <div class="sw"><div class="c" style="background:#FFFFFF"></div><div class="m"><span>surface</span><em>#FFFFFF</em></div></div>
+                <div class="sw"><div class="c" style="background:#E7E7EA"></div><div class="m"><span>border</span><em>#E7E7EA</em></div></div>
+                <div class="sw"><div class="c" style="background:#18181B"></div><div class="m"><span>text</span><em>#18181B</em></div></div>
+                <div class="sw"><div class="c" style="background:#5B5B66"></div><div class="m"><span>text-2</span><em>#5B5B66</em></div></div>
+                <div class="sw"><div class="c" style="background:#93939E"></div><div class="m"><span>text-3</span><em>#93939E</em></div></div>
+                <div class="sw"><div class="c" style="background:var(--accent)"></div><div class="m"><span>accent</span><em id="accentHex">#4F46E5</em></div></div>
+                <div class="sw"><div class="c" style="background:var(--accent-soft)"></div><div class="m"><span>accent-soft</span><em>8% 同色</em></div></div>
+                <div class="sw"><div class="c" style="background:#15803D"></div><div class="m"><span>ok</span><em>#15803D</em></div></div>
+                <div class="sw"><div class="c" style="background:#B45309"></div><div class="m"><span>warn</span><em>#B45309</em></div></div>
+                <div class="sw"><div class="c" style="background:#C02626"></div><div class="m"><span>danger</span><em>#C02626</em></div></div>
+                <div class="sw"><div class="c" style="background:#FAFAFA"></div><div class="m"><span>subtle</span><em>#FAFAFA</em></div></div>
+              </div>
+              <div class="note" style="margin-top:12px">
+                <svg class="icon sm"><use href="#i-alert"/></svg>
+                <span>状态色只出现在圆点、文字与 20px 高的小标签上，不用大面积色块。一张页面只有一个强调色。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">字体层级</div><span class="tag neutral">系统字体</span></div>
+            <div class="panel-body">
+              <div class="type-row"><span class="tag2">20 / 500</span><span class="demo" style="font-size:20px;font-weight:500">页面标题</span><span class="note2">Page title</span></div>
+              <div class="type-row"><span class="tag2">14 / 500</span><span class="demo" style="font-size:14px;font-weight:500">区块 / 抽屉标题</span><span class="note2">Section</span></div>
+              <div class="type-row"><span class="tag2">13 / 400</span><span class="demo">正文与表格内容，中文最小 12px</span><span class="note2">Body</span></div>
+              <div class="type-row"><span class="tag2">12 / 400</span><span class="demo" style="font-size:12px;color:var(--text-2)">辅助说明、表头、时间</span><span class="note2">Meta</span></div>
+              <div class="type-row"><span class="tag2">12 / mono</span><span class="demo" style="font-family:var(--mono);font-size:12px">www.97654.com · 1,284ms</span><span class="note2">Data</span></div>
+              <div class="type-row" style="border-bottom:0"><span class="tag2">10.5 / mono</span><span class="demo" style="font-family:var(--mono);font-size:10.5px;color:var(--text-3)">15:18:22 · 171.214.202.23</span><span class="note2">Caption</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">控件</div><span class="tag neutral">高度 30 / 26</span></div>
+            <div class="panel-body">
+              <div class="comp-row">
+                <button class="btn primary">主操作</button>
+                <button class="btn secondary">次操作</button>
+                <button class="btn ghost">幽灵按钮</button>
+                <button class="btn danger">危险操作</button>
+                <button class="btn icon secondary"><svg class="icon"><use href="#i-plus"/></svg></button>
+              </div>
+              <div class="comp-row">
+                <div class="segmented"><button class="on">全部</button><button>未读</button><button>异常</button></div>
+                <span class="tag ok">正常</span><span class="tag warn">慢响应</span><span class="tag danger">超时</span><span class="tag neutral">已读</span>
+              </div>
+              <div class="comp-row">
+                <span class="status"><i class="dot ok"></i>监测中</span>
+                <span class="status alert"><i class="dot"></i>报警</span>
+                <span class="status wait"><i class="dot"></i>等待</span>
+                <span class="status off"><i class="dot"></i>离线</span>
+              </div>
+              <div class="comp-row">
+                <input class="input" style="width:180px" placeholder="输入框">
+                <input class="cb" type="checkbox" checked>
+                <span style="font-size:12px;color:var(--text-2)">14px 复选框</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">空状态与间距</div><span class="tag neutral">8pt</span></div>
+            <div class="panel-body">
+              <div class="empty" style="padding:18px 16px 10px">
+                <div class="ico"><svg class="icon"><use href="#i-bell"/></svg></div>
+                <h4>暂无报警</h4>
+                <p>站点运行正常，新的报警会出现在这里</p>
+                <button class="btn secondary xs">查看监测规则</button>
+              </div>
+              <div class="spacing" style="font-size:11px;color:var(--text-3);line-height:24px">
+                <span style="width:4px"></span>4
+                <span style="width:8px"></span>8
+                <span style="width:12px"></span>12
+                <span style="width:16px"></span>16
+                <span style="width:24px"></span>24
+                <span style="width:32px"></span>32
+                <span style="width:40px"></span>40
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="mask" onclick="closeDrawers()"></div>
+
+<aside class="drawer" id="drawerSite" role="dialog" aria-modal="true" aria-label="站点详情">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title-row"><i class="dot danger"></i><h2>www.97654.com</h2></div>
+      <div class="drawer-sub">97654-pc · 创建于 2025-02-07 · 最近监测 15:18:42</div>
+    </div>
+    <div class="drawer-actions">
+      <button class="btn xs secondary" onclick="toast('编辑监测配置')"><svg class="icon sm"><use href="#i-edit"/></svg>编辑</button>
+      <button class="btn xs ghost" onclick="toast('已暂停监测')"><svg class="icon sm"><use href="#i-pause"/></svg>暂停</button>
+      <button class="btn icon xs ghost danger" title="删除" onclick="toast('二次确认后删除')"><svg class="icon sm"><use href="#i-trash"/></svg></button>
+      <button class="btn icon xs ghost" onclick="closeDrawers()" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+  </div>
+  <div class="drawer-meta">
+    <span>频率<b>15s</b></span><span>对照组<b>baidu.com</b></span><span>Ping<b>223.5.5.5</b></span><span>监测点<b>2</b></span><span>采集 URL<b>128</b></span>
+  </div>
+  <div class="drawer-tabs">
+    <div class="tab on" onclick="dtab(this,'d-pane-1')">概览</div>
+    <div class="tab" onclick="dtab(this,'d-pane-2')">监测点 <em>2</em></div>
+    <div class="tab" onclick="dtab(this,'d-pane-3')">采集 URL <em>128</em></div>
+    <div class="tab" onclick="dtab(this,'d-pane-4')">日志</div>
+  </div>
+  <div class="drawer-body">
+    <div class="pane on" id="d-pane-1">
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="l">今日请求</div><div class="v">4,820</div></div>
+        <div class="mini-stat"><div class="l">可用率</div><div class="v">99.62<small>%</small></div></div>
+        <div class="mini-stat"><div class="l">平均响应</div><div class="v">212<small>ms</small></div></div>
+        <div class="mini-stat"><div class="l">P95</div><div class="v">640<small>ms</small></div></div>
+      </div>
+
+      <div class="chart-box">
+        <div class="chart-head">
+          <div class="chart-title">响应时间 · 近 24 小时</div>
+          <div class="legend">
+            <span><i></i>站点</span><span class="gray"><i></i>对照组</span><span class="dash"><i></i>阈值 800ms</span>
+          </div>
+        </div>
+        <svg class="chart" viewBox="0 0 640 150" preserveAspectRatio="none">
+          <g stroke="#F0F0F2" stroke-width="1">
+            <line x1="0" y1="10" x2="640" y2="10"/><line x1="0" y1="45" x2="640" y2="45"/><line x1="0" y1="80" x2="640" y2="80"/><line x1="0" y1="115" x2="640" y2="115"/><line x1="0" y1="145" x2="640" y2="145"/>
+          </g>
+          <line x1="0" y1="45" x2="640" y2="45" stroke="#C9C9D1" stroke-width="1" stroke-dasharray="3 4"/>
+          <polyline points="0,112 27,110 53,112 80,108 107,110 133,106 160,108 187,104 213,106 240,102 267,104 293,100 320,102 347,98 373,100 400,96 427,98 453,94 480,96 507,92 533,94 560,90 587,92 613,88 640,90" fill="none" stroke="#C9C9D1" stroke-width="1.2"/>
+          <path d="M0 92 L27 88 L53 90 L80 84 L107 86 L133 80 L160 82 L187 76 L213 78 L240 72 L267 74 L293 68 L320 70 L347 74 L373 66 L400 36 L427 68 L453 62 L480 64 L507 58 L533 60 L560 54 L587 56 L613 50 L640 52 L640 150 L0 150 Z" fill="var(--accent)" opacity=".06"/>
+          <polyline points="0,92 27,88 53,90 80,84 107,86 133,80 160,82 187,76 213,78 240,72 267,74 293,68 320,70 347,74 373,66 400,36 427,68 453,62 480,64 507,58 533,60 560,54 587,56 613,50 640,52" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <div class="chart-x"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+      </div>
+
+      <div class="section-title">基础信息<span class="panel-link" onclick="toast('正在重新采集')"><svg class="icon sm"><use href="#i-refresh"/></svg>重新采集</span></div>
+      <div class="kv-grid">
+        <div class="kv"><span class="k">标题</span><span class="v">97654.com - 免费资源站</span></div>
+        <div class="kv"><span class="k">服务端</span><span class="v">nginx / 1.24.0</span></div>
+        <div class="kv"><span class="k">A 记录</span><span class="v">47.98.112.4</span></div>
+        <div class="kv"><span class="k">CNAME</span><span class="v">w.cdngslb.com</span></div>
+        <div class="kv"><span class="k">证书到期</span><span class="v">2027-02-14 · 82 天</span></div>
+        <div class="kv"><span class="k">备案</span><span class="v">蜀ICP备12004576号</span></div>
+        <div class="kv"><span class="k">解析耗时</span><span class="v">12 ms</span></div>
+        <div class="kv"><span class="k">监测节点</span><span class="v">node2 · 四川成都</span></div>
+      </div>
+
+      <div class="section-title">最近报警<span class="panel-link" onclick="go('alerts');closeDrawers()">查看全部</span></div>
+      <div class="panel" style="border-radius:7px">
+        <div class="alert-item" style="padding:9px 12px" onclick="openAlert()">
+          <i class="sev"></i>
+          <div class="alert-main"><div class="alert-line"><span class="alert-host">15:16 · Health</span><span class="alert-time">超时</span></div><div class="alert-msg">请求超时：context deadline exceeded</div></div>
+        </div>
+        <div class="alert-item" style="padding:9px 12px;border-bottom:0" onclick="openAlert()">
+          <i class="sev warn"></i>
+          <div class="alert-main"><div class="alert-line"><span class="alert-host">09:20 · Random</span><span class="alert-time">慢响应</span></div><div class="alert-msg">响应 3,342ms，超过阈值 3,000ms</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="d-pane-2">
+      <div class="section-title" style="margin-top:0">监测点（2）<button class="btn xs secondary" onclick="toast('添加监测点')"><svg class="icon sm"><use href="#i-plus"/></svg>添加</button></div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>URL</th><th style="width:90px">状态</th><th style="width:100px">平均响应</th><th style="width:90px">最近</th><th style="width:40px"></th></tr></thead>
+            <tbody>
+              <tr><td class="num">https://www.97654.com/sitemap.xml</td><td><span class="status"><i class="dot ok"></i>正常</span></td><td class="num">186 ms</td><td class="num muted">15:18</td><td><button class="mini" style="opacity:1" onclick="copyText('https://www.97654.com/sitemap.xml')"><svg class="icon sm"><use href="#i-copy"/></svg></button></td></tr>
+              <tr><td class="num">https://www.97654.com/about</td><td><span class="status"><i class="dot ok"></i>正常</span></td><td class="num">224 ms</td><td class="num muted">15:17</td><td><button class="mini" style="opacity:1" onclick="copyText('https://www.97654.com/about')"><svg class="icon sm"><use href="#i-copy"/></svg></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px"><svg class="icon sm"><use href="#i-alert"/></svg><span>监测点按轮询依次执行，每轮只测一个，避免对目标站点造成额外压力。</span></div>
+    </div>
+
+    <div class="pane" id="d-pane-3">
+      <div class="section-title" style="margin-top:0">采集 URL（128）<button class="btn xs secondary" onclick="toast('重新扫描站点')"><svg class="icon sm"><use href="#i-refresh"/></svg>重新扫描</button></div>
+      <div class="toolbar" style="margin-bottom:10px"><div class="search-box" style="width:100%"><svg class="icon"><use href="#i-search"/></svg><input placeholder="过滤 URL 或类型"></div></div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>URL</th><th style="width:70px">类型</th><th style="width:60px"></th></tr></thead>
+            <tbody>
+              <tr><td class="num">https://www.97654.com/</td><td><span class="tag neutral">页面</span></td><td><button class="mini" style="opacity:1" onclick="copyText('https://www.97654.com/')"><svg class="icon sm"><use href="#i-copy"/></svg></button></td></tr>
+              <tr><td class="num">https://www.97654.com/sitemap.xml</td><td><span class="tag neutral">页面</span></td><td><button class="mini" style="opacity:1" onclick="copyText('https://www.97654.com/sitemap.xml')"><svg class="icon sm"><use href="#i-copy"/></svg></button></td></tr>
+              <tr><td class="num">https://www.97654.com/static/app.js</td><td><span class="tag info">JS</span></td><td><button class="mini" style="opacity:1" onclick="copyText('https://www.97654.com/static/app.js')"><svg class="icon sm"><use href="#i-copy"/></svg></button></td></tr>
+              <tr><td class="num">https://www.97654.com/static/site.css</td><td><span class="tag info">CSS</span></td><td><button class="mini" style="opacity:1" onclick="copyText('https://www.97654.com/static/site.css')"><svg class="icon sm"><use href="#i-copy"/></svg></button></td></tr>
+              <tr><td class="num">https://cdn.example.com/logo.png</td><td><span class="tag neutral">图片</span></td><td><button class="mini" style="opacity:1" onclick="copyText('https://cdn.example.com/logo.png')"><svg class="icon sm"><use href="#i-copy"/></svg></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="d-pane-4">
+      <div class="section-title" style="margin-top:0">今日日志<span class="panel-link" onclick="toast('下载日志文件')"><svg class="icon sm"><use href="#i-download"/></svg>下载</span></div>
+      <div class="log">
+<span class="t">15:18:42</span> <span class="i">Info</span>  Health  200  212ms  passed<br>
+<span class="t">15:18:27</span> <span class="i">Info</span>  Random  200  186ms  passed<br>
+<span class="t">15:18:12</span> <span class="i">Info</span>  Point   200  224ms  passed<br>
+<span class="t">15:16:42</span> <span class="a">Alert</span> Health  —    timeout  context deadline exceeded<br>
+<span class="t">15:16:27</span> <span class="w">Error</span> Health  —    —        网络环境缓慢，超过 1s（1,240ms）<br>
+<span class="t">15:16:12</span> <span class="i">Info</span>  Random  200  198ms  passed
+      </div>
+      <div class="note" style="margin-top:12px"><svg class="icon sm"><use href="#i-alert"/></svg><span>日志按天切分，默认保留 30 天，可在设置中调整。</span></div>
+    </div>
+  </div>
+</aside>
+
+<aside class="drawer sm" id="drawerAlert" role="dialog" aria-modal="true" aria-label="报警详情">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title-row"><span class="tag danger">超时</span><h2>www.97654.com</h2></div>
+      <div class="drawer-sub">2026-11-26 15:16:42 · Health · 根 URI</div>
+    </div>
+    <div class="drawer-actions">
+      <button class="btn xs secondary" onclick="toast('已标记为已读')"><svg class="icon sm"><use href="#i-check"/></svg>已读</button>
+      <button class="btn icon xs ghost danger" onclick="toast('二次确认后删除')"><svg class="icon sm"><use href="#i-trash"/></svg></button>
+      <button class="btn icon xs ghost" onclick="closeDrawers()" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <div class="mini-stats" style="grid-template-columns:repeat(3,1fr)">
+      <div class="mini-stat"><div class="l">响应耗时</div><div class="v danger-text">4,962<small>ms</small></div></div>
+      <div class="mini-stat"><div class="l">状态码</div><div class="v">—</div></div>
+      <div class="mini-stat"><div class="l">连续次数</div><div class="v">3<small>次</small></div></div>
+    </div>
+    <div class="section-title" style="margin-top:0">报警信息</div>
+    <div class="kv-grid" style="grid-template-columns:1fr">
+      <div class="kv"><span class="k">监测 URI</span><span class="v">https://www.97654.com</span></div>
+      <div class="kv"><span class="k">URI 类型</span><span class="v">Health</span></div>
+      <div class="kv"><span class="k">报警类型</span><span class="v">timeout</span></div>
+      <div class="kv"><span class="k">详情</span><span class="v">context deadline exceeded（30s）</span></div>
+      <div class="kv"><span class="k">探针</span><span class="v">node2 · 171.214.202.23</span></div>
+      <div class="kv"><span class="k">归属地</span><span class="v">四川成都 · 电信</span></div>
+    </div>
+
+    <div class="section-title">网络环境</div>
+    <div class="kv-grid">
+      <div class="kv"><span class="k">对照组</span><span class="v">baidu.com · 200</span></div>
+      <div class="kv"><span class="k">对照组耗时</span><span class="v">86 ms</span></div>
+      <div class="kv"><span class="k">Ping</span><span class="v">223.5.5.5</span></div>
+      <div class="kv"><span class="k">Ping 耗时</span><span class="v">24 ms</span></div>
+    </div>
+    <div class="note" style="margin-top:12px"><svg class="icon sm"><use href="#i-alert"/></svg><span>对照组与 Ping 均正常，判断为目标站点侧问题，而非探针网络异常。</span></div>
+
+    <div class="section-title">建议操作</div>
+    <div class="comp-row">
+      <button class="btn secondary" onclick="toast('已在新标签打开')"><svg class="icon sm"><use href="#i-external"/></svg>打开链接</button>
+      <button class="btn secondary" onclick="toast('已复制报警信息')"><svg class="icon sm"><use href="#i-copy"/></svg>复制详情</button>
+      <button class="btn ghost" onclick="toast('已暂停该站点')">暂停该站点</button>
+    </div>
+  </div>
+</aside>
+
+<div class="modal-mask" id="modalMask">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="创建监测">
+    <div class="modal-head">
+      <div><h2>创建监测</h2><p>填写地址与策略，创建后自动采集站点信息并下发至在线探针</p></div>
+      <button class="btn icon ghost" onclick="closeModal()" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="st">基础信息</div>
+        <div class="form-grid">
+          <div class="field full"><label>站点地址</label><input class="input" value="https://www.97654.com"><div class="hint">需可从公网访问，创建前会自动校验状态码。</div></div>
+          <div class="field"><label>备注</label><input class="input" placeholder="例如：主站 PC 端"></div>
+          <div class="field"><label>监测频率</label><input class="input" value="15"><div class="hint">单位秒，最小 5 秒。</div></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="st">健康校验</div>
+        <div class="form-grid">
+          <div class="field"><label>对照组 URL</label><input class="input" value="https://www.baidu.com"></div>
+          <div class="field"><label>对照组阈值</label><input class="input" value="1000"><div class="hint">超过则本轮不监测。</div></div>
+          <div class="field"><label>Ping 地址</label><input class="input" value="223.5.5.5"></div>
+          <div class="field"><label>Ping 阈值</label><input class="input" value="1000"><div class="hint">单位毫秒。</div></div>
+        </div>
+      </div>
+      <div class="form-section" style="margin-bottom:0">
+        <div class="adv-head" onclick="toggleAdv(this)" role="button" tabindex="0" aria-expanded="false">
+          <svg class="icon sm adv-chev"><use href="#i-chevron-r"/></svg>
+          <span>采集与告警</span>
+          <span class="tag neutral">可选</span>
+          <span class="hint" style="margin:0 0 0 auto">扫描深度 2 · 24h · 慢响应 3000ms · 证书 14 天</span>
+        </div>
+        <div class="adv-body">
+          <div class="form-grid">
+            <div class="field"><label>扫描深度</label><input class="input" value="2"></div>
+            <div class="field"><label>扫描频率</label><input class="input" value="24"><div class="hint">单位小时。</div></div>
+            <div class="field"><label>慢响应阈值</label><input class="input" value="3000"><div class="hint">单位毫秒。</div></div>
+            <div class="field"><label>证书到期阈值</label><input class="input" value="14"><div class="hint">单位天。</div></div>
+          </div>
+          <div class="check-row">
+            <label><input class="cb" type="checkbox" checked> 检查死链</label>
+            <label><input class="cb" type="checkbox"> 检查 TDK</label>
+            <label><input class="cb" type="checkbox"> 对比外链变化</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn secondary" onclick="closeModal()">取消</button>
+      <button class="btn primary" onclick="closeModal();toast('创建成功，正在采集站点信息')">创建监测</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><svg class="icon sm"><use href="#i-check"/></svg><span id="toastMsg">已复制</span></div>
+
+<script>
+const NAMES={dashboard:'面板',sites:'站点',probes:'探针',alerts:'报警',tools:'在线工具',requester:'请求器',kit:'设计规范'};
+const ROOTS={dashboard:'监测',sites:'监测',probes:'工具',alerts:'监测',tools:'工具',requester:'调试',kit:'系统'};
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  const el=document.getElementById('screen-'+name);
+  if(el)el.classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on',n.dataset.screen===name));
+  document.getElementById('crumb').textContent=NAMES[name]||'';
+  document.getElementById('crumbRoot').textContent=ROOTS[name]||'监测';
+  closeDrawers();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('[data-screen]').forEach(n=>n.addEventListener('click',()=>go(n.dataset.screen)));
+document.querySelectorAll('[data-soon]').forEach(n=>n.addEventListener('click',()=>toast(n.dataset.soon+'模块将在后续迭代中实现')));
+
+function openDrawer(id){
+  closeDrawers();
+  document.getElementById(id).classList.add('open');
+  document.getElementById('mask').classList.add('open');
+}
+function openSite(){openDrawer('drawerSite')}
+function openAlert(){openDrawer('drawerAlert')}
+function closeDrawers(){
+  document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('open'));
+  document.getElementById('mask').classList.remove('open');
+}
+function dtab(el,pane){
+  el.parentNode.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  const body=el.closest('.drawer').querySelector('.drawer-body');
+  body.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  body.querySelector('#'+pane).classList.add('on');
+}
+function openModal(){document.getElementById('modalMask').classList.add('open')}
+function closeModal(){document.getElementById('modalMask').classList.remove('open')}
+function toggleAdv(el){
+  const open=el.classList.toggle('open');
+  el.setAttribute('aria-expanded',open?'true':'false');
+  el.parentNode.querySelector('.adv-body').classList.toggle('open',open);
+}
+document.getElementById('modalMask').addEventListener('click',e=>{if(e.target.id==='modalMask')closeModal()});
+
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function copyText(txt){
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).catch(()=>{});
+  toast('已复制 '+txt);
+}
+function setAccent(name,el){
+  document.documentElement.dataset.accent=name;
+  if(el){
+    document.querySelectorAll('.accent-switch button').forEach(b=>b.classList.remove('on'));
+    el.classList.add('on');
+  }
+  const hex={indigo:'#4F46E5',teal:'#0F766E',graphite:'#27272A'}[name];
+  const h=document.getElementById('accentHex');if(h)h.textContent=hex;
+  toast('强调色已切换为 '+({indigo:'靛蓝',teal:'青绿',graphite:'石墨'}[name]));
+}
+function toggleDensity(){
+  const r=document.documentElement;
+  const next=r.dataset.density==='compact'?'cozy':'compact';
+  r.dataset.density=next;
+  toast(next==='compact'?'已切换为紧凑模式':'已切换为舒适模式');
+}
+function onSelect(){
+  const n=document.querySelectorAll('#sitesTable tbody input.cb:checked').length;
+  document.getElementById('selCount').textContent=n;
+  document.getElementById('bulkbar').classList.toggle('show',n>0);
+  const all=document.querySelector('#sitesTable thead input.cb');
+  const total=document.querySelectorAll('#sitesTable tbody input.cb').length;
+  all.checked=n===total;
+  all.indeterminate=n>0&&n<total;
+}
+function toggleAll(box){
+  document.querySelectorAll('#sitesTable tbody input.cb').forEach(c=>c.checked=box.checked);
+  onSelect();
+}
+function clearSel(){
+  document.querySelectorAll('#sitesTable input.cb').forEach(c=>{c.checked=false;c.indeterminate=false});
+  onSelect();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeDrawers();closeModal()}
+  if(e.key==='/'&&!/input|textarea|select/i.test(document.activeElement.tagName)){e.preventDefault();document.getElementById('globalSearch').focus()}
+});
+document.getElementById('globalSearch').addEventListener('keydown',e=>{
+  if(e.key==='Enter')toast('搜索：'+(e.target.value||'（空）'));
+});
+(function(){
+  const h=location.hash.replace('#','');
+  if(NAMES[h])go(h);
+  else if(h==='site'){go('sites');openSite()}
+  else if(h==='alert'){go('alerts');openAlert()}
+  else if(h==='create'){go('dashboard');openModal()}
+  else if(h==='createadv'){go('dashboard');openModal();const a=document.querySelector('.adv-head');if(a)toggleAdv(a)}
+})();
+</script>
+</body>
+</html>

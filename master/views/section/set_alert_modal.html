@@ -1,130 +1,107 @@
-<!-- 设置报警 -->
-<div class="modal modal-xl fade" id="setAlertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setAlertModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="setAlertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="setAlertModalLabel">{{ editWebsiteConf.host }} 监测设置</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div>
+                    <h1 class="modal-title" id="setAlertModalLabel">{{ editWebsiteConf.base.host }} · 监测设置</h1>
+                    <div class="hint" style="margin-top:2px">修改后会立即通知探针更新配置</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
             </div>
             <div class="modal-body">
-                <div class="form-floating mb-3">
-                    <input type="email" class="form-control" v-model="editWebsiteConf.base.host" placeholder="name@example.com" disabled>
-                    <label>监测网站</label>
-                </div>
-                <div class="mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.base.notes" placeholder="name@example.com">
-                        <label>备注</label>
+                <div class="form-section">
+                    <div class="st">基础信息</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>监测网站</label>
+                            <input type="text" class="input" v-model="editWebsiteConf.base.host" disabled>
+                        </div>
+                        <div class="field">
+                            <label>备注</label>
+                            <input type="text" class="input" v-model="editWebsiteConf.base.notes">
+                        </div>
+                        <div class="field">
+                            <label>监测频率</label>
+                            <input type="number" class="input" v-model="editWebsiteConf.base.monitorRate" min="5">
+                            <div class="hint">单位秒。</div>
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.base.monitorRate" placeholder="name@example.com">
-                        <label>监测频率(单位s)</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.base.contrastUrl" placeholder="name@example.com">
-                        <label>对照组URL(保证监测的有效性:每次监测前先过对照组+ping来确认当前监测器网络的情况)</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.base.contrastTime" placeholder="name@example.com">
-                        <label>对照组响应超时(单位ms;超过这个时间判定为当前网络不稳定不执行本次监测请求)</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.base.ping" placeholder="name@example.com">
-                        <label>Ping(保证监测的有效性:每次监测前先过对照组+ping来确认当前监测器网络的情况)</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.base.pingTime" placeholder="name@example.com">
-                        <label>Ping响应超时(单位ms;超过这个时间判定为当前网络不稳定不执行本次监测请求)</label>
-                    </div>
-                </div>
-                <hr>
-                扫描设置:
-
-                <div class="mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.scanCheckUp.uriDepth" placeholder="name@example.com">
-                        <label>扫描网站深度</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.scanCheckUp.scanRate" placeholder="name@example.com">
-                        <label>扫描网站频率(单位小时)</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanBadLink" role="switch" checked>
-                        <label class="form-check-label">死链检查</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanTDK" role="switch">
-                        <label class="form-check-label">TDK为空检查</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanExtLinks" role="switch">
-                        <label class="form-check-label">外链变化检查</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" disabled>
-                        <label class="form-check-label">[TODO...] 开启SQL注入扫描</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" disabled>
-                        <label class="form-check-label">[TODO...] 开启XXS扫描</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" disabled>
-                        <label class="form-check-label">[TODO...] 开启服务器端口扫描</label>
-                    </div>
-                </div>
-                <hr>
-                报警设置:
-
-                <div class="mb-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" checked disabled>
-                        <label class="form-check-label">响应状态码错误报警；例如 404,500...</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.alarmRule.websiteSlowResponseTime" placeholder="name@example.com">
-                        <label>网站响应多慢记录报警(单位ms)</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.alarmRule.websiteSlowResponseCount" placeholder="name@example.com">
-                        <label>连续几次慢就发送邮件通知</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" v-model="editWebsiteConf.alarmRule.SSLCertificateExpire" placeholder="name@example.com">
-                        <label>证书到期预警邮件通知(单位天)</label>
-                    </div>
-                    其他: 开启了扫描检查，检查到问题就会有对应的报警通知;例如开启了死链扫描检查检查到死链就会发送报警通知邮件；
                 </div>
 
+                <div class="form-section">
+                    <div class="st">健康校验</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>对照组 URL</label>
+                            <input type="text" class="input" v-model="editWebsiteConf.base.contrastUrl">
+                        </div>
+                        <div class="field">
+                            <label>对照组阈值</label>
+                            <input type="number" class="input" v-model="editWebsiteConf.base.contrastTime">
+                            <div class="hint">单位毫秒。</div>
+                        </div>
+                        <div class="field">
+                            <label>Ping 地址</label>
+                            <input type="text" class="input" v-model="editWebsiteConf.base.ping">
+                        </div>
+                        <div class="field">
+                            <label>Ping 阈值</label>
+                            <input type="number" class="input" v-model="editWebsiteConf.base.pingTime">
+                            <div class="hint">单位毫秒。</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="st">采集设置</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>扫描深度</label>
+                            <input type="number" class="input" v-model="editWebsiteConf.scanCheckUp.uriDepth" min="1">
+                        </div>
+                        <div class="field">
+                            <label>扫描频率</label>
+                            <input type="number" class="input" v-model="editWebsiteConf.scanCheckUp.scanRate" min="1">
+                            <div class="hint">单位小时。</div>
+                        </div>
+                        <div class="field full">
+                            <label>扫描项</label>
+                            <div class="check-row" style="margin-top:4px">
+                                <label><input class="cb" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanBadLink"> 死链检查</label>
+                                <label><input class="cb" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanTDK"> TDK 为空检查</label>
+                                <label><input class="cb" type="checkbox" v-model="editWebsiteConf.scanCheckUp.scanExtLinks"> 外链变化检查</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section" style="margin-bottom:0">
+                    <div class="st">报警设置</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>慢响应阈值</label>
+                            <input type="number" class="input" v-model="editWebsiteConf.alarmRule.websiteSlowResponseTime">
+                            <div class="hint">单位毫秒，超过则记录报警。</div>
+                        </div>
+                        <div class="field">
+                            <label>连续几次慢发送通知</label>
+                            <input type="number" class="input" v-model="editWebsiteConf.alarmRule.websiteSlowResponseCount" min="1">
+                        </div>
+                        <div class="field">
+                            <label>证书到期阈值</label>
+                            <input type="number" class="input" v-model="editWebsiteConf.alarmRule.SSLCertificateExpire" min="1">
+                            <div class="hint">单位天。</div>
+                        </div>
+                    </div>
+                    <div class="note" style="margin-top:12px">
+                        <svg class="icon sm"><use href="#i-alert"/></svg>
+                        <span>响应状态码 400 / 404 / 5xx 默认触发报警；扫描类检查发现的问题也会发送通知邮件。</span>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" @click="editWebsiteConfSubmit()">提交</button>
+                <button type="button" class="btn secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn primary" @click="editWebsiteConfSubmit()">保存设置</button>
             </div>
         </div>
     </div>

@@ -1,0 +1,76 @@
+<aside class="drawer sm" id="alertDrawer" role="dialog" aria-modal="true" aria-label="报警详情">
+    <template v-if="alertDetail.data">
+        <div class="drawer-head">
+            <div style="min-width:0">
+                <div class="drawer-title-row">
+                    <span class="tag" :class="alertDetail.severity()">{{ alertDetail.severityText() }}</span>
+                    <h2>{{ alertDetail.shortHost() }}</h2>
+                </div>
+                <div class="drawer-sub">{{ alertDetail.data.date }} · {{ alertDetail.data.uriType || '监测' }} · {{ alertDetail.data.read == 0 ? '未读' : '已读' }}</div>
+            </div>
+            <div class="drawer-actions">
+                <button type="button" class="btn xs secondary" v-if="alertDetail.data.read == 0" @click="alertDetail.read()">
+                    <svg class="icon sm"><use href="#i-check"/></svg>已读
+                </button>
+                <button type="button" class="btn icon xs ghost danger" @click="alertDetail.del()" title="删除报警">
+                    <svg class="icon sm"><use href="#i-trash"/></svg>
+                </button>
+                <button type="button" class="btn icon xs ghost" @click="alertDetail.close()" aria-label="关闭">
+                    <svg class="icon"><use href="#i-x"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="drawer-body">
+            <div class="mini-stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+                <div class="mini-stat">
+                    <div class="l">响应耗时</div>
+                    <div class="v" :class="alertDetail.data.uriMs > 1000 ? 'danger-text' : ''">{{ alertDetail.data.uriMs || '—' }}<small>ms</small></div>
+                </div>
+                <div class="mini-stat">
+                    <div class="l">状态码</div>
+                    <div class="v">{{ alertDetail.data.uriCode || '—' }}</div>
+                </div>
+                <div class="mini-stat">
+                    <div class="l">状态</div>
+                    <div class="v" style="font-size:13px">{{ alertDetail.data.read == 0 ? '未读' : '已读' }}</div>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top:0">报警信息</div>
+            <div class="kv-grid" style="grid-template-columns:1fr">
+                <div class="kv"><span class="k">监测 URI</span><span class="v">{{ alertDetail.data.uri || '—' }}</span></div>
+                <div class="kv"><span class="k">URI 类型</span><span class="v">{{ alertDetail.data.uriType || '—' }}</span></div>
+                <div class="kv"><span class="k">报警类型</span><span class="v">{{ alertDetail.data.alertType || '—' }}</span></div>
+                <div class="kv"><span class="k">报警信息</span><span class="v">{{ alertDetail.data.msg || '—' }}</span></div>
+                <div class="kv"><span class="k">探针</span><span class="v">{{ alertDetail.data.monitorName || '—' }} · {{ alertDetail.data.monitorIP || '—' }}</span></div>
+                <div class="kv"><span class="k">归属地</span><span class="v">{{ alertDetail.data.monitorAddr || '—' }}</span></div>
+                <div class="kv"><span class="k">连接地址</span><span class="v">{{ alertDetail.data.clientIP || '—' }}</span></div>
+            </div>
+
+            <div class="section-title">网络环境</div>
+            <div class="kv-grid">
+                <div class="kv"><span class="k">对照组</span><span class="v">{{ alertDetail.data.contrastUri || '—' }}</span></div>
+                <div class="kv"><span class="k">对照组状态</span><span class="v">{{ alertDetail.data.contrastUriCode || '—' }} · {{ alertDetail.data.contrastUriMs }}ms</span></div>
+                <div class="kv"><span class="k">Ping</span><span class="v">{{ alertDetail.data.ping || '—' }}</span></div>
+                <div class="kv"><span class="k">Ping 耗时</span><span class="v">{{ alertDetail.data.pingMs }}ms</span></div>
+            </div>
+
+            <div class="note" style="margin-top:12px">
+                <svg class="icon sm"><use href="#i-alert"/></svg>
+                <span>若对照组与 Ping 均正常，说明探针出口网络无异常，问题更可能出现在目标站点侧。</span>
+            </div>
+
+            <div class="section-title">建议操作</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button type="button" class="btn secondary" @click="alertDetail.gotoUri()">
+                    <svg class="icon sm"><use href="#i-external"/></svg>打开链接
+                </button>
+                <button type="button" class="btn secondary" @click="alertDetail.copy()">
+                    <svg class="icon sm"><use href="#i-copy"/></svg>复制详情
+                </button>
+                <a class="btn ghost" :href="'/sites?kw=' + alertDetail.data.host">查看站点</a>
+            </div>
+        </div>
+    </template>
+</aside>

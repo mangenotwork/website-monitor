@@ -1,8 +1,12 @@
 {[ template "__start__.html" . ]}
 <body>
-    <main class="form-signin w-100 m-auto">
-        <h2 class="h3 mb-3 fw-normal">页面 404 !</h2>
-        <a href="/">返回主页</a>
-    </main>
+<div class="error-page">
+    <div class="error-card">
+        <div class="error-code">404</div>
+        <h1>页面不存在</h1>
+        <p>你访问的地址可能已被删除，或者输入有误。</p>
+        <a class="btn primary" href="/home">返回面板</a>
+    </div>
+</div>
 </body>
 {[ template "__end__.html" . ]}

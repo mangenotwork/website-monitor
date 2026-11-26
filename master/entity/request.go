@@ -23,7 +23,7 @@ type RequestTool struct {
 	ResponseCode       int                 `json:"respCode"`           // Response code
 	ResponseTime       string              `json:"respTime"`           // Response time
 	ResponseHeader     map[string][]string `json:"respHeader"`         // 响应头
-	ResponseCookie     []*http.Cookie      `json:"respCookie"`         //  Response cookie
+	ResponseCookie     []*http.Cookie      `json:"respCookie"`         // Response cookie
 	ResponseBody       string              `json:"respBody"`           // Response body text
 	RequestHeader      map[string][]string `json:"reqHeader"`          // request header
 	HostIP             string              `json:"hostIP"`             // 请求主机的ip

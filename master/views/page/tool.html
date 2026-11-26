@@ -2,58 +2,220 @@
 <body>
 <div id="app">
     {[ template "__header__.html" . ]}
-    <div class="container-fluid">
-        <div class="row">
-            {[ template "__menu__.html" . ]}
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <template v-for="item in func">
-                    <div class="card box" @click="open(item.fid)" style="width: 266px;height: 102px; margin: 12px;float: left;border-radius: 26px;cursor: pointer;">
-                        <div class="card-body">
-                            <div style="width: 100%;margin-bottom: 8px;">
-                                <div v-html="item.svg" style="float: left;"></div>
-                                <h5 class="card-title" style="float: left;margin-left: 12px;">  {{ item.title }}</h5>
+
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>在线工具</h1>
+                <p>{{ tools.length }} 个诊断工具 · 结果内联展示，可回看最近查询</p>
+            </div>
+        </div>
+
+        <div class="tool-shell">
+            <div class="panel tool-nav">
+                <div v-for="g in groups" :key="g.name">
+                    <div class="tool-group-label">{{ g.name }}</div>
+                    <div class="tool-link" v-for="t in g.tools" :key="t.id"
+                         :class="{on: active === t.id}" @click="select(t.id)">
+                        <svg class="icon"><use :href="'#i-' + t.icon"/></svg>{{ t.name }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="tool-head">
+                    <div>
+                        <div class="tool-title">{{ current.name }}</div>
+                        <div class="tool-desc">{{ current.desc }}</div>
+                    </div>
+                    <button type="button" class="btn icon ghost" @click="clearHistory" title="清空该工具的历史">
+                        <svg class="icon"><use href="#i-trash"/></svg>
+                    </button>
+                </div>
+
+                <div class="query-row">
+                    <input class="input" v-model="params[active]" :placeholder="current.placeholder"
+                           @keyup.enter="submit">
+                    <button type="button" class="btn primary" @click="submit" :disabled="loading">
+                        {{ loading ? '查询中…' : '查询' }}
+                    </button>
+                </div>
+
+                <div class="result-meta" v-if="hasResult() && !loading && !error">
+                    <span><i class="dot ok"></i> 查询完成</span>
+                    <span class="muted" style="font-family:var(--mono);font-size:11px">{{ current.name }}</span>
+                </div>
+
+                <div class="empty" v-if="loading">
+                    <div class="ico"><svg class="icon"><use href="#i-refresh"/></svg></div>
+                    <h4>正在查询…</h4>
+                    <p>网络请求可能需要几秒钟</p>
+                </div>
+
+                <div class="empty" v-else-if="error">
+                    <div class="ico"><svg class="icon"><use href="#i-alert"/></svg></div>
+                    <h4>查询失败</h4>
+                    <p>{{ error }}</p>
+                    <button type="button" class="btn secondary sm" @click="submit">重试</button>
+                </div>
+
+                <div class="empty" v-else-if="!hasResult()">
+                    <div class="ico"><svg class="icon"><use href="#i-search"/></svg></div>
+                    <h4>输入内容后开始查询</h4>
+                    <p>{{ current.desc }}</p>
+                </div>
+
+                <template v-else>
+                    <!-- TDK -->
+                    <div v-if="active === 1" class="panel-body">
+                        <div class="field"><label>Title</label><div>{{ result[1].title || '—' }}</div></div>
+                        <div class="field"><label>Description</label><div>{{ result[1].description || '—' }}</div></div>
+                        <div class="field"><label>Keywords</label><div>{{ result[1].keywords || '—' }}</div></div>
+                        <div class="field"><label>Icon</label>
+                            <div style="display:flex;align-items:center;gap:10px">
+                                <img v-if="result[1].icon" :src="result[1].icon" alt="icon"
+                                     style="width:28px;height:28px;border:1px solid var(--border);border-radius:5px;background:var(--bg-subtle)">
+                                <span class="num muted" style="font-size:11.5px">{{ result[1].icon || '—' }}</span>
                             </div>
-                            <br>
-                            <p class="card-text" style="float: left;width: 100%;">{{ item.content }}</p>
+                        </div>
+                    </div>
+
+                    <!-- IP -->
+                    <div v-if="active === 2" class="panel-body">
+                        <div style="font-size:18px;font-weight:500">{{ result[2] || '未获取到属地' }}</div>
+                        <div class="hint">数据来源 ip.cn，结果会缓存到本地 IP 表</div>
+                    </div>
+
+                    <!-- DNS -->
+                    <div v-if="active === 3">
+                        <div class="result-meta">
+                            <span><i class="dot ok"></i> 解析完成</span>
+                            <span>IP <b>{{ (result[3].ips || []).length }}</b> 个</span>
+                            <span>DNS 服务器 <b>{{ (result[3].list || []).length }}</b> 个</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="tbl">
+                                <thead>
+                                <tr><th style="width:140px">DNS</th><th style="width:130px">名称</th><th>解析结果</th><th style="width:200px">CNAME</th><th style="width:80px">耗时</th></tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="d in (result[3].list || [])" :key="d.dnsServerIP">
+                                    <td class="num">{{ d.dnsServerIP }}</td>
+                                    <td class="muted">{{ d.dnsServerName || '—' }}</td>
+                                    <td class="num">{{ ipText(d) }}</td>
+                                    <td class="num muted">{{ d.cname || '—' }}</td>
+                                    <td class="num">{{ ms(d.ms) }}ms</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Whois -->
+                    <div v-if="active === 4" class="panel-body">
+                        <div class="section-title" style="margin-top:0">Whois 响应</div>
+                        <pre class="json" style="max-height:340px;border:1px solid var(--border);border-radius:6px">{{ result[4].rse || '—' }}</pre>
+                        <details class="adv" style="margin-top:12px">
+                            <summary>IANA 根服务器响应</summary>
+                            <pre class="json" style="max-height:220px;border:1px solid var(--border);border-radius:6px;margin-top:10px">{{ result[4].root || '—' }}</pre>
+                        </details>
+                    </div>
+
+                    <!-- ICP -->
+                    <div v-if="active === 5" class="panel-body">
+                        <div class="kv-grid">
+                            <div class="kv"><span class="k">备案号</span><span class="v">{{ result[5].ipc || '—' }}</span></div>
+                            <div class="kv"><span class="k">主办单位</span><span class="v">{{ result[5].company || '—' }}</span></div>
+                            <div class="kv"><span class="k">单位性质</span><span class="v">{{ result[5].nature || '—' }}</span></div>
+                            <div class="kv"><span class="k">网站名称</span><span class="v">{{ result[5].websiteName || '—' }}</span></div>
+                            <div class="kv"><span class="k">首页地址</span><span class="v">{{ result[5].websiteIndex || '—' }}</span></div>
+                            <div class="kv"><span class="k">审核日期</span><span class="v">{{ result[5].auditDate || '—' }}</span></div>
+                        </div>
+                        <div class="note" style="margin-top:12px">
+                            <svg class="icon sm"><use href="#i-alert"/></svg>
+                            <span>备案数据来自第三方站点，若为空通常是对方反爬或接口调整导致的。</span>
+                        </div>
+                    </div>
+
+                    <!-- Ping -->
+                    <div v-if="active === 6" class="table-wrap">
+                        <table class="tbl">
+                            <thead><tr><th style="width:60px">#</th><th>时间</th><th style="width:110px">结果</th><th style="width:120px">耗时</th></tr></thead>
+                            <tbody>
+                            <tr v-for="p in (result[6] || [])" :key="p.item">
+                                <td class="num muted">{{ p.item }}</td>
+                                <td class="num muted">{{ p.date }}</td>
+                                <td>
+                                    <span v-if="p.err" class="tag danger">失败</span>
+                                    <span v-else class="tag ok">可达</span>
+                                </td>
+                                <td class="num">{{ p.ms }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- SSL -->
+                    <div v-if="active === 7" class="table-wrap">
+                        <table class="tbl">
+                            <tbody>
+                            <tr style="cursor:default"><td class="muted" style="width:150px">地址</td><td class="num">{{ result[7].url || '—' }}</td></tr>
+                            <tr style="cursor:default"><td class="muted">有效时间</td><td>{{ result[7].effectiveTime || '—' }}</td></tr>
+                            <tr style="cursor:default"><td class="muted">颁发对象</td><td>{{ result[7].subject || '—' }}</td></tr>
+                            <tr style="cursor:default"><td class="muted">颁发者</td><td>{{ result[7].issuer || '—' }}</td></tr>
+                            <tr style="cursor:default"><td class="muted">备用域名</td><td class="num">{{ result[7].dnsName || '—' }}</td></tr>
+                            <tr style="cursor:default"><td class="muted">公钥算法</td><td>{{ result[7].publicKeyAlgorithm || '—' }}</td></tr>
+                            <tr style="cursor:default"><td class="muted">签名算法</td><td>{{ result[7].signatureAlgorithm || '—' }}</td></tr>
+                            <tr style="cursor:default"><td class="muted">OCSP</td><td class="num">{{ result[7].ocspServer || '—' }}</td></tr>
+                            <tr style="cursor:default"><td class="muted">CRL 分发点</td><td class="num">{{ result[7].crlDistributionPoints || '—' }}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 站点信息 -->
+                    <div v-if="active === 8" class="panel-body">
+                        <div class="section-title" style="margin-top:0">基础信息</div>
+                        <div class="kv-grid">
+                            <div class="kv"><span class="k">站点</span><span class="v">{{ result[8].host || '—' }}</span></div>
+                            <div class="kv"><span class="k">标题</span><span class="v">{{ result[8].title || '—' }}</span></div>
+                            <div class="kv"><span class="k">服务端</span><span class="v">{{ result[8].server || '—' }}</span></div>
+                            <div class="kv"><span class="k">内容编码</span><span class="v">{{ result[8].contentEncoding || '—' }}</span></div>
+                            <div class="kv"><span class="k">Keywords</span><span class="v">{{ result[8].keywords || '—' }}</span></div>
+                            <div class="kv"><span class="k">Description</span><span class="v">{{ result[8].description || '—' }}</span></div>
+                        </div>
+
+                        <div class="section-title">DNS 与 IP</div>
+                        <div class="kv-grid">
+                            <div class="kv"><span class="k">A 记录</span><span class="v">{{ result[8].DNS && result[8].DNS.ips ? result[8].DNS.ips.join(', ') : '—' }}</span></div>
+                            <div class="kv"><span class="k">CNAME</span><span class="v">{{ result[8].DNS ? result[8].DNS.cname : '—' }}</span></div>
+                            <div class="kv" v-for="ip in (result[8].IPAddr || [])" :key="ip.ip">
+                                <span class="k">{{ ip.ip }}</span><span class="v">{{ ip.address || '—' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="section-title">证书与备案</div>
+                        <div class="kv-grid">
+                            <div class="kv"><span class="k">证书到期</span><span class="v">{{ result[8].SSLCertificateInfo ? result[8].SSLCertificateInfo.effectiveTime : '—' }}</span></div>
+                            <div class="kv"><span class="k">颁发者</span><span class="v">{{ result[8].SSLCertificateInfo ? result[8].SSLCertificateInfo.issuer : '—' }}</span></div>
+                            <div class="kv"><span class="k">备案号</span><span class="v">{{ result[8].IPC ? result[8].IPC.ipc : '—' }}</span></div>
+                            <div class="kv"><span class="k">主办单位</span><span class="v">{{ result[8].IPC ? result[8].IPC.company : '—' }}</span></div>
                         </div>
                     </div>
                 </template>
-                {[ template "add_host_modal.html" . ]}
-                {[ template "mail_set_modal.html" . ]}
-                {[ template "toast.html" . ]}
-                {[ template "tool_FidWebsiteTDKI_modal.html" . ]}
-                {[ template "tool_FidIp_modal.html" . ]}
-                {[ template "tool_FidNsLookUp_modal.html" . ]}
-                {[ template "tool_FidWhois_modal.html" . ]}
-                {[ template "tool_FidICP_modal.html" . ]}
-                {[ template "tool_FidPing_modal.html" . ]}
-                {[ template "tool_FidSSL_modal.html" . ]}
-                {[ template "tool_FidWebsiteInfo_modal.html" . ]}
-            </main>
+
+                <div class="hist">
+                    <span class="hist-label">最近查询</span>
+                    <span class="hist-chip" v-for="h in historyList.slice(0, 8)" :key="h" @click="pick(h)">{{ h }}</span>
+                    <span v-if="historyList.length === 0" class="hist-label">暂无记录</span>
+                </div>
+            </div>
         </div>
-    </div>
+
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "toast.html" . ]}
+    </main>
 </div>
 </body>
-<script>
-    const FidWebsiteTDKI = 1; // 获取网站的T, D, K, 图标
-    const FidIp = 2; // ip信息查询
-    const FidNsLookUp = 3; // 查询dns
-    const FidWhois = 4; // Whois查询
-    const FidICP = 5; // 查询备案
-    const FidPing = 6; // 在线ping
-    const FidSSL = 7; // 获取证书
-    const FidWebsiteInfo = 8; // 网站信息获取
-    const funcData = [
-        {fid: FidWebsiteTDKI, title: "获取网页的TDK", content: "Title Keywords Description Icon .", svg: '{[ SVG "window" 24 24 ]}'},
-        {fid: FidIp, title: "IP属地查询", content: "查询IP属地.", svg: '{[ SVG "hdd-network" 24 24 ]}'},
-        {fid: FidNsLookUp, title: "DNS查询", content: "在线nslookup.", svg: '{[ SVG "hdd-rack" 24 24 ]}'},
-        {fid: FidWhois, title: "Whois查询", content: "Whois查询.", svg: '{[ SVG "globe" 24 24 ]}'},
-        {fid: FidICP, title: "ICP查询", content: "网站备案查询.", svg: '{[ SVG "menu-button-wide" 24 24 ]}'},
-        {fid: FidPing, title: "Ping", content: "在线ping功能.", svg: '{[ SVG "terminal" 24 24 ]}'},
-        {fid: FidSSL, title: "SSL证书信息查询", content: "获取网站的证书信息.", svg: '{[ SVG "shield-check" 24 24 ]}'},
-        {fid: FidWebsiteInfo, title: "获取网站信息", content: "获取网站信息.", svg: '{[ SVG "tv" 24 24 ]}'}
-    ]
-</script>
 {[ template "__js__.html" . ]}
 <script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
 <script src="/static/js/tool.js?v={[ .TimeStamp ]}"></script>

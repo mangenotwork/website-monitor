@@ -1,186 +1,191 @@
 {[ template "__start__.html" . ]}
 <body>
-    <div id="app">
-        {[ template "__header__.html" . ]}
-        <div class="container-fluid">
-            <div class="row">
-                {[ template "__menu__.html" . ]}
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="padding-top: 1.1rem;">
+<div id="app">
+    {[ template "__header__.html" . ]}
 
-                    <div class="row" style="margin-bottom: 1.2rem;">
-
-                        <div class="btn-group btn-group-lg" role="group" aria-label="Large button group" style="width: 76%;">
-                            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#addHostModal">
-                                {[ SVG "plus-lg" 25 25 ]} 创建监测
-                            </button>
-                            <button type="button" class="btn btn-outline-dark" href="/requester" >
-                                {[ SVG "lightning" 25 25 ]} 快速请求
-                            </button>
-                            <button type="button" class="btn btn-outline-dark" @click="open(8)">
-                                {[ SVG "tv" 25 25 ]} 获取网站信息
-                            </button>
-                            <button type="button" class="btn btn-outline-dark" @click="open(3)">
-                                {[ SVG "hdd-rack" 25 25 ]} DNS查询
-                            </button>
-                            <button type="button" class="btn btn-outline-dark" @click="open(4)">
-                                {[ SVG "globe" 25 25 ]} Whois查询
-                            </button>
-                        </div>
-
-                    </div>
-
-                    <div class="row" style="margin-bottom: 24px;">
-                        <div class="col">
-                            <div class="card box">
-                                <div class="card-header" style="background-color: #f0f0f0"><b>{[ SVG "bell" 16 16 ]}
-                                    网站监测报警通知</b>
-                                    <template v-if="alertList.len !== 0">
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                            {{ alertList.len }}<span class="visually-hidden">unread messages</span>
-                                        </span>
-                                    </template>
-                                    <a @click="refreshAlertList" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="刷新报警信息" >{[ SVG "arrow-repeat" 18 18 ]}</a>
-                                </div>
-                                <div class="card-body" style="height: 220px;overflow: auto;padding: 2px;">
-                                    <ul class="list-group list-group-flush">
-                                        <template v-if="alertList.len === 0"><p style="text-align: center;">占无报警通知</p></template>
-                                        <template v-else>
-                                            <template v-for="item in alertList.list">
-                                                <li class="list-group-item list-group-item-action">
-                                                    <a href="/alert" style="text-decoration: none;color: #dc3545;">
-                                                        <span style="font-size: 12px;">{{item.date}} | {{item.uri}} | {{item.msg}} </span>
-                                                    </a>
-                                                </li>
-                                            </template>
-                                        </template>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="card box">
-                                <div class="card-header" style="background-color: #f0f0f0"><b>{[ SVG "diagram-3-fill" 16 16 ]} 监测器列表</b>
-                                    <a @click="refreshMonitorList" style="float: right;cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="刷新监视器列表" >{[ SVG "arrow-repeat" 18 18 ]}</a>
-                                </div>
-                                <div class="card-body" style="height: 220px;overflow: auto;padding: 2px;">
-                                    <ul class="list-group list-group-flush">
-                                        <template v-if="monitor.list.length<=0"><p style="text-align: center;color: red;">没有连接监测器,请部署监测器!!!</p></template>
-                                        <template v-else>
-                                            <template v-for="item in monitor.list">
-                                                <li class="list-group-item list-group-item-action" style="font-size: 12px;">
-                                                    <a href="/monitor" style="text-decoration: none;color: inherit;">
-                                                    <span>{{item.key}} |
-                                                        <template v-if="item.online===true">
-                                                            <span class="badge text-bg-success">执行监测中...</span>
-                                                        </template>
-                                                        <template v-if="item.online===false">
-                                                             <span class="badge text-bg-danger">离线! </span>
-                                                        </template> |
-                                                        公网: {{item.publicIP}} {{item.publicIPAddr}} |
-                                                    </span>
-                                                    </a>
-                                                </li>
-                                            </template>
-                                        </template>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 24px;padding: 0px;">
-                        <div class="box" style="height: calc(100vh - 468px); overflow: auto;border: 1px solid #D3D3D3; border-radius: 12px;">
-                            <table class="table table-hover">
-                                <thead style="z-index: 99;">
-                                    <tr>
-                                        <th scope="col" style="font-size: 14px;">网站</th>
-                                        <th scope="col" style="font-size: 14px;">备注</th>
-                                        <th scope="col" style="font-size: 14px;">状态</th>
-                                        <th scope="col" style="font-size: 14px;">请求频率</th>
-                                        <th scope="col" style="font-size: 14px;">Ping</th>
-                                        <th scope="col" style="font-size: 14px;">对照组</th>
-                                        <th scope="col" style="font-size: 14px;">操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <template v-for="item in webSite.list">
-                                    <tr>
-                                        <td><a @click="openAlert(item.ID)" style="cursor: pointer;">
-                                            <span style="font-size: 14px;"><b>{{ item.host }}</b></span></a></td>
-                                        <td><span style="font-size: 14px;">{{ item.notes }}</span></td>
-                                        <td>
-                                            <template v-if="item.state == 0">
-                                                <span class="badge text-bg-warning">等待监测器</span>
-                                            </template>
-                                            <template v-if="item.state == 1">
-                                                <span class="badge text-bg-success">监测中...</span>
-                                            </template>
-                                            <template v-if="item.state == 2">
-                                                <a @click="openAlert(item.hostID)" style="cursor: pointer;"><span class="badge text-bg-danger">报警: {{ item.alertCount }}条 </span></a>
-                                            </template>
-                                        </td>
-                                        <td><span style="font-size: 12px;">{{ item.monitorRate }}s/次</span></td>
-                                        <td><span style="font-size: 12px;">{{ item.ping }}</span></td>
-                                        <td><span style="font-size: 12px;">{{ item.contrastUrl }}</span></td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-                                                <a type="button" class="btn btn-outline-dark btn-sm websiteInfoBtn" data-bs-toggle="tooltip" data-bs-title="查看网站信息" @click="openWebsiteInfo(item.hostID)">{[ SVG "house-fill" 18 18 ]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm websiteAlertBtn" data-bs-toggle="tooltip" data-bs-title="报警信息" @click="openAlert(item.hostID)">{[ SVG "bell-fill" 18 18 ]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm gotoWebsiteBtn" data-bs-toggle="tooltip" data-bs-title="跳转到网站" @click="gotoWebsite(item)">{[ SVG "browser-chrome" 18 18 ]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm editWebsiteConfBtn" data-bs-toggle="tooltip" data-bs-title="修改网站监测配置" @click="openEditWebsiteConf(item.hostID)">{[ SVG "gear-fill" 18 18]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm websiteUrlBtn" data-bs-toggle="tooltip" data-bs-title="网站扫描的Url" @click="openWebsiteUrl(item)">{[ SVG "window-stack" 18 18]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm uriPointBtn" data-bs-toggle="tooltip" data-bs-title="设置网站监测点(Url)" @click="setUriPoint(item)">{[ SVG "broadcast" 18 18 ]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm logShowBtn" data-bs-toggle="tooltip" data-bs-title="监测日志" @click="logShow(item)">{[ SVG "file-text-fill" 18 18 ]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm openChartBtn" data-bs-toggle="tooltip" data-bs-title="监测图" @click="openChart(item)">{[ SVG "graph-up" 18 18 ]}</a>
-                                                <a type="button" class="btn btn-outline-dark btn-sm websiteOpenBtn" data-bs-toggle="tooltip" data-bs-title="删除该网站监测" @click="deleteWebsiteOpen(item)">{[ SVG "trash-fill" 18 18 ]}</a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </template>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    {[ template "add_host_modal.html" . ]}
-                    {[ template "mail_set_modal.html" . ]}
-                    {[ template "toast.html" . ]}
-                    {[ template "set_alert_modal.html" . ]}
-                    {[ template "set_uri_modal.html" . ]}
-                    {[ template "website_info_modal.html" . ]}
-                    {[ template "log_modal.html" . ]}
-                    {[ template "isok_modal.html" . ]}
-                    {[ template "chart_modal.html" . ]}
-                    {[ template "alert_modal.html" . ]}
-                    {[ template "url_info_modal.html" . ]}
-                    {[ template "tool_FidWebsiteInfo_modal.html" . ]}
-                    {[ template "tool_FidNsLookUp_modal.html" . ]}
-                    {[ template "tool_FidWhois_modal.html" . ]}
-                </main>
+    <main class="viewport">
+        <div class="page-head">
+            <div>
+                <h1>面板</h1>
+                <p><b>{{ siteMonitoring }}</b> 个站点监测中 · <b>{{ unreadAlerts }}</b> 条未读报警 · 每 30 秒自动刷新</p>
+            </div>
+            <div class="page-actions">
+                <button type="button" class="btn icon ghost" @click="refreshAll" title="刷新">
+                    <svg class="icon"><use href="#i-refresh"/></svg>
+                </button>
+                <button type="button" class="btn primary" data-bs-toggle="modal" data-bs-target="#addHostModal">
+                    <svg class="icon sm"><use href="#i-plus"/></svg>创建监测
+                </button>
             </div>
         </div>
-    </div>
-</body>
-<script>
-    const FidWebsiteTDKI = 1; // 获取网站的T, D, K, 图标
-    const FidIp = 2; // ip信息查询
-    const FidNsLookUp = 3; // 查询dns
-    const FidWhois = 4; // Whois查询
-    const FidICP = 5; // 查询备案
-    const FidPing = 6; // 在线ping
-    const FidSSL = 7; // 获取证书
-    const FidWebsiteInfo = 8; // 网站信息获取
-    const funcData = [
-        {fid: FidWebsiteTDKI, title: "获取网页的TDK", content: "Title Keywords Description Icon .", svg: '{[ SVG "window" 24 24 ]}'},
-        {fid: FidIp, title: "IP属地查询", content: "查询IP属地.", svg: '{[ SVG "hdd-network" 24 24 ]}'},
-        {fid: FidNsLookUp, title: "DNS查询", content: "在线nslookup.", svg: '{[ SVG "hdd-rack" 24 24 ]}'},
-        {fid: FidWhois, title: "Whois查询", content: "Whois查询.", svg: '{[ SVG "globe" 24 24 ]}'},
-        {fid: FidICP, title: "ICP查询", content: "网站备案查询.", svg: '{[ SVG "menu-button-wide" 24 24 ]}'},
-        {fid: FidPing, title: "Ping", content: "在线ping功能.", svg: '{[ SVG "terminal" 24 24 ]}'},
-        {fid: FidSSL, title: "SSL证书信息查询", content: "获取网站的证书信息.", svg: '{[ SVG "shield-check" 24 24 ]}'},
-        {fid: FidWebsiteInfo, title: "获取网站信息", content: "获取网站信息.", svg: '{[ SVG "tv" 24 24 ]}'}
-    ]
 
-</script>
+        <div class="stats">
+            <a class="stat" href="/sites" title="查看全部站点">
+                <div class="stat-label">监测站点</div>
+                <div class="stat-value">{{ siteTotal }}</div>
+                <div class="stat-sub">共 {{ siteTotal }} 个 · {{ siteWaiting }} 个等待探针</div>
+                <svg class="icon sm stat-go"><use href="#i-chevron-r"/></svg>
+            </a>
+            <a class="stat" href="/sites?seg=monitoring" title="查看监测中的站点">
+                <div class="stat-label">监测中</div>
+                <div class="stat-value">{{ siteMonitoring }}</div>
+                <div class="stat-sub">占比 {{ monitorRate }}%</div>
+                <svg class="icon sm stat-go"><use href="#i-chevron-r"/></svg>
+            </a>
+            <a class="stat" href="/sites?seg=alert" title="查看有报警的站点">
+                <div class="stat-label">报警站点</div>
+                <div class="stat-value" :class="siteAlertSites > 0 ? 'danger-text' : ''">{{ siteAlertSites }}</div>
+                <div class="stat-sub">存在报警记录的站点</div>
+                <svg class="icon sm stat-go"><use href="#i-chevron-r"/></svg>
+            </a>
+            <a class="stat" href="/alert?seg=unread" title="查看未读报警">
+                <div class="stat-label">未读报警</div>
+                <div class="stat-value" :class="unreadAlerts > 0 ? 'danger-text' : ''">{{ unreadAlerts }}</div>
+                <div class="stat-sub">最近 {{ lastAlertTime }}</div>
+                <svg class="icon sm stat-go"><use href="#i-chevron-r"/></svg>
+            </a>
+        </div>
+
+        <div class="dash-grid">
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">站点<span class="count">{{ siteTotal }}</span></div>
+                    <a class="panel-link" href="/sites">全部站点
+                        <svg class="icon sm"><use href="#i-chevron-r"/></svg>
+                    </a>
+                </div>
+                <div class="table-wrap">
+                    <table class="tbl">
+                        <thead>
+                        <tr>
+                            <th>站点</th>
+                            <th style="width:104px">状态</th>
+                            <th style="width:66px">频率</th>
+                            <th style="width:190px">对照组</th>
+                            <th style="width:118px">Ping</th>
+                            <th style="width:76px">报警</th>
+                            <th style="width:66px"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="item in webSite.list" :key="item.hostID" @click="openSite(item)">
+                            <td>
+                                <div class="host-cell">
+                                    <div class="host-line">
+                                        <span class="host">{{ shortHost(item.host) }}</span>
+                                        <button type="button" class="mini" @click.stop="copy(item.host)" title="复制域名">
+                                            <svg class="icon sm"><use href="#i-copy"/></svg>
+                                        </button>
+                                    </div>
+                                    <div class="sub">{{ item.notes || '未填写备注' }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span v-if="item.state === 2" class="status danger"><i class="dot"></i>报警 {{ item.alertCount }}</span>
+                                <span v-else-if="item.state === 1" class="status ok"><i class="dot ok"></i>正常</span>
+                                <span v-else class="status wait"><i class="dot"></i>等待探针</span>
+                            </td>
+                            <td class="num muted">{{ item.monitorRate }}s</td>
+                            <td class="num muted" style="max-width:190px;overflow:hidden;text-overflow:ellipsis">{{ item.contrastUrl }}</td>
+                            <td class="num muted">{{ item.ping }}</td>
+                            <td>
+                                <span v-if="item.alertCount > 0" class="tag danger">{{ item.alertCount }} 条</span>
+                                <span v-else class="muted">—</span>
+                            </td>
+                            <td @click.stop>
+                                <div class="cell-actions">
+                                    <button type="button" class="btn xs ghost" @click="openSite(item)">详情</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="webSite.list.length === 0">
+                            <td colspan="7" style="cursor:default">
+                                <div class="empty">
+                                    <div class="ico"><svg class="icon"><use href="#i-globe"/></svg></div>
+                                    <h4>还没有监测站点</h4>
+                                    <p>添加第一个站点后，探针会开始拉取配置并上报数据</p>
+                                    <button type="button" class="btn primary sm" data-bs-toggle="modal" data-bs-target="#addHostModal">创建监测</button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="side-stack">
+                <div class="panel">
+                    <div class="panel-head">
+                        <div class="panel-title">报警<span class="count">{{ unreadAlerts }} 未读</span></div>
+                        <a class="panel-link" href="/alert">全部
+                            <svg class="icon sm"><use href="#i-chevron-r"/></svg>
+                        </a>
+                    </div>
+                    <div v-if="alertList.list.length > 0">
+                        <div class="alert-item" v-for="item in recentAlerts.slice(0, 4)" :key="item.alertId"
+                             @click="openAlertItem(item)">
+                            <i class="sev" :class="sevClass(item)"></i>
+                            <div class="alert-main">
+                                <div class="alert-line">
+                                    <span class="alert-host">{{ shortHost(item.host) }}</span>
+                                    <span class="alert-time">{{ hm(item.date) }}</span>
+                                </div>
+                                <div class="alert-msg">{{ item.msg }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else class="empty" style="padding:22px 14px">
+                        <div class="ico"><svg class="icon"><use href="#i-bell"/></svg></div>
+                        <h4>暂无报警</h4>
+                        <p>站点运行正常</p>
+                    </div>
+                    <a class="panel-foot" href="/alert">查看全部报警
+                        <svg class="icon sm"><use href="#i-chevron-r"/></svg>
+                    </a>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <div class="panel-title">探针<span class="count">{{ probeOnline }} / {{ probeTotal }} 在线</span></div>
+                        <a class="panel-link" href="/monitor">管理
+                            <svg class="icon sm"><use href="#i-chevron-r"/></svg>
+                        </a>
+                    </div>
+                    <div v-if="monitor.list.length > 0">
+                        <div class="probe" v-for="item in monitor.list.slice(0, 3)" :key="item.key">
+                            <div class="probe-icon"><svg class="icon sm"><use href="#i-server"/></svg></div>
+                            <div class="probe-main">
+                                <div class="probe-name">
+                                    {{ item.name || item.key }}
+                                    <i class="dot" :class="item.online ? 'ok' : ''"></i>
+                                </div>
+                                <div class="probe-meta">{{ probeAddr(item) }}</div>
+                            </div>
+                            <span class="tag neutral">{{ probeTag(item) }}</span>
+                        </div>
+                    </div>
+                    <div v-else class="empty" style="padding:22px 14px">
+                        <div class="ico"><svg class="icon"><use href="#i-server"/></svg></div>
+                        <h4>没有连接探针</h4>
+                        <p>部署探针后才能执行监测</p>
+                        <a class="btn secondary sm" href="/monitor">查看接入方式</a>
+                    </div>
+                    <a class="panel-foot" href="/monitor">管理探针
+                        <svg class="icon sm"><use href="#i-chevron-r"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {[ template "add_host_modal.html" . ]}
+        {[ template "mail_set_modal.html" . ]}
+        {[ template "set_alert_modal.html" . ]}
+        {[ template "toast.html" . ]}
+        {[ template "site_drawer.html" . ]}
+        {[ template "alert_drawer.html" . ]}
+    </main>
+</div>
+</body>
 {[ template "__js__.html" . ]}
 <script src="/static/js/public.js?v={[ .TimeStamp ]}"></script>
 <script src="/static/js/home.js?v={[ .TimeStamp ]}"></script>

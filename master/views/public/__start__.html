@@ -1,14 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN" data-accent="indigo" data-density="cozy">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
     <link rel="icon" href="/static/bootstrap/img/outlet.svg">
     <title>{[ .Title ]}</title>
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/page.css?v={[ .TimeStamp ]}" rel="stylesheet">
-    <style>
-        .select_activity {border-bottom: 1px solid #0C0C0C;}
-        .select_activity a {color: #0C0C0C;}
-    </style>
+    <link href="/static/css/theme.css?v={[ .TimeStamp ]}" rel="stylesheet">
+    <script>
+        (function () {
+            try {
+                var accent = localStorage.getItem('wm.accent');
+                var density = localStorage.getItem('wm.density');
+                if (accent) document.documentElement.setAttribute('data-accent', accent);
+                if (density) document.documentElement.setAttribute('data-density', density);
+            } catch (e) { }
+        })();
+    </script>
 </head>

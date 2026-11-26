@@ -21,6 +21,7 @@ const app = createApp({
                 bodyText : "",
             },
             resp:{},
+            historyKw: "",
             history: {
                 api: "/api/requester/history/list",
                 list: [],
@@ -73,12 +74,8 @@ const app = createApp({
             let t = this;
             t.param.reqId = id;
 
-            for (item in t.nowReqList.list) {
-                if (t.nowReqList.list[item].id === id ) {
-                    t.nowReqList.list[item].isNow = true;
-                } else {
-                    t.nowReqList.list[item].isNow = false;
-                }
+            for (let i = 0; i < t.nowReqList.list.length; i++) {
+                t.nowReqList.list[i].isNow = t.nowReqList.list[i].id === id;
             }
             t.getNow();
         },
@@ -86,9 +83,10 @@ const app = createApp({
             let t = this;
             common.AjaxGet(t.closeTabApi(id), function (data){
                 if (data.code === 0) {
-                    for (item in t.nowReqList.list) {
-                        if (t.nowReqList.list[item].id === id ) {
-                            t.nowReqList.list.splice(item, 1);
+                    for (let i = 0; i < t.nowReqList.list.length; i++) {
+                        if (t.nowReqList.list[i].id === id) {
+                            t.nowReqList.list.splice(i, 1);
+                            break;
                         }
                     }
                     if (t.nowReqList.list.length === 0) {
@@ -259,18 +257,33 @@ const app = createApp({
         // 发送
         execute: function () {
             let t = this;
-            console.log(t.param);
+            if (!t.param.url) {
+                common.ToastShow("请输入请求地址");
+                return;
+            }
             common.AjaxPost("/api/requester/execute", t.param, function (data){
-                console.log(data);
                 if (data.code === 0 ){
                     t.resp = data.data;
                     t.getNowReqList();
                     t.getHistory();
+                } else {
+                    common.ToastShow(data.msg || "请求失败");
                 }
             });
         },
+
+        copyResp: function () {
+            UI.copy(this.resp.respBody || "");
+        },
     },
     computed: {
+        historyFiltered: function () {
+            const kw = (this.historyKw || "").toLowerCase();
+            if (!kw) return this.history.list;
+            return this.history.list.filter(function (i) {
+                return ((i.name || "") + " " + (i.method || "") + " " + (i.url || "")).toLowerCase().indexOf(kw) !== -1;
+            });
+        },
     },
     mounted:function(){
     },
