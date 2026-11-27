@@ -148,7 +148,7 @@ const app = createApp({
         openEditWebsiteConf: function (hostId) {
             const t = this;
             t.editWebsiteConf.hostId = hostId;
-            common.AjaxGetNotAsync(t.editWebsiteConf.confApi(), function (data) {
+            common.AjaxGet(t.editWebsiteConf.confApi(), function (data) {
                 if (data.code !== 0) { UI.toast(data.msg || "获取配置失败"); return; }
                 t.editWebsiteConf.base = data.data.base;
                 t.editWebsiteConf.alarmRule = data.data.alarmRule;

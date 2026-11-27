@@ -24,7 +24,7 @@
                 <button type="button" :class="{on: seg === 'code'}" @click="setSeg('code')">状态码<span class="count">{{ counts.code }}</span></button>
             </div>
 
-            <select class="input" style="width:180px" v-model="hostFilter">
+            <select class="input" style="width:180px" v-model="hostFilter" @change="onHostChange">
                 <option value="">全部站点</option>
                 <option v-for="h in hosts" :key="h.id" :value="h.id">{{ h.host }}</option>
             </select>
@@ -38,7 +38,7 @@
         </div>
 
         <div class="panel">
-            <div class="table-wrap scroll-y">
+            <div class="table-wrap scroll-y" @scroll="onScroll">
                 <table class="tbl">
                     <thead>
                     <tr>
@@ -77,14 +77,23 @@
                             </div>
                         </td>
                     </tr>
-                    <tr v-if="filtered.length === 0">
+                    <tr v-if="filtered.length === 0 && !alerts.loading">
                         <td colspan="8" style="cursor:default">
                             <div class="empty">
                                 <div class="ico"><svg class="icon"><use href="#i-bell"/></svg></div>
-                                <h4>{{ alerts.list.length === 0 ? '暂无报警' : '没有符合条件的报警' }}</h4>
-                                <p>{{ alerts.list.length === 0 ? '站点运行正常，新的报警会出现在这里' : '试试切换筛选条件或清空搜索' }}</p>
+                                <h4>{{ counts.all === 0 ? '暂无报警' : '没有符合条件的报警' }}</h4>
+                                <p>{{ counts.all === 0 ? '站点运行正常，新的报警会出现在这里' : '试试切换筛选条件或清空搜索' }}</p>
                             </div>
                         </td>
+                    </tr>
+                    <tr v-if="alerts.loading" class="load-row">
+                        <td colspan="8">正在加载 {{ alerts.size }} 条…</td>
+                    </tr>
+                    <tr v-else-if="alerts.hasMore && filtered.length > 0" class="load-row" @click.stop="loadMore">
+                        <td colspan="8">下拉加载更多（每次 {{ alerts.size }} 条）</td>
+                    </tr>
+                    <tr v-else-if="!alerts.hasMore && filtered.length > 0" class="load-end">
+                        <td colspan="8">已加载全部 {{ alerts.total }} 条</td>
                     </tr>
                     </tbody>
                 </table>

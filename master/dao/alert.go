@@ -4,24 +4,52 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/boltdb/bolt"
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
-	"sync"
-	"time"
 	"website-monitor/master/constname"
 	"website-monitor/master/entity"
 )
 
 type AlertEr interface {
-	Get(alertId string) (*entity.AlertData, error)           // 指定获取报警信息
-	GetList() ([]*entity.AlertData, error)                   // 获取所有报警信息列表
-	GetAtWebsite(hostId string) ([]*entity.AlertData, error) // 获取指定网站的报警信息
-	GetWebsiteAlertIDList(hostId string) ([]string, error)   // 获取指定网站报警信息的id
-	Read(id string) error                                    // 消息标记为已读
-	Del(id string) error                                     // 删除报警信息
-	Clear(hostId string) error                               // 清空网站的报警信息
-	ClearAll() error                                         // 清空所有报警信息
+	Get(alertId string) (*entity.AlertData, error)                   // 指定获取报警信息
+	GetList() ([]*entity.AlertData, error)                           // 获取所有报警信息列表
+	Page(page, size int, filter AlertFilter) (*AlertPageData, error) // 分页查询报警信息
+	GetAtWebsite(hostId string) ([]*entity.AlertData, error)         // 获取指定网站的报警信息
+	GetWebsiteAlertIDList(hostId string) ([]string, error)           // 获取指定网站报警信息的id
+	GetAllWebsiteAlertCounts() (map[string]int, error)               // 一次读取所有站点的报警数量
+	Read(id string) error                                            // 消息标记为已读
+	ReadAll() error                                                  // 全部标记为已读
+	Del(id string) error                                             // 删除报警信息
+	Clear(hostId string) error                                       // 清空网站的报警信息
+	ClearAll() error                                                 // 清空所有报警信息
+}
+
+// AlertFilter 报警列表筛选条件
+type AlertFilter struct {
+	Seg  string // all / unread / timeout / code
+	Host string // hostId
+	Kw   string // 站点、URI、报警内容
+}
+
+// AlertHost 报警涉及的站点
+type AlertHost struct {
+	ID   string `json:"id"`
+	Host string `json:"host"`
+}
+
+// AlertPageData 一页报警数据 + 全局统计信息
+type AlertPageData struct {
+	List   []*entity.AlertData
+	Total  int
+	Unread int
+	Counts map[string]int
+	Hosts  []AlertHost
 }
 
 func NewAlert() AlertEr {
@@ -72,19 +100,16 @@ func (a *alertDao) getAtHostID(hostId string) ([]string, error) {
 func (a *alertDao) Get(alertId string) (*entity.AlertData, error) {
 	data := &entity.AlertData{}
 	err := DB.Get(AlertTable, alertId, &data)
+	if err == nil {
+		data.AlertType = alertTypeOf(data)
+	}
 	return data, err
 }
 
 func (a *alertDao) GetList() ([]*entity.AlertData, error) {
-	conn := GetDBConn()
-
-	defer func() {
-		_ = conn.Close()
-	}()
-
 	list := make([]*entity.AlertData, 0)
 
-	err := conn.View(func(tx *bolt.Tx) error {
+	err := DB.View(func(tx *bolt.Tx) error {
 
 		b := tx.Bucket([]byte(AlertTable))
 		if b == nil {
@@ -99,6 +124,7 @@ func (a *alertDao) GetList() ([]*entity.AlertData, error) {
 			if err != nil {
 				return err
 			}
+			data.AlertType = alertTypeOf(data)
 			list = append(list, data)
 
 		}
@@ -139,6 +165,132 @@ func (a *alertDao) GetWebsiteAlertIDList(hostId string) ([]string, error) {
 	return a.getAtHostID(hostId)
 }
 
+// GetAllWebsiteAlertCounts 一次读取 alert_website_table，避免站点列表 N+1 次 DB 读
+func (a *alertDao) GetAllWebsiteAlertCounts() (map[string]int, error) {
+	counts := make(map[string]int)
+
+	err := DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(AlertWebsiteTable))
+		if b == nil {
+			return nil
+		}
+		return b.ForEach(func(k, v []byte) error {
+			ids := make([]string, 0)
+			if err := json.Unmarshal(v, &ids); err != nil {
+				return nil // 跳过脏数据，不影响其他站点
+			}
+			counts[string(k)] = len(ids)
+			return nil
+		})
+	})
+
+	return counts, err
+}
+
+// alertTypeOf 兼容老数据：AlertType 字段是后加的，老记录为空，按消息内容推断。
+func alertTypeOf(v *entity.AlertData) string {
+	if v.AlertType != "" {
+		return v.AlertType
+	}
+	switch {
+	case strings.Contains(v.Msg, "超时"):
+		return constname.AlertTypeTimeout
+	case strings.Contains(v.Msg, "响应时间超过"):
+		// 慢响应在探针侧也归为 timeout 类型
+		return constname.AlertTypeTimeout
+	case strings.Contains(v.Msg, "状态码"):
+		return constname.AlertTypeCode
+	case strings.Contains(v.Msg, "请求失败"):
+		return constname.AlertTypeErr
+	case strings.Contains(v.Msg, "证书"):
+		return "ssl"
+	}
+	return ""
+}
+
+// Page 分页查询报警。
+// 报警总量在当前量级下很小（千级），一次性读出后在内存中过滤/排序，
+// 保证筛选、计数、站点下拉都是全量准确；对外只吐 size 条。
+func (a *alertDao) Page(page, size int, filter AlertFilter) (*AlertPageData, error) {
+	all, err := a.GetList()
+	if err != nil {
+		return nil, err
+	}
+
+	out := &AlertPageData{
+		List:   make([]*entity.AlertData, 0),
+		Counts: map[string]int{"all": len(all), "unread": 0, "timeout": 0, "code": 0},
+		Hosts:  make([]AlertHost, 0),
+	}
+	hostMap := make(map[string]string, len(all))
+	for _, v := range all {
+		if v.Read == 0 {
+			out.Unread++
+			out.Counts["unread"]++
+		}
+		switch v.AlertType {
+		case constname.AlertTypeTimeout:
+			out.Counts["timeout"]++
+		case constname.AlertTypeCode:
+			out.Counts["code"]++
+		}
+		hostMap[v.HostId] = v.Host
+	}
+	for id, host := range hostMap {
+		out.Hosts = append(out.Hosts, AlertHost{ID: id, Host: host})
+	}
+	sort.Slice(out.Hosts, func(i, j int) bool { return out.Hosts[i].Host < out.Hosts[j].Host })
+
+	kw := strings.ToLower(strings.TrimSpace(filter.Kw))
+	list := make([]*entity.AlertData, 0, len(all))
+	for _, v := range all {
+		switch filter.Seg {
+		case "unread":
+			if v.Read != 0 {
+				continue
+			}
+		case "timeout":
+			if v.AlertType != constname.AlertTypeTimeout {
+				continue
+			}
+		case "code":
+			if v.AlertType != constname.AlertTypeCode {
+				continue
+			}
+		}
+		if filter.Host != "" && v.HostId != filter.Host {
+			continue
+		}
+		if kw != "" {
+			text := strings.ToLower(v.Host + " " + v.Uri + " " + v.Msg)
+			if !strings.Contains(text, kw) {
+				continue
+			}
+		}
+		list = append(list, v)
+	}
+	sort.Slice(list, func(i, j int) bool { return list[i].Date > list[j].Date })
+
+	out.Total = len(list)
+	if size <= 0 {
+		out.List = list
+		return out, nil
+	}
+	if page < 1 {
+		page = 1
+	}
+	start := (page - 1) * size
+	if start >= out.Total {
+		return out, nil
+	}
+	end := start + size
+	if end > out.Total {
+		end = out.Total
+	}
+	out.List = list[start:end]
+	return out, nil
+}
+
 func (a *alertDao) Read(id string) error {
 	alert, err := a.Get(id)
 	if err != nil {
@@ -148,6 +300,49 @@ func (a *alertDao) Read(id string) error {
 	alert.Read = 1 // 0:未读  1:已读
 
 	return a.update(alert)
+}
+
+// ReadAll 一次性把所有未读报警标记为已读。
+// 放在单个写事务里，避免逐条 DB.Set 触发 N 次 fsync。
+func (a *alertDao) ReadAll() error {
+	return DB.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(AlertTable))
+		if b == nil {
+			return fmt.Errorf("%s 表不存在", AlertTable)
+		}
+
+		keys := make([][]byte, 0)
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			alert := &entity.AlertData{}
+			if err := json.Unmarshal(v, alert); err != nil {
+				return err
+			}
+			if alert.Read == 0 {
+				keys = append(keys, append([]byte(nil), k...))
+			}
+		}
+
+		for _, k := range keys {
+			raw := b.Get(k)
+			if raw == nil {
+				continue
+			}
+			alert := &entity.AlertData{}
+			if err := json.Unmarshal(raw, alert); err != nil {
+				return err
+			}
+			alert.Read = 1
+			value, err := utils.AnyToJsonB(alert)
+			if err != nil {
+				return err
+			}
+			if err := b.Put(k, value); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (a *alertDao) Del(id string) error {
@@ -214,6 +409,7 @@ func AddAlert(mLog *entity.MonitorLog) {
 		AlertId:         utils.IDStr(),
 		HostId:          mLog.HostId,
 		Host:            mLog.Host,
+		AlertType:       mLog.AlertType,
 		Date:            mLog.Time,
 		Uri:             mLog.Uri,
 		UriCode:         mLog.UriCode,

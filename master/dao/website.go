@@ -210,16 +210,10 @@ func (w *websiteDao) Edit(base *entity.Website, alarmRule *entity.WebsiteAlarmRu
 }
 
 func (w *websiteDao) SelectList() ([]*entity.Website, int, error) {
-	DB.Open()
-
-	defer func() {
-		_ = DB.Conn.Close()
-	}()
-
 	count := 0
 	data := make([]*entity.Website, 0)
 
-	err := DB.Conn.View(func(tx *bolt.Tx) error {
+	err := DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(WebSiteTable))
 		if b == nil {
 			return fmt.Errorf(WebSiteTable + "表不存在")

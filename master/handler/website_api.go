@@ -2,11 +2,13 @@ package handler
 
 import (
 	"fmt"
-	gt "github.com/mangenotwork/gathertool"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"website-monitor/master/business"
+
+	gt "github.com/mangenotwork/gathertool"
 
 	"website-monitor/master/constname"
 	"website-monitor/master/dao"
@@ -149,22 +151,17 @@ func WebsiteList(c *ginHelper.GinCtx) {
 		return
 	}
 
-	// 监测器状态
-	isMonitor := false
-	monitor := dao.GetClientList()
-	for _, v := range monitor {
+	// 监测器状态：只读在线表，不再为布尔值同步拉取每个探针的 IP/OS
+	isMonitor := dao.HasOnlineMonitor()
 
-		if v.Online {
-			isMonitor = true
-			break
-		}
-
+	// 报警数量：一次读取全部站点的索引，避免每个站点都开一次 DB 读
+	alertCounts, countErr := dao.NewAlert().GetAllWebsiteAlertCounts()
+	if countErr != nil {
+		log.Error("获取站点报警数量失败: ", countErr)
 	}
 
-	// 报警数量获取
 	for _, v := range websiteList {
-		alertList, _ := dao.NewAlert().GetWebsiteAlertIDList(v.HostID)
-		alertLen := len(alertList)
+		alertLen := alertCounts[v.HostID]
 
 		state := 0
 		if isMonitor {
@@ -427,6 +424,14 @@ func WebsiteEdit(c *ginHelper.GinCtx) {
 	return
 }
 
+// maxChartPoints 单日图表最多返回的点数；一天 5s 采样有 1.7 万点，全量传太大
+const maxChartPoints = 1500
+
+type WebsiteChartOut struct {
+	List [][]int64        `json:"list"`
+	Stat map[string]int64 `json:"stat"`
+}
+
 func WebsiteChart(c *ginHelper.GinCtx) {
 	hostId := c.Param("hostId")
 	day := c.GetQuery("day")
@@ -442,29 +447,90 @@ func WebsiteChart(c *ginHelper.GinCtx) {
 		return
 	}
 
-	out := make([][]int64, 0)
+	out := make([][]int64, 0, len(data))
 	for _, v := range data {
 
 		if len(uri) > 0 { // 指定类型
 
 			if v.UriType == uri {
-				item := make([]int64, 0)
-				item = append(item, utils.Date2Timestamp(v.Time)*1000)
-				item = append(item, v.UriMs)
-				out = append(out, item)
+				out = append(out, []int64{utils.Date2Timestamp(v.Time) * 1000, v.UriMs})
 			}
 
 		} else {
-			item := make([]int64, 0)
-			item = append(item, utils.Date2Timestamp(v.Time)*1000)
-			item = append(item, v.UriMs)
-			out = append(out, item)
+			out = append(out, []int64{utils.Date2Timestamp(v.Time) * 1000, v.UriMs})
 		}
 
 	}
 
-	c.APIOutPut(out, "")
+	// 统计用全量数据算，图表用降采样后的数据，避免前端拿采样值算平均值/P95
+	c.APIOutPut(&WebsiteChartOut{
+		List: downsampleChart(out, maxChartPoints),
+		Stat: chartStat(out),
+	}, "")
 	return
+}
+
+// chartStat 基于全量采样计算 数量/平均/P95/峰值
+func chartStat(list [][]int64) map[string]int64 {
+	n := len(list)
+	if n == 0 {
+		return map[string]int64{"count": 0, "avg": 0, "p95": 0, "max": 0}
+	}
+
+	vals := make([]int64, 0, n)
+	var sum, max int64
+	for _, v := range list {
+		ms := v[1]
+		vals = append(vals, ms)
+		sum += ms
+		if ms > max {
+			max = ms
+		}
+	}
+	sort.Slice(vals, func(i, j int) bool { return vals[i] < vals[j] })
+	idx := int(float64(n) * 0.95)
+	if idx >= n {
+		idx = n - 1
+	}
+
+	return map[string]int64{
+		"count": int64(n),
+		"avg":   sum / int64(n),
+		"p95":   vals[idx],
+		"max":   max,
+	}
+}
+
+// downsampleChart 按桶取最大值降采样，保留响应尖刺
+func downsampleChart(list [][]int64, max int) [][]int64 {
+	if max <= 0 || len(list) <= max {
+		return list
+	}
+
+	step := float64(len(list)) / float64(max)
+	out := make([][]int64, 0, max)
+	for i := 0; i < max; i++ {
+		start := int(float64(i) * step)
+		end := int(float64(i+1) * step)
+		if start >= len(list) {
+			break
+		}
+		if end > len(list) {
+			end = len(list)
+		}
+		if end <= start {
+			end = start + 1
+		}
+
+		worst := list[start]
+		for _, v := range list[start:end] {
+			if v[1] > worst[1] {
+				worst = v
+			}
+		}
+		out = append(out, worst)
+	}
+	return out
 }
 
 func MonitorLog(c *ginHelper.GinCtx) {
@@ -582,8 +648,13 @@ func WebsitePointClear(c *ginHelper.GinCtx) {
 }
 
 func MonitorList(c *ginHelper.GinCtx) {
-	data := dao.GetClientList()
-	c.APIOutPut(data, "成功")
+	if c.Query("detail") == "1" {
+		// 探针页需要公网 IP / 系统信息，串行拉取
+		c.APIOutPut(dao.GetClientListDetail(), "成功")
+		return
+	}
+	// 默认轻量：只读在线表，不发起 UDP 请求
+	c.APIOutPut(dao.GetClientList(), "成功")
 	return
 }
 
@@ -594,24 +665,63 @@ func MonitorIPAddr(c *ginHelper.GinCtx) {
 }
 
 type AlertListOut struct {
-	List  []*entity.AlertData `json:"list"`
-	Count int                 `json:"count"`
+	List    []*entity.AlertData `json:"list"`
+	Count   int                 `json:"count"`
+	Page    int                 `json:"page"`
+	Size    int                 `json:"size"`
+	HasMore bool                `json:"hasMore"`
+	Unread  int                 `json:"unread"`
+	Counts  map[string]int      `json:"counts"`
+	Hosts   []dao.AlertHost     `json:"hosts"`
 }
 
+// AlertList 报警列表：page/size 分页，seg/host/kw 服务端筛选。
+// size 不传或 <=0 时返回全部，兼容旧调用。
 func AlertList(c *ginHelper.GinCtx) {
-	list, err := dao.NewAlert().GetList()
+	page, _ := strconv.Atoi(c.Query("page"))
+	if page < 1 {
+		page = 1
+	}
+	size, _ := strconv.Atoi(c.Query("size"))
+	if size < 0 {
+		size = 0
+	}
+	if size > 500 {
+		size = 500
+	}
+
+	res, err := dao.NewAlert().Page(page, size, dao.AlertFilter{
+		Seg:  c.Query("seg"),
+		Host: c.Query("host"),
+		Kw:   c.Query("kw"),
+	})
 	if err != nil {
 		log.Error(err)
 		c.APIOutPutError(nil, err.Error())
 		return
 	}
 
-	data := &AlertListOut{
-		List:  list,
-		Count: len(list),
-	}
+	c.APIOutPut(&AlertListOut{
+		List:    res.List,
+		Count:   res.Total,
+		Page:    page,
+		Size:    size,
+		HasMore: size > 0 && page*size < res.Total,
+		Unread:  res.Unread,
+		Counts:  res.Counts,
+		Hosts:   res.Hosts,
+	}, "")
+	return
+}
 
-	c.APIOutPut(data, "")
+// AlertReadAll 全部标记为已读
+func AlertReadAll(c *ginHelper.GinCtx) {
+	if err := dao.NewAlert().ReadAll(); err != nil {
+		log.Error(err)
+		c.APIOutPutError(nil, err.Error())
+		return
+	}
+	c.APIOutPut("", "已全部标记为已读")
 	return
 }
 

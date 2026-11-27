@@ -9,8 +9,9 @@ const app = createApp({
             site: newSiteDetail(),
             alertDetail: newAlertDetail(),
             alertList: {
-                api: "/api/alert/list",
+                api: "/api/alert/list?size=5",
                 list: [],
+                unread: 0,
             },
             monitor: {
                 api: "/api/monitor/list",
@@ -32,7 +33,7 @@ const app = createApp({
         siteMonitoring() { return this.webSite.list.filter(function (i) { return i.state === 1; }).length; },
         siteAlertSites() { return this.webSite.list.filter(function (i) { return i.state === 2; }).length; },
         siteWaiting() { return this.webSite.list.filter(function (i) { return i.state === 0; }).length; },
-        unreadAlerts() { return this.alertList.list.filter(function (i) { return i.read === 0; }).length; },
+        unreadAlerts() { return this.alertList.unread; },
         recentAlerts() {
             return this.alertList.list.slice().sort(function (a, b) {
                 return String(b.date).localeCompare(String(a.date));
@@ -83,6 +84,7 @@ const app = createApp({
             common.AjaxGet(t.alertList.api, function (data) {
                 if (data.code !== 0) return;
                 t.alertList.list = (data.data && data.data.list) ? data.data.list : [];
+                t.alertList.unread = (data.data && data.data.unread) || 0;
                 UI.setAlertBadge(t.unreadAlerts);
             });
         },
@@ -124,7 +126,7 @@ const app = createApp({
         openEditWebsiteConf: function (hostId) {
             const t = this;
             t.editWebsiteConf.hostId = hostId;
-            common.AjaxGetNotAsync(t.editWebsiteConf.confApi(), function (data) {
+            common.AjaxGet(t.editWebsiteConf.confApi(), function (data) {
                 if (data.code !== 0) { UI.toast(data.msg || "获取配置失败"); return; }
                 t.editWebsiteConf.base = data.data.base;
                 t.editWebsiteConf.alarmRule = data.data.alarmRule;

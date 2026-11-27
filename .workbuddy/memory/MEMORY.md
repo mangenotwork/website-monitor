@@ -26,6 +26,20 @@
 - 改动前先确认范围；DAO 沿用 interface + `NewXxx()` 返回风格；保持日志行 19 字段格式兼容（master 解析依赖）。
 - 两个 module 需分别 `go build ./...` 验证（已验证均通过，Go 1.25 工具链）。
 
+## 存储与性能约定（2026-11-27）
+- `dao.DB` 是**单连接**：`Init()` 打开一次并建桶，`Get/Set/Delete` 内部走 `DB.View/Update`；**禁止**再引入 per-call `bolt.Open/Close` 或 `GetDBConn`（已删除）。`DB.Conn` 只在 `Init/Close` 修改。
+- 同一 `data.db` 不能被两个 master 进程同时打开（Bolt 独占文件锁，第二个会 5s 超时 panic），这是预期行为。
+- 探针列表分两档：`GetClientList()` 纯内存、无 UDP（首页用）；`GetClientListDetail()` 才拉 IP/OS，且只对在线节点串行（探针页用 `?detail=1`）。
+- **udp_comm v0.0.1 的 `GetAtIP` 不能并发**：`ID64()` 每次新建 IdWorker，同毫秒 ID 冲突，实测 4 并发 3 超时/响应错配；所有 UDP Get 必须串行。
+- 前端依赖全部本地化：`static/js/vue.global.prod.js`（170KB）在 `__js__.html` 引入；ECharts 1MB 由 `public.js` 的 `loadECharts()` 在打开站点抽屉时按需加载，不进首屏；clipboard/tippy/popper 已不再引用。
+- 报警分页（2026-11-27）：`/api/alert/list` 支持 `page/size/seg/host/kw`，返回 `list/count/hasMore/unread/counts/hosts`；首页 `size=5`，报警页 `size=100` 下拉加载；`size` 不传返回全部（兼容）。`entity.AlertData.AlertType` 为后加字段，老数据由 `dao.alertTypeOf()` 按 Msg 推断。
+- `/api/alert/all/read` 单事务批量已读；`ReadAll` 不要改回逐条 `DB.Set`（会触发 N 次 fsync）。
+- 日志读取：`ReadLog` 按 32KB 块从文件尾倒读 300 行，不要改回逐字节 Seek；`LogList/LogListDay/DeleteLog` 用 `filepath.Glob(host_*.log)`，不要 Walk 整个 log 目录。
+- 探针详情 `GetClientListDetail` 有 5 分钟缓存（失败 30s）+ 2s 总预算，单次 Get 800ms；`GetClientList` 仍是纯内存轻量列表。
+- `/api/website/chart` 返回 `{list, stat}`：`stat` 基于全量数据，`list` 最多 1500 点（按桶取最大值），前端兼容旧数组。
+- 全局已有 `gin-contrib/gzip`（`Router.Use(gzip.Gzip(...))`），不要再加压缩中间件，会双重压缩。
+- 站点列表报警数用 `GetAllWebsiteAlertCounts()` 一次读全表，不要退回每站点一次 DB 读。
+
 ## 前端架构（2026-11-26 UI 改版后）
 - 样式唯一入口 `static/css/theme.css`（Bootstrap 先加载，再覆盖）；`page.css` 已不再引用。设计 token 用 CSS 变量，`html[data-accent]` 支持靛蓝/青绿/石墨，`html[data-density]` 支持舒适/紧凑，偏好存 localStorage。
 - 布局：`__header__.html` 同时输出 `.sidebar` + `.topbar` + 确认框/遮罩；页面用 `<main class="viewport">`。图标是 `__header__` 顶部的 SVG sprite（`#i-*`），不再依赖 `SVG` 模板函数（旧弹窗仍可用）。

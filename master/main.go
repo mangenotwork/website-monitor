@@ -17,6 +17,7 @@ import (
 func main() {
 	conf.InitConf("./conf/")
 	dao.DB.Init()
+	defer dao.DB.Close()
 	// 启动 udp servers
 	go udpServer.RunUDPServer()
 	// 启动采集

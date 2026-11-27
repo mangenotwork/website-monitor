@@ -2,6 +2,7 @@ package dao
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/log"
@@ -76,79 +77,62 @@ func (m *monitorLogDao) ReadLog(hostId, day string) []*entity.MonitorLog {
 	}
 
 	if day == "" {
-
 		list, err := m.LogListDay(hostId)
 		if err != nil || len(list) < 1 {
 			log.Info(err)
 			return make([]*entity.MonitorLog, 0)
 		}
-
 		day = list[0]
 	}
 
 	fileName := logPath + hostId + "_" + day + ".log"
-	log.Info("fileName = ", fileName)
-
 	f, err := os.Open(fileName)
 	if err != nil {
 		log.ErrorF("open file error:%s", err.Error())
+		return make([]*entity.MonitorLog, 0)
 	}
-
 	defer func() {
 		_ = f.Close()
 	}()
 
-	data := make([]*entity.MonitorLog, 0)
-	buff := make([]byte, 0, 4096)
-	char := make([]byte, 1)
-	stat, _ := f.Stat()
-	filesize := stat.Size()
-	cursor := 0
-	count := 0
-	maxCount := 300
+	stat, err := f.Stat()
+	if err != nil || stat.Size() == 0 {
+		return make([]*entity.MonitorLog, 0)
+	}
 
-	for {
-		cursor -= 1
-		_, _ = f.Seek(int64(cursor), io.SeekEnd)
-		_, err = f.Read(char)
-		if err != nil {
+	// 从文件尾部按块倒读，凑够 maxCount 行即可，避免逐字节 Seek（1MB 文件约 15 万次系统调用）
+	const maxCount = 300
+	const chunkSize = 32 * 1024
+
+	pos := stat.Size()
+	buf := make([]byte, 0, chunkSize)
+	for pos > 0 && bytes.Count(buf, []byte{'\n'}) <= maxCount {
+		n := int64(chunkSize)
+		if pos < n {
+			n = pos
+		}
+		pos -= n
+
+		chunk := make([]byte, n)
+		if _, err := f.ReadAt(chunk, pos); err != nil && err != io.EOF {
 			log.Error(err)
 			break
 		}
-
-		if char[0] == '\n' {
-			if len(buff) > 0 {
-				revers(buff)
-				d := m.ToMonitorLogObj(string(buff))
-				if d != nil {
-					data = append(data, d)
-				}
-
-				count++
-				if count == maxCount {
-					break
-				}
-			}
-
-			buff = buff[:0]
-
-		} else {
-			buff = append(buff, char[0])
-		}
-
-		if int64(cursor) == -filesize {
-			break
-		}
-
+		buf = append(chunk, buf...)
 	}
 
+	lines := bytes.Split(buf, []byte{'\n'})
+	data := make([]*entity.MonitorLog, 0, maxCount)
+	for i := len(lines) - 1; i >= 0 && len(data) < maxCount; i-- {
+		line := bytes.TrimSpace(lines[i])
+		if len(line) == 0 {
+			continue
+		}
+		if d := m.ToMonitorLogObj(string(line)); d != nil {
+			data = append(data, d)
+		}
+	}
 	return data
-}
-
-func revers(s []byte) {
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		s[i], s[j] = s[j], s[i]
-	}
 }
 
 func (m *monitorLogDao) ToMonitorLogObj(str string) *entity.MonitorLog {
@@ -182,29 +166,26 @@ func (m *monitorLogDao) ToMonitorLogObj(str string) *entity.MonitorLog {
 }
 
 func (m *monitorLogDao) DeleteLog(hostId string) error {
+	var firstErr error
+	for _, path := range m.logFiles(hostId) {
+		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			log.Error(err)
+			if firstErr == nil {
+				firstErr = err
+			}
+		}
+	}
+	return firstErr
+}
+
+// logFiles 只匹配指定站点的日志文件，避免 Walk 整个日志目录
+func (m *monitorLogDao) logFiles(hostId string) []string {
 	logPath, err := conf.YamlGetString("logPath")
 	if err != nil {
 		logPath = "./log/"
 	}
-
-	return filepath.Walk(logPath, func(path string, info os.FileInfo, err error) error {
-
-		if info.IsDir() {
-			return err
-		}
-
-		fileName := info.Name()
-		fid := strings.Split(fileName, "_")
-		if len(fid) > 0 && fid[0] == hostId {
-			log.Info("fileName = ", fileName, path)
-			err = os.Remove(path)
-			if err != nil {
-				log.Error(err)
-			}
-		}
-
-		return err
-	})
+	matches, _ := filepath.Glob(filepath.Join(logPath, hostId+"_*.log"))
+	return matches
 }
 
 func (m *monitorLogDao) ReadAll(hostId, day string) ([]*entity.MonitorLog, error) {
@@ -230,81 +211,43 @@ func (m *monitorLogDao) ReadAll(hostId, day string) ([]*entity.MonitorLog, error
 
 	for {
 		line, e := r.ReadBytes('\n')
-		if e == nil {
-
-			d := m.ToMonitorLogObj(string(line))
-			if d != nil {
+		if len(line) > 0 {
+			if d := m.ToMonitorLogObj(strings.TrimRight(string(line), "\r\n")); d != nil {
 				data = append(data, d)
 			}
 		}
-
-		if e != nil && e != io.EOF {
-			log.Error(e)
-			err = e
-		}
-
-		if e == io.EOF {
+		if e != nil {
+			if e != io.EOF {
+				log.Error(e)
+				err = e
+			}
 			break
 		}
-
 	}
 
 	return data, err
 }
 
 func (m *monitorLogDao) LogList(hostId string) ([]string, error) {
-	logPath, err := conf.YamlGetString("logPath")
-	if err != nil {
-		logPath = "./log/"
-	}
-
 	list := make([]string, 0)
-	err = filepath.Walk(logPath, func(path string, info os.FileInfo, err error) error {
-
-		if info.IsDir() {
-			return err
-		}
-
-		fileName := info.Name()
-		fid := strings.Split(fileName, "_")
-		if len(fid) > 0 && fid[0] == hostId {
-			log.Info("fileName = ", fileName, path)
-			list = append(list, fileName)
-		}
-
-		return err
-	})
-
-	return list, err
+	for _, path := range m.logFiles(hostId) {
+		list = append(list, filepath.Base(path))
+	}
+	sort.Strings(list)
+	return list, nil
 }
 
 func (m *monitorLogDao) LogListDay(hostId string) ([]string, error) {
-	logPath, err := conf.YamlGetString("logPath")
-	if err != nil {
-		logPath = "./log/"
-	}
-
 	list := make([]string, 0)
-
-	err = filepath.Walk(logPath, func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return err
+	for _, path := range m.logFiles(hostId) {
+		parts := strings.SplitN(filepath.Base(path), "_", 2)
+		if len(parts) < 2 {
+			continue
 		}
-
-		fileName := info.Name()
-		fid := strings.Split(fileName, "_")
-		if len(fid) > 1 && fid[0] == hostId {
-			list = append(list, strings.Replace(fid[1], ".log", "", -1))
-		}
-
-		return err
-	})
-
-	sort.Slice(list, func(i, j int) bool {
-		return i > j
-	})
-
-	return list, err
+		list = append(list, strings.TrimSuffix(parts[1], ".log"))
+	}
+	sort.Slice(list, func(i, j int) bool { return list[i] > list[j] })
+	return list, nil
 }
 
 func (m *monitorLogDao) Upload(hostId, day string) (string, error) {

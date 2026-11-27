@@ -5,6 +5,7 @@ type AlertData struct {
 	AlertId         string `json:"alertId"`         //
 	HostId          string `json:"hostId"`          //
 	Host            string `json:"host"`            //
+	AlertType       string `json:"alertType"`       // 报警类型 timeout / code / err 等，老数据可能为空
 	Date            string `json:"date"`            // 监测的时间
 	Uri             string `json:"uri"`             // 出现问题的URI
 	UriCode         int    `json:"uriCode"`         // URI响应码

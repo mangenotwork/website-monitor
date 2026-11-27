@@ -15,14 +15,6 @@ class Utils {
         });
     }
 
-    AjaxGetNotAsync(url, func) {
-        $.ajax({
-            type: "get", url: url, data: "", dataType: 'json', async: false,
-            success: function (data) { func(data); },
-            error: function (xhr, textStatus) { console.log(xhr, textStatus); }
-        });
-    }
-
     AjaxPost(url, param, func) {
         $.ajax({
             type: "post", url: url,
@@ -208,6 +200,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /* -------------------------------------------------------------------------- */
 
+/*
+ * ECharts 按需加载：图表库约 1MB，只在打开站点详情并需要绘图时加载，
+ * 不参与首页首屏，避免阻塞 Vue 挂载与接口请求。
+ */
+let echartsLoading = null;
+
+function loadECharts() {
+    if (window.echarts) return Promise.resolve(window.echarts);
+    if (!echartsLoading) {
+        echartsLoading = new Promise(function (resolve, reject) {
+            const s = document.createElement('script');
+            s.src = '/static/js/echarts.min.js?v=5.4.3';
+            s.async = true;
+            s.onload = function () {
+                if (window.echarts) resolve(window.echarts);
+                else reject(new Error('ECharts 未就绪'));
+            };
+            s.onerror = function () {
+                echartsLoading = null;
+                reject(new Error('ECharts 加载失败'));
+            };
+            document.head.appendChild(s);
+        });
+    }
+    return echartsLoading;
+}
+
 function newSiteDetail() {
     return {
         hostId: '', host: '', tab: 'overview',
@@ -266,7 +285,7 @@ function newSiteDetail() {
             const self = this;
             if (!this.hostId || !this.info) return;
             UI.toast('正在重新采集站点信息，请稍候…');
-            new Utils().AjaxGetNotAsync('/api/website/info/refresh?host=' + encodeURIComponent(this.host) + '&id=' + this.hostId, function (data) {
+            new Utils().AjaxGet('/api/website/info/refresh?host=' + encodeURIComponent(this.host) + '&id=' + this.hostId, function (data) {
                 if (data.code === 0) { self.loadInfo(); UI.toast('采集完成'); }
                 else { UI.toast(data.msg || '采集失败'); }
             });
@@ -327,17 +346,23 @@ function newSiteDetail() {
 
         loadLogs: function () {
             const self = this;
-            if (this.logDays.length === 0) {
-                new Utils().AjaxGetNotAsync('/api/website/log/list/' + this.hostId, function (data) {
-                    if (data.code === 0) self.logDays = data.data || [];
+            const load = function () {
+                self.logDay = self.logDay || self.logDays[0] || '';
+                self.logLoading = true;
+                new Utils().AjaxGet('/api/website/log/' + self.hostId + (self.logDay ? ('?day=' + self.logDay) : ''), function (data) {
+                    self.logLoading = false;
+                    self.logs = data.code === 0 ? (data.data || []) : [];
                 });
+            };
+
+            if (this.logDays.length === 0) {
+                new Utils().AjaxGet('/api/website/log/list/' + this.hostId, function (data) {
+                    if (data.code === 0) self.logDays = data.data || [];
+                    load();
+                });
+                return;
             }
-            this.logDay = this.logDay || this.logDays[0] || '';
-            this.logLoading = true;
-            new Utils().AjaxGet('/api/website/log/' + this.hostId + (this.logDay ? ('?day=' + this.logDay) : ''), function (data) {
-                self.logLoading = false;
-                self.logs = data.code === 0 ? (data.data || []) : [];
-            });
+            load();
         },
 
         changeLogDay: function (day) {
@@ -391,15 +416,22 @@ function newSiteDetail() {
         loadChart: function () {
             const self = this;
             this.chartLoading = true;
-            new Utils().AjaxGetNotAsync('/api/website/log/list/' + this.hostId, function (data) {
+            new Utils().AjaxGet('/api/website/log/list/' + this.hostId, function (data) {
                 if (data.code === 0) self.logDays = data.data || [];
                 self.logDay = self.logDays[0] || '';
                 const day = self.logDay;
                 new Utils().AjaxGet('/api/website/chart/' + self.hostId + '?day=' + day + '&uri=Health', function (res) {
                     self.chartLoading = false;
                     if (res.code !== 0) { self.chartData = []; return; }
-                    self.chartData = res.data || [];
-                    self.calcStat();
+                    const d = res.data;
+                    if (Array.isArray(d)) { // 兼容旧接口
+                        self.chartData = d;
+                        self.calcStat();
+                    } else {
+                        self.chartData = (d && d.list) ? d.list : [];
+                        if (d && d.stat) self.stat = d.stat;
+                        else self.calcStat();
+                    }
                     setTimeout(function () { self.renderChart(); }, 30);
                 });
             });
@@ -420,9 +452,26 @@ function newSiteDetail() {
             };
         },
 
-        renderChart: function () {
+        renderChart: function (retry) {
+            if (this.chartData.length === 0) return;
             const el = document.getElementById('siteChart');
-            if (!el || this.chartData.length === 0) return;
+            if (!el) {
+                // chart-box 由 v-if 控制，数据刚写入时 DOM 可能还没更新，短暂重试
+                if ((retry || 0) < 20) {
+                    const self = this;
+                    setTimeout(function () { self.renderChart((retry || 0) + 1); }, 50);
+                }
+                return;
+            }
+            if (!window.echarts) {
+                const self = this;
+                loadECharts().then(function () {
+                    self.renderChart();
+                }).catch(function () {
+                    UI.toast('图表组件加载失败，请检查网络后重试');
+                });
+                return;
+            }
             const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4F46E5';
             if (this.chart && this.chart.getDom() !== el) {
                 this.chart.dispose();
@@ -450,7 +499,8 @@ function newSiteDetail() {
             }
             this.chart.setOption({
                 animation: false,
-                grid: { left: 6, right: 14, top: 18, bottom: 22, containLabel: true },                tooltip: {
+                grid: { left: 6, right: 14, top: 18, bottom: 22, containLabel: true },
+                tooltip: {
                     trigger: 'axis',
                     backgroundColor: '#18181B', borderWidth: 0,
                     textStyle: { color: '#fff', fontSize: 11 },
@@ -541,7 +591,7 @@ function newAlertDetail() {
                 UI.toast(data.msg || '');
                 if (data.code === 0) {
                     self.data.read = 1;
-                    if (self.onChange) self.onChange();
+                    if (self.onChange) self.onChange('read');
                 }
             });
         },
@@ -554,7 +604,7 @@ function newAlertDetail() {
                     UI.toast(data.msg || '');
                     if (data.code === 0) {
                         UI.closeDrawers();
-                        if (self.onChange) self.onChange();
+                        if (self.onChange) self.onChange('del');
                     }
                 });
             }, true);

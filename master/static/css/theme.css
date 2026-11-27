@@ -424,6 +424,12 @@ a.stat:hover .stat-go { opacity: 1; transform: none; }
 .tbl .muted { color: var(--text-3); }
 .tbl .right { text-align: right; }
 .tbl tr.selected td { background: var(--accent-soft); }
+.load-row td, .load-end td {
+  height: 34px; text-align: center; font-size: 12px;
+  color: var(--text-3); background: var(--bg-subtle); cursor: pointer;
+}
+.load-row:hover td { color: var(--text); background: var(--bg-hover); }
+.load-end td { cursor: default; }
 
 .host-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .host-line { display: flex; align-items: center; gap: 5px; min-width: 0; }

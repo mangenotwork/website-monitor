@@ -6,7 +6,7 @@ const app = createApp({
         return {
             mail: Mail,
             monitor: {
-                api: "/api/monitor/list",
+                api: "/api/monitor/list?detail=1",
                 list: [],
             },
         }

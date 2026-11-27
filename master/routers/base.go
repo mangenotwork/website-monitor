@@ -94,6 +94,7 @@ func API() {
 	api.GET("/alert/list", ginHelper.Handle(handler.AlertList))               // 报警列表
 	api.GET("/alert/website/:hostId", ginHelper.Handle(handler.AlertWebsite)) // 指定网站的报警信息
 	api.GET("/alert/read/:id", ginHelper.Handle(handler.AlertRead))           // 报警信息已读
+	api.GET("/alert/all/read", ginHelper.Handle(handler.AlertReadAll))        // 全部标记已读
 	api.GET("/alert/info/:id", ginHelper.Handle(handler.AlertInfo))           // 报警消息详细信息
 	api.GET("/alert/del/:id", ginHelper.Handle(handler.AlertDel))             // 报警消息删除
 	api.GET("/alert/clear/:hostId", ginHelper.Handle(handler.AlertClear))     // 指定网站的报警信息清空

@@ -25,11 +25,16 @@ func Collect() {
 			for _, v := range website {
 
 				scan, _ := dao.NewWebsite().GetScanCheckUp(v.HostID)
+				if scan == nil || scan.ScanRate <= 0 {
+					continue
+				}
 				tNow := time.Now().Unix()
 
 				// 当前时间 - 创建时间 -> 计算出小时差 |  小时差 余 扫描频率 == 0 就执行扫描
 				if ((tNow-v.Created)/(60*60))%scan.ScanRate == 0 {
 
+					// Go 1.19 循环变量复用，必须显式复制，否则所有 goroutine 都扫最后一个站点
+					v, scan := v, scan
 					go func() {
 						dao.Scan(v.Host, v.HostID, scan.ScanDepth)
 					}()

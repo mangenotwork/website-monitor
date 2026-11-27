@@ -58,14 +58,8 @@ func (r *requestToolDao) GetAtID(id string) (*entity.RequestTool, error) {
 }
 
 func (r *requestToolDao) History() ([]*entity.RequestTool, error) {
-	conn := GetDBConn()
-
-	defer func() {
-		_ = conn.Close()
-	}()
-
 	list := make([]*entity.RequestTool, 0)
-	err := conn.View(func(tx *bolt.Tx) error {
+	err := DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(RequestTable))
 		if b == nil {
 			return ISNULL
@@ -109,11 +103,9 @@ func (r *requestToolDao) initRequestNowList() (*entity.RequestNowList, error) {
 }
 
 func (r *requestToolDao) GetRequestNowList() ([]*entity.RequestNowList, error) {
-	conn := GetDBConn()
-
 	list := make([]*entity.RequestNowList, 0)
 
-	err := conn.View(func(tx *bolt.Tx) error {
+	err := DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(RequestNowListTable))
 		if b == nil {
 			return ISNULL
@@ -133,8 +125,6 @@ func (r *requestToolDao) GetRequestNowList() ([]*entity.RequestNowList, error) {
 
 		return nil
 	})
-
-	_ = conn.Close()
 
 	if len(list) < 1 {
 		data, _ := r.initRequestNowList()
@@ -169,15 +159,9 @@ func (r *requestToolDao) SetGlobalHeader(list []*entity.RequesterGlobalHeader) e
 }
 
 func (r *requestToolDao) GetGlobalHeader() ([]*entity.RequesterGlobalHeader, error) {
-	conn := GetDBConn()
-
-	defer func() {
-		_ = conn.Close()
-	}()
-
 	list := make([]*entity.RequesterGlobalHeader, 0)
 
-	err := conn.View(func(tx *bolt.Tx) error {
+	err := DB.View(func(tx *bolt.Tx) error {
 		// Assume bucket exists and has keys
 		b := tx.Bucket([]byte(RequestGlobalHeaderTable))
 		if b == nil {

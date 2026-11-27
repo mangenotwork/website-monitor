@@ -2,7 +2,9 @@ package dao
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/boltdb/bolt"
 	"github.com/mangenotwork/common/log"
@@ -63,10 +65,14 @@ var (
 		HistoryPingTable, HistorySSLTable, HistoryWebsiteInfoTable, AlertTable, AlertWebsiteTable,
 		RequestTable, RequestDirTable, RequestCookieTable, RequestGlobalHeaderTable, RequestNowListTable,
 	}
-	DB     = NewLocalDB(DBPath, Tables)
-	ISNULL = fmt.Errorf("ISNULL")
+	DB           = NewLocalDB(DBPath, Tables)
+	ISNULL       = fmt.Errorf("ISNULL")
+	errDBNotInit = errors.New("数据库未初始化")
 )
 
+// LocalDB 单进程内只保留一个 *bolt.DB 连接。
+// Bolt 的读事务（View）可并发，写事务（Update）串行；
+// 每次操作重新 bolt.Open 会拿独占文件锁，导致所有读写排队，必须避免。
 type LocalDB struct {
 	Path   string
 	Tables []string
@@ -80,71 +86,79 @@ func NewLocalDB(path string, tables []string) *LocalDB {
 	}
 }
 
-func GetDBConn() *bolt.DB {
-	DB.Open()
-	return DB.Conn
-}
-
+// Init 打开数据库并创建缺失的桶，进程退出前不再关闭。
 func (ldb *LocalDB) Init() {
+	if ldb.Conn != nil {
+		return
+	}
 
-	db, err := bolt.Open(ldb.Path, 0600, nil)
+	db, err := bolt.Open(ldb.Path, 0600, &bolt.Options{Timeout: 5 * time.Second})
+	if err != nil {
+		log.Panic(err)
+	}
+	ldb.Conn = db
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		for _, table := range ldb.Tables {
+			if tx.Bucket([]byte(table)) != nil {
+				continue
+			}
+			log.Info("创建数据表 : ", table)
+			if _, err := tx.CreateBucket([]byte(table)); err != nil {
+				return fmt.Errorf("创建数据表 %s 失败: %w", table, err)
+			}
+		}
+		return nil
+	})
 	if err != nil {
 		log.Panic(err)
 	}
 
-	defer func() {
-		_ = db.Close()
-	}()
-
-	for _, table := range ldb.Tables {
-
-		log.Info("检查数据表 : ", table)
-		err = db.Update(func(tx *bolt.Tx) error {
-
-			b := tx.Bucket([]byte(table))
-			if b == nil {
-				_, err = tx.CreateBucket([]byte(table))
-				if err != nil {
-					log.Panic(err)
-				}
-			}
-
-			return nil
-		})
-
-		if err != nil {
-			log.Panic(err)
-		}
-
-	}
+	log.Info("数据库已打开: ", ldb.Path)
 }
 
-func (ldb *LocalDB) Open() {
-	ldb.Conn, _ = bolt.Open(ldb.Path, 0600, nil)
-}
-
+// Close 仅在进程退出时调用
 func (ldb *LocalDB) Close() {
-	_ = ldb.Conn.Close()
+	if ldb.Conn == nil {
+		return
+	}
+	if err := ldb.Conn.Close(); err != nil {
+		log.Error("关闭数据库失败: ", err)
+	}
+	ldb.Conn = nil
+}
+
+func (ldb *LocalDB) conn() (*bolt.DB, error) {
+	if ldb.Conn == nil {
+		return nil, errDBNotInit
+	}
+	return ldb.Conn, nil
+}
+
+// View 只读事务，可并发调用
+func (ldb *LocalDB) View(fn func(tx *bolt.Tx) error) error {
+	db, err := ldb.conn()
+	if err != nil {
+		return err
+	}
+	return db.View(fn)
+}
+
+// Update 读写事务，进程内串行
+func (ldb *LocalDB) Update(fn func(tx *bolt.Tx) error) error {
+	db, err := ldb.conn()
+	if err != nil {
+		return err
+	}
+	return db.Update(fn)
 }
 
 func (ldb *LocalDB) Get(table, key string, data interface{}) error {
-	ldb.Open()
+	return ldb.View(func(tx *bolt.Tx) error {
 
-	defer func() {
-		_ = ldb.Conn.Close()
-	}()
-
-	return ldb.Conn.View(func(tx *bolt.Tx) error {
-
-	R:
 		b := tx.Bucket([]byte(table))
 		if b == nil {
-
-			err := ldb.ClearTable(table)
-			if err != nil {
-				return err
-			}
-			goto R
+			return fmt.Errorf("%s 表不存在", table)
 		}
 
 		bt := b.Get([]byte(key))
@@ -152,83 +166,48 @@ func (ldb *LocalDB) Get(table, key string, data interface{}) error {
 			return ISNULL
 		}
 
-		err := json.Unmarshal(bt, data)
-		if err != nil {
-			return err
-		}
-
-		return nil
-
+		return json.Unmarshal(bt, data)
 	})
 }
 
 func (ldb *LocalDB) Set(table, key string, data interface{}) error {
-	ldb.Open()
-
-	defer func() {
-		_ = ldb.Conn.Close()
-	}()
-
 	value, err := utils.AnyToJsonB(data)
 	if err != nil {
 		return err
 	}
 
-	return ldb.Conn.Update(func(tx *bolt.Tx) error {
+	return ldb.Update(func(tx *bolt.Tx) error {
 
-	R:
 		b := tx.Bucket([]byte(table))
 		if b == nil {
-
-			err = ldb.ClearTable(table)
-			if err != nil {
-				return err
+			var createErr error
+			b, createErr = tx.CreateBucket([]byte(table))
+			if createErr != nil {
+				return fmt.Errorf("创建数据表 %s 失败: %w", table, createErr)
 			}
-
-			goto R
 		}
 
-		err = b.Put([]byte(key), value)
-		if err != nil {
-			return err
-		}
-
-		return nil
-
+		return b.Put([]byte(key), value)
 	})
 }
 
 func (ldb *LocalDB) Delete(table, key string) error {
-	ldb.Open()
-
-	defer func() {
-		_ = ldb.Conn.Close()
-	}()
-
-	return ldb.Conn.Update(func(tx *bolt.Tx) error {
+	return ldb.Update(func(tx *bolt.Tx) error {
 
 		b := tx.Bucket([]byte(table))
 		if b == nil {
-			return fmt.Errorf("未获取到表")
+			return fmt.Errorf("%s 表不存在", table)
 		}
 
-		if err := b.Delete([]byte(key)); err != nil {
-			return err
-		}
-
-		return nil
-
+		return b.Delete([]byte(key))
 	})
 }
 
 func (ldb *LocalDB) ClearTable(table string) error {
-	ldb.Open()
-
-	defer func() {
-		_ = ldb.Conn.Close()
-	}()
-
-	return ldb.Conn.Update(func(tx *bolt.Tx) error {
+	return ldb.Update(func(tx *bolt.Tx) error {
+		if tx.Bucket([]byte(table)) == nil {
+			return nil
+		}
 		return tx.DeleteBucket([]byte(table))
 	})
 }
