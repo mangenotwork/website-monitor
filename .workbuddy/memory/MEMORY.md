@@ -14,9 +14,9 @@
 1. `dao/db.go` 每次 Get/Set/Delete 都 `bolt.Open` + `Close`，且 `GetDBConn()` 复用并关闭共享 `DB.Conn`，并发下有文件锁阻塞与竞态风险。
 2. `WebsiteList` 调 `dao.GetClientList()`，对每个 monitor 同步 UDP Get（ipAddr/osInfo，各 1s 超时）→ 面板加载慢的主因。
 3. `master/business/scan.go`：`go func(){ dao.Scan(v.Host,...) }()` 闭包捕获循环变量（module go 1.19，无 loopvar 语义）；`% scan.ScanRate` 为 0 时除零 panic。
-4. `dao/whois.go`：`net.Dial` 错误被忽略，conn 为 nil 直接 Write → panic。
+4. `dao/whois.go` 已修：`net.DialTimeout` 失败直接返回空串，不再对 nil conn 调 Write；输入统一经 `dao.NormalizeDomain` 规范化（去协议/端口/路径），`rootDomain` 取 eTLD+1。
 5. `dao/monitor_log.go ReadLog`：`os.Open` 失败后仍 `defer f.Close()`，f 为 nil → panic。
-6. monitor `PingActive` 硬编码 1000ms，未使用 `PingTime`；`request()` 无超时参数（gathertool 默认 30s），故网站超时配置不生效。
+6. monitor `PingActive` 已改为读取 `PingTime`（<=0 时回退 1000ms）；`request()` 已改原生 net/http，固定 30s 超时（仍无站点级 timeout 配置）。
 7. monitor 复用同一个 `mLog` 对象，Random/Point 阶段未重置 `UriCode/UriMs`；错误分支误写 `ContrastUriCode=0`。
 8. monitor `Business()` 在单 goroutine 顺序执行，慢站点会阻塞所有站点。
 9. `dao/alert.go` 的 `AlertTimeInfoMap` 无淘汰机制；`GetAtWebsite` 为 O(n*m) 双层遍历。
@@ -39,6 +39,9 @@
 - `/api/website/chart` 返回 `{list, stat}`：`stat` 基于全量数据，`list` 最多 1500 点（按桶取最大值），前端兼容旧数组。
 - 全局已有 `gin-contrib/gzip`（`Router.Use(gzip.Gzip(...))`），不要再加压缩中间件，会双重压缩。
 - 站点列表报警数用 `GetAllWebsiteAlertCounts()` 一次读全表，不要退回每站点一次 DB 读。
+- monitor 的 `request()` **不要改回 gathertool**：它读 Body 时会忽略 `io.ErrUnexpectedEOF`，截断响应会被误判为正常；回归测试见 `monitor/business/request_test.go`。
+- 站点配置变更（Edit）必须 `NoticeUpdateWebsite(hostID)` 通知探针重拉，否则探针内存里的 `WebsiteSlowResponseTime` 等仍是旧值；`Edit` 已加，写表错误也不要再被覆盖。
+- 慢响应报警消息格式：`响应时间超过设置的报警时间(%dms)，响应时间:%dms`，阈值直接写在消息里。
 
 ## 前端架构（2026-11-26 UI 改版后）
 - 样式唯一入口 `static/css/theme.css`（Bootstrap 先加载，再覆盖）；`page.css` 已不再引用。设计 token 用 CSS 变量，`html[data-accent]` 支持靛蓝/青绿/石墨，`html[data-density]` 支持舒适/紧凑，偏好存 localStorage。

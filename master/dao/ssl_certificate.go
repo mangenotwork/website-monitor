@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"website-monitor/master/entity"
 
@@ -23,7 +24,7 @@ func GetCertificateInfo(caseUrl string) (*entity.SSLCertificateInfo, bool) {
 	var cert *x509.Certificate
 	var err error
 
-	client := http.Client{}
+	client := http.Client{Timeout: 15 * time.Second}
 
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{

@@ -15,12 +15,14 @@ func NsLookUpLocal(host string) *entity.DNSInfo {
 
 	log.Info("NsLookUpLocal...")
 
-	host = strings.Replace(host, "https://", "", -1)
-	host = strings.Replace(host, "http://", "", -1)
+	host = NormalizeDomain(host)
 	dnsInfo := &entity.DNSInfo{
 		DnsServerIP:   "Local",
 		DnsServerName: "Local",
 		IsCDN:         false,
+	}
+	if host == "" {
+		return dnsInfo
 	}
 
 	start := time.Now().UnixNano()
@@ -48,6 +50,8 @@ func NsLookUpLocal(host string) *entity.DNSInfo {
 }
 
 func NsLookUpFromDNSServer(host, dnsServer string) *entity.DNSInfo {
+
+	host = NormalizeDomain(host)
 
 	r := &net.Resolver{
 		PreferGo:     true,
@@ -91,6 +95,8 @@ func NsLookUpFromDNSServer(host, dnsServer string) *entity.DNSInfo {
 func NsLookUp(host, dnsServer, name string) *entity.DNSInfo {
 
 	log.Info("dnsServer = ", dnsServer)
+	host = NormalizeDomain(host)
+
 	r := &net.Resolver{
 		PreferGo:     true,
 		StrictErrors: false,

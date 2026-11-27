@@ -3,13 +3,13 @@ package business
 import (
 	"bytes"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
 	udp "github.com/mangenotwork/udp_comm"
-	"strings"
-	"sync"
-	"time"
 )
 
 var AllWebsiteData sync.Map
@@ -67,9 +67,14 @@ func (item *WebsiteItem) PingActive(mLog *MonitorLog) (int64, bool) {
 
 	pingMs := ping.Milliseconds()
 	mLog.PingMs = pingMs
-	if pingMs >= 1000 {
+
+	limit := item.PingTime
+	if limit <= 0 {
+		limit = 1000
+	}
+	if pingMs >= limit {
 		mLog.LogType = LogTypeError
-		mLog.Msg = fmt.Sprintf("网络环境缓慢，超过1s(%d)请前往检查监测平台!", pingMs)
+		mLog.Msg = fmt.Sprintf("网络环境缓慢，超过%dms(%d)请前往检查监测平台!", limit, pingMs)
 		item.Put(item.mLogSerialize(mLog))
 		return pingMs, false
 	}
@@ -137,8 +142,7 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 		mLog.LogType = LogTypeAlert
 		errStr := err.Error()
 
-		if strings.Index(errStr, "timeout") != -1 ||
-			strings.Index(errStr, "Client.Timeout") != -1 {
+		if isTimeoutError(err) {
 			mLog.AlertType = AlertTypeTimeout
 			mLog.Msg = "请求超时 : " + errStr
 		} else {
@@ -165,7 +169,7 @@ func (item *WebsiteItem) MonitorHealthUri(mLog *MonitorLog) {
 	// 请求超时报警
 	if item.AlertRuleMs(healthMs) {
 		mLog.LogType = LogTypeAlert
-		mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms;", healthMs)
+		mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间(%dms)，响应时间:%dms;", item.WebsiteSlowResponseTime, healthMs)
 		mLog.AlertType = AlertTypeTimeout
 		item.Put(item.mLogSerialize(mLog))
 		return
@@ -196,8 +200,7 @@ func (item *WebsiteItem) MonitorRandomUri(mLog *MonitorLog) {
 			mLog.LogType = LogTypeAlert
 			errStr := err.Error()
 
-			if strings.Index(errStr, "timeout") != -1 ||
-				strings.Index(errStr, "Client.Timeout") != -1 {
+			if isTimeoutError(err) {
 				mLog.AlertType = AlertTypeTimeout
 				mLog.Msg = "请求超时 : " + errStr
 			} else {
@@ -222,7 +225,7 @@ func (item *WebsiteItem) MonitorRandomUri(mLog *MonitorLog) {
 
 		if item.AlertRuleMs(randomMs) {
 			mLog.LogType = LogTypeAlert
-			mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms", randomMs)
+			mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间(%dms)，响应时间:%dms", item.WebsiteSlowResponseTime, randomMs)
 			mLog.AlertType = AlertTypeTimeout
 			item.Put(item.mLogSerialize(mLog))
 			return
@@ -249,8 +252,7 @@ func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
 		mLog.LogType = LogTypeAlert
 		errStr := err.Error()
 
-		if strings.Index(errStr, "timeout") != -1 ||
-			strings.Index(errStr, "Client.Timeout") != -1 {
+		if isTimeoutError(err) {
 			mLog.AlertType = AlertTypeTimeout
 			mLog.Msg = "请求超时 : " + errStr
 		} else {
@@ -264,7 +266,7 @@ func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
 
 	mLog.UriCode = pointCode
 	mLog.UriMs = pointMs
-	
+
 	// 监测规则
 	if item.AlertRuleCode(pointCode) {
 		mLog.LogType = LogTypeAlert
@@ -276,7 +278,7 @@ func (item *WebsiteItem) MonitorPointUri(mLog *MonitorLog, pointUrl string) {
 
 	if item.AlertRuleMs(pointMs) {
 		mLog.LogType = LogTypeAlert
-		mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间，响应时间:%dms", pointMs)
+		mLog.Msg += fmt.Sprintf("响应时间超过设置的报警时间(%dms)，响应时间:%dms", item.WebsiteSlowResponseTime, pointMs)
 		mLog.AlertType = AlertTypeTimeout
 		item.Put(item.mLogSerialize(mLog))
 		return

@@ -203,10 +203,23 @@ func (w *websiteDao) Del(hostID string) error {
 }
 
 func (w *websiteDao) Edit(base *entity.Website, alarmRule *entity.WebsiteAlarmRule, scan *entity.WebsiteScanCheckUp) error {
-	err := w.addWebsite(base)
-	err = w.addWebsiteAlarmRule(alarmRule)
-	err = w.addWebsiteScanCheckUp(scan)
-	return err
+	if err := w.addWebsite(base); err != nil {
+		return err
+	}
+	if err := w.addWebsiteAlarmRule(alarmRule); err != nil {
+		return err
+	}
+	if err := w.addWebsiteScanCheckUp(scan); err != nil {
+		return err
+	}
+
+	// 配置变更后必须通知探针重新拉取。
+	// 否则探针内存里的 WebsiteSlowResponseTime 等仍是旧值，报警会继续用旧阈值。
+	go func() {
+		NoticeUpdateWebsite(base.HostID)
+	}()
+
+	return nil
 }
 
 func (w *websiteDao) SelectList() ([]*entity.Website, int, error) {
@@ -248,6 +261,10 @@ func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
 	info := &entity.WebsiteInfo{
 		Host: host,
 	}
+	domain := NormalizeDomain(host)
+	if domain == "" {
+		return info
+	}
 
 	tdkI := w.CollectTDK(host)
 	info.Title = tdkI.Title
@@ -256,7 +273,7 @@ func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
 	info.Icon = tdkI.Icon
 
 	// dns
-	info.DNS = NsLookUpLocal(host)
+	info.DNS = NsLookUpLocal(domain)
 
 	// IPAddr
 	info.IPAddr = make([]*entity.IPAddr, 0)
@@ -269,10 +286,10 @@ func (w *websiteDao) Collect(host string) *entity.WebsiteInfo {
 	info.SSLCertificateInfo, _ = GetCertificateInfo(host)
 
 	// Whois
-	info.Whois = Whois(host)
+	info.Whois = Whois(domain)
 
 	// ipc
-	info.IPC = GetICP(host)
+	info.IPC = GetICP(domain)
 
 	header := w.responseHeaders(host)
 	info.Server = header.Get("Server")

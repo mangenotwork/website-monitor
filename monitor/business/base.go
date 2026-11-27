@@ -2,17 +2,23 @@ package business
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"net"
+	"net/http"
+	"sync"
+	"time"
+
 	"github.com/mangenotwork/common/conf"
 	"github.com/mangenotwork/common/ginHelper"
 	"github.com/mangenotwork/common/log"
 	"github.com/mangenotwork/common/utils"
 	gt "github.com/mangenotwork/gathertool"
 	udp "github.com/mangenotwork/udp_comm"
-	"sync"
-	"time"
 )
 
 const (
@@ -332,20 +338,55 @@ func Struct2Buf(any2 any) []byte {
 	return buf.Bytes()
 }
 
-func request(url string) (int, int64, error) {
-	ctx, err := gt.Get(
-		url,
-		gt.Header{
-			"Accept-Encoding": "gzip, deflate, br",
-			"Referer":         url,
-		},
-		gt.IsRetry(false),
-	)
+const (
+	monitorRequestTimeout = 30 * time.Second
+	monitorMaxBodyBytes   = 8 << 20 // 最多读 8MB 响应体，避免大文件拖慢探针
+	monitorUserAgent      = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+)
 
+var monitorHTTPClient = &http.Client{Timeout: monitorRequestTimeout}
+
+// request 执行一次站点请求。
+// 不用 gathertool：它在读 Body 时会忽略 io.ErrUnexpectedEOF，
+// 服务端 Content-Length 未写满就断开时会被误判为正常（老 bug）。
+func request(url string) (int, int64, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Error(err)
 		return 0, 0, err
 	}
+	req.Header.Set("User-Agent", monitorUserAgent)
+	req.Header.Set("Referer", url)
 
-	return ctx.StateCode, ctx.Ms.Milliseconds(), nil
+	start := time.Now()
+	resp, err := monitorHTTPClient.Do(req)
+	cost := time.Since(start)
+	if err != nil {
+		log.Error(err)
+		return 0, 0, err
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	// 必须读到 EOF，否则 Content-Length 不匹配（unexpected EOF）发现不了。
+	// 耗时沿用原来的 TTFB 口径，避免改变慢响应报警的判定。
+	if _, readErr := io.Copy(io.Discard, io.LimitReader(resp.Body, monitorMaxBodyBytes)); readErr != nil {
+		log.Error("读取响应体失败: ", readErr)
+		return resp.StatusCode, cost.Milliseconds(), readErr
+	}
+
+	return resp.StatusCode, cost.Milliseconds(), nil
+}
+
+// isTimeoutError 统一判断超时，兼容 context deadline、net.Error 和 Client.Timeout
+func isTimeoutError(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return true
+	}
+	var netErr net.Error
+	return errors.As(err, &netErr) && netErr.Timeout()
 }

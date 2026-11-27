@@ -5,6 +5,7 @@ import (
 	"net"
 	"regexp"
 	"strings"
+	"time"
 
 	"website-monitor/master/entity"
 
@@ -15,37 +16,50 @@ import (
 var RootWhoisServers = "whois.iana.org:43"
 
 func Whois(host string) *entity.WhoisInfo {
-	hostList := strings.Split(host, ".")
-	host = strings.Join(hostList[len(hostList)-2:len(hostList)], ".")
 	info := &entity.WhoisInfo{}
+
+	host = rootDomain(NormalizeDomain(host))
+	if host == "" {
+		return info
+	}
+
 	rootRse := whois(RootWhoisServers, host)
 	info.Root = rootRse
 	referList := regFindTxt(`(?is:refer:(.*?)\n)`, rootRse)
 
 	if len(referList) > 0 {
-		refer := utils.StrDeleteSpace(referList[0])
-		rse := whois(refer+":43", host)
-		info.Rse = rse
+		refer := strings.TrimSpace(utils.StrDeleteSpace(referList[0]))
+		if refer != "" {
+			info.Rse = whois(refer+":43", host)
+		}
 	}
 
 	return info
 }
 
 func whois(server, host string) string {
-	conn, _ := net.Dial("tcp", server)
-	_, _ = conn.Write([]byte(host + " \r\n"))
-	buf := make([]byte, 1024*10)
-	n, err := conn.Read(buf)
-	if err != nil && err != io.EOF {
-		log.Error(err)
+	conn, err := net.DialTimeout("tcp", server, 8*time.Second)
+	if err != nil {
+		log.Error("whois 连接失败 ", server, " err: ", err)
+		return ""
 	}
-
-	rse := string(buf[:n])
 	defer func() {
 		_ = conn.Close()
 	}()
 
-	return rse
+	_ = conn.SetDeadline(time.Now().Add(15 * time.Second))
+
+	if _, err := conn.Write([]byte(host + "\r\n")); err != nil {
+		log.Error("whois 写入失败 ", server, " err: ", err)
+		return ""
+	}
+
+	buf, err := io.ReadAll(io.LimitReader(conn, 1<<20))
+	if err != nil && err != io.EOF {
+		log.Error("whois 读取失败 ", server, " err: ", err)
+	}
+
+	return string(buf)
 }
 
 func RegFindAll(regStr, rest string) [][]string {

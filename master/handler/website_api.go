@@ -275,6 +275,10 @@ func WebsiteInfo(c *ginHelper.GinCtx) {
 func WebsiteInfoRefresh(c *ginHelper.GinCtx) {
 	host := c.GetQuery("host")
 	hostId := c.GetQuery("id")
+	if len(host) < 1 || len(hostId) < 1 {
+		c.APIOutPutError(fmt.Errorf("参数为空"), "参数为空")
+		return
+	}
 
 	err := dao.NewWebsite().SaveCollectInfo(host, hostId)
 	if err != nil {
@@ -344,7 +348,7 @@ func AllWebsite(c *ginHelper.GinCtx) {
 
 type WebsiteDataOut struct {
 	*entity.Website
-	WebsiteSlowResponseTime int64
+	WebsiteSlowResponseTime int64 `json:"websiteSlowResponseTime"`
 }
 
 func GetWebsiteData(c *ginHelper.GinCtx) {
@@ -381,6 +385,12 @@ func WebsiteEdit(c *ginHelper.GinCtx) {
 		return
 	}
 
+	// 编辑配置不能重置创建时间：扫描周期按 Created 计算，重置会让扫描计划整体漂移
+	created := time.Now().Unix()
+	if old, sErr := dao.NewWebsite().Select(hostId); sErr == nil && old.Created > 0 {
+		created = old.Created
+	}
+
 	website := &entity.Website{
 		Host:         param.Host,
 		HostID:       hostId,
@@ -390,7 +400,7 @@ func WebsiteEdit(c *ginHelper.GinCtx) {
 		Ping:         param.Ping,
 		PingTime:     param.PingTime,
 		Notes:        param.Notes,
-		Created:      time.Now().Unix(),
+		Created:      created,
 	}
 
 	alarmRule := &entity.WebsiteAlarmRule{
